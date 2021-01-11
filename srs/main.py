@@ -1,2 +1,6 @@
+from piece import Knight
+
 if __name__ == '__main__':
-    print('hello world')
+    knight = Knight(2,4)
+    knight.test()
+    
