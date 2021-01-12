@@ -7,4 +7,4 @@ class Square:
         location = {'x': int, 'y':int}
 
     def piece(self, piece):
-        piece = 
+        pass
