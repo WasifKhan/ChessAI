@@ -1,21 +1,46 @@
-class Board:
-    def __init__(self, square):
-        self.square = square
+from piece import Square, Rook, Knight, Bishop, Queen, King, Pawn
 
-    def board(self, square):
-        alpha_lst = ['A','B','C','D','E','F','G','H']
-        num_lst    = [1,2,3,4,5,6,7,8]
-        #board_lbl = {alpha_lst[x]+str(num_lst[y]): square}
-        board_label = {'A1':square, 'A2':square, 'A3':square, 'A4':square, 'A5':square, 
-                    'A6':square, 'A7':square, 'A8':square, 'B1':square, 'B2':square, 
-                    'B3':square, 'B4':square, 'B5':square, 'B6':square, 'B7':square, 
-                    'B8':square, 'C1':square, 'C2':square, 'C3':square, 'C4':square, 
-                    'C5':square, 'C6':square, 'C7':square, 'C8':square, 'D1':square, 
-                    'D2':square, 'D3':square, 'D4':square, 'D5':square, 'D6':square, 
-                    'D7':square, 'D8':square, 'E1':square, 'E2':square, 'E3':square, 
-                    'E4':square, 'E5':square, 'E6':square, 'E7':square, 'E8':square, 
-                    'F1':square, 'F2':square, 'F3':square, 'F4':square, 'F5':square, 
-                    'F6':square, 'F7':square, 'F8':square, 'G1':square, 'G2':square, 
-                    'G3':square, 'G4':square, 'G5':square, 'G6':square, 'G7':square, 
-                    'G8':square, 'H1':square, 'H2':square, 'H3':square, 'H4':square, 
-                    'H5':square, 'H6':square, 'H7':square, 'H8':square}
+class Board:
+    def __init__(self):
+        self.board = [[Square(location=((x-1)*10 + y-1)) for x in range(8)] for y in range(8)]
+        self.board[0][0] = Rook(is_white=True, location=0)
+        self.board[0][1] = Knight(is_white=True, location=1)
+        self.board[0][2] = Bishop(is_white=True, location=2)
+        self.board[0][3] = Queen(is_white=True, location=3)
+        self.board[0][4] = King(is_white=True, location=4)
+        self.board[0][5] = Bishop(is_white=True, location=5)
+        self.board[0][6] = Knight(is_white=True, location=6)
+        self.board[0][7] = Rook(is_white=True, location=7)
+        self.board[1][0] = Pawn(is_white=True, location=10)
+        self.board[1][1] = Pawn(is_white=True, location=11)
+        self.board[1][2] = Pawn(is_white=True, location=12)
+        self.board[1][3] = Pawn(is_white=True, location=13)
+        self.board[1][4] = Pawn(is_white=True, location=14)
+        self.board[1][5] = Pawn(is_white=True, location=15)
+        self.board[1][6] = Pawn(is_white=True, location=16)
+        self.board[1][7] = Pawn(is_white=True, location=17)
+        self.board[6][0] = Pawn(is_white=False, location=60)
+        self.board[6][1] = Pawn(is_white=False, location=61)
+        self.board[6][2] = Pawn(is_white=False, location=62)
+        self.board[6][3] = Pawn(is_white=False, location=63)
+        self.board[6][4] = Pawn(is_white=False, location=64)
+        self.board[6][5] = Pawn(is_white=False, location=65)
+        self.board[6][6] = Pawn(is_white=False, location=66)
+        self.board[6][7] = Pawn(is_white=False, location=67)
+        self.board[7][0] = Rook(is_white=False, location=70)
+        self.board[7][1] = Knight(is_white=False, location=71)
+        self.board[7][2] = Bishop(is_white=False, location=72)
+        self.board[7][3] = Queen(is_white=False, location=73)
+        self.board[7][4] = King(is_white=False, location=74)
+        self.board[7][5] = Bishop(is_white=False, location=75)
+        self.board[7][6] = Knight(is_white=False, location=76)
+        self.board[7][7] = Rook(is_white=False, location=77)
+        
+
+
+    def __str__(self):
+        output = ''
+        for x in range(len(self.board)):
+            output += str(self.board[x])
+            output += '\n'
+        return output
