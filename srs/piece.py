@@ -1,7 +1,14 @@
-class Piece:
-    def __init__(self, is_white, location):
-        self.is_white = is_white
+class Square:
+    def __init__(self, location):
         self.location = location
+
+    def __str__(self):
+        return 'hello'
+
+class Piece(Square):
+    def __init__(self, is_white, location):
+        super().__init__(location)
+        self.is_white = is_white
 
 
 class Knight(Piece):
