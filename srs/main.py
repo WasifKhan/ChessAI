@@ -1,6 +1,7 @@
 from piece import Knight
+from board import Board
 
 if __name__ == '__main__':
-    knight = Knight(2,4)
-    knight.test()
+    board = Board()
+    print(board)
     
