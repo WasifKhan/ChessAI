@@ -9,15 +9,11 @@ class Board:
 
     def __str__(self):
         output = ''
-        print('got hereee')
-        for row in self.board:
-            for col in row:
-                print('got hereeeeeee')
+        for row in range(len(self.board) -1, -1, -1):
+            for col in self.board[row]:
                 output += f'[{col.display()}]'
             output += '\n'
-            print('got herefdsfsdfsd')
         return output
-
 
 def initialize_board():
         board = [[Square(location=((x-1)*10 + y-1)) for x in range(8)] for y in range(8)]
