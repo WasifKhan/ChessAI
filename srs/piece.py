@@ -84,7 +84,6 @@ class Pawn(Piece):
     def display(self):
         return 'P' if self.is_white else 'p'
 
-<<<<<<< HEAD
     def is_valid_move(self, board, destination):
         # TODO: Implement correct movement
         current_location = self.location
@@ -97,7 +96,5 @@ class Pawn(Piece):
             return False
         return True
 
-=======
->>>>>>> 4e61326db8e6d5f469d5ffb0daf9544db3fd355a
     def move(self, location):
         pass  
