@@ -11,6 +11,9 @@ class Piece(Square):
         super().__init__(location)
         self.is_white = is_white
 
+    def move(self, location):
+        self.location = location
+
 class Knight(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
@@ -21,9 +24,6 @@ class Knight(Piece):
     def is_valid_move(self, board, destination):
         return True
     
-    def move(self, location):
-        pass
-
 
 class King(Piece):
     def __init__(self, is_white, location):
@@ -35,8 +35,6 @@ class King(Piece):
     def is_valid_move(self, board, destination):
         return True
 
-    def move(self, location):
-        pass
     
 class Queen(Piece):
     def __init__(self, is_white, location):
@@ -48,8 +46,6 @@ class Queen(Piece):
     def is_valid_move(self, board, destination):
         return True
     
-    def move(self, location):
-        pass
 
 class Rook(Piece):
     def __init__(self, is_white, location):
@@ -61,8 +57,6 @@ class Rook(Piece):
     def is_valid_move(self, board, destination):
         return True
 
-    def move(self, location):
-        pass
 
 class Bishop(Piece):
     def __init__(self, is_white, location):
@@ -74,8 +68,6 @@ class Bishop(Piece):
     def is_valid_move(self, board, destination):
         return True
 
-    def move(self, location):
-        pass
 
 class Pawn(Piece):
     def __init__(self, is_white, location):
@@ -85,16 +77,43 @@ class Pawn(Piece):
         return 'P' if self.is_white else 'p'
 
     def is_valid_move(self, board, destination):
-        # TODO: Implement correct movement
-        current_location = self.location
-        if current_location[0] != destination[0]:
-            print(f'current_location: {current_location}')
-            return False
-        if abs(current_location[1] - destination[1]) > 1:
-            print(f'current_location[1]: {current_location[1]}')
-            print(f'destination[1]: {destination[1]}')
-            return False
-        return True
+        # Check for diagonal movement
+        if self.is_white:
+            if (self.location[1] + 1 == destination[1] and
+               (self.location[0] + 1 == destination[0] or
+                self.location[0] - 1 == destination[0])):
+                if board[destination].is_white == False:
+                    return True
+        else:
+            if (self.location[1] - 1 == destination[1] and
+               (self.location[0] + 1 == destination[0] or
+                self.location[0] - 1 == destination[0])):
+                if board[destination].is_white:
+                    return True
 
-    def move(self, location):
-        pass  
+        # Check for vertical movement
+        if self.is_white:
+            if (self.location[1] + 1 == destination[1] and
+                self.location[0] == destination[0]):
+                if board[destination].is_white == None:
+                    return True
+            elif (self.location[1] + 2 == destination[1] and 
+                  self.location[0] == destination[0] and 
+                  self.location[1] == 1):
+                if (board[destination].is_white == None and
+                    board[(destination[0], destination[1] - 1)].is_white == None):
+                    return True
+        else:
+            if (self.location[1] - 1 == destination[1] and
+                self.location[0] == destination[0]):
+                if board[destination].is_white == None:
+                    return True
+            elif (self.location[1] - 2 == destination[1] and 
+                  self.location[0] == destination[0] and 
+                  self.location[1] == 1):
+                if (board[destination].is_white == None and
+                    board[(destination[0], destination[1] + 1)].is_white == None):
+                    return True
+        return False
+
+ 
