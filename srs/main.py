@@ -1,27 +1,13 @@
-from board import Board
+from run_manual import run_manual
+from test_suite.test_pawn import test_pawn
 
 
 if __name__ == '__main__':
-    board = Board('testWhite', 'testBlack')
+    while (user_input := input('\n1 for tests, 2 for manual: ')) not in {'1', '2'}:
+        print('please enter a valid command')
+    
+    if user_input == '1':
+        test_pawn()
+    elif user_input == '2':
+        run_manual()
 
-    white_turn = True
-    while board.has_kings():
-        print(board)
-        # Command format = <Origin> <Destination>
-        # Origin = Destination = <Letter><Number>
-        if white_turn:
-            move = input('Enter white move: ')
-        else:
-            move = input('Enter black move: ')
-        origin = move.split(' ')[0]
-        origin_x, origin_y = ord(origin[0]) - 65, int(origin[1]) - 1
-        destination = move.split(' ')[1]
-        destination_x, destination_y= ord(destination[0]) - 65, int(destination[1]) - 1
-        piece = board.board[origin_x][origin_y]
-        if ((white_turn and piece.is_white) or (not(white_turn) and not(piece.is_white))) and piece.is_valid_move(board, (destination_x, destination_y)):
-            board.move(piece, (destination_x, destination_y))
-            white_turn = not(white_turn)
-        else:
-            print('invalid move, please enter a valid move')
-
-    print('game over')

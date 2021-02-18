@@ -111,7 +111,7 @@ class Pawn(Piece):
             # Check for vertical movement - 2 squares
             elif (self.location[1] - 2 == destination[1] and 
                   self.location[0] == destination[0] and 
-                  self.location[1] == 1):
+                  self.location[1] == 6):
                 if (board[destination].is_white == None and
                     board[(destination[0], destination[1] + 1)].is_white == None):
                     return True
