@@ -69,12 +69,11 @@ class Board:
 
     def has_kings(self):
         return True if self.white_king_location and self.black_king_location else False
-        
-        self.board = initialize_board()      
-        print('got here')
+
 
     def __getitem__(self, key):
         return self.board[key[0]][key[1]]
+
 
     def __str__(self):
         output = ''
