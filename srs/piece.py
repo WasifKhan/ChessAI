@@ -77,26 +77,19 @@ class Pawn(Piece):
         return 'P' if self.is_white else 'p'
 
     def is_valid_move(self, board, destination):
-        # Check for diagonal movement
         if self.is_white:
+            # Check for diagonal movement
             if (self.location[1] + 1 == destination[1] and
                (self.location[0] + 1 == destination[0] or
                 self.location[0] - 1 == destination[0])):
                 if board[destination].is_white == False:
                     return True
-        else:
-            if (self.location[1] - 1 == destination[1] and
-               (self.location[0] + 1 == destination[0] or
-                self.location[0] - 1 == destination[0])):
-                if board[destination].is_white:
-                    return True
-
-        # Check for vertical movement
-        if self.is_white:
+            # Check for vertical movement - 1 square
             if (self.location[1] + 1 == destination[1] and
                 self.location[0] == destination[0]):
                 if board[destination].is_white == None:
                     return True
+            # Check for vertical movement - 2 squares
             elif (self.location[1] + 2 == destination[1] and 
                   self.location[0] == destination[0] and 
                   self.location[1] == 1):
@@ -104,10 +97,18 @@ class Pawn(Piece):
                     board[(destination[0], destination[1] - 1)].is_white == None):
                     return True
         else:
+            # Check for diagonal movement
+            if (self.location[1] - 1 == destination[1] and
+               (self.location[0] + 1 == destination[0] or
+                self.location[0] - 1 == destination[0])):
+                if board[destination].is_white:
+                    return True
+            # Check for vertical movement - 1 square
             if (self.location[1] - 1 == destination[1] and
                 self.location[0] == destination[0]):
                 if board[destination].is_white == None:
                     return True
+            # Check for vertical movement - 2 squares
             elif (self.location[1] - 2 == destination[1] and 
                   self.location[0] == destination[0] and 
                   self.location[1] == 1):
