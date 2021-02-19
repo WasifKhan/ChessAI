@@ -4,7 +4,9 @@ class Board:
     def __init__(self, white_player, black_player):
         self.white = white_player
         self.black = black_player
+        self.history = []
         self.initialize_board()
+        
 
     def initialize_board(self):
         board = [[Square(location=((x-1)*10, y-1)) for x in range(8)] for y in range(8)]
@@ -60,6 +62,8 @@ class Board:
             else:
                 self.black_king_location = None
 
+        self.history.append((piece, piece.location, destination))
+
         # Update the board to move piece from previous location to destination
         previous_location = piece.location
         piece.location = destination
@@ -79,7 +83,8 @@ class Board:
         output = ''
         for column in range(len(self.board) -1, -1, -1):
             for row in range(len(self.board)):
-                output += f'[{self.board[row][column].display()}]'
+                output += f'[{str(self.board[row][column])}]'
             output += '\n'
         return output
+
 
