@@ -4,7 +4,8 @@ from board import Board
 moves = {'vertical_double':['A2 A4', 'A7 A5', 'A4 A5'],
          'vertical_single':['A2 A3', 'D7 D6', 'B2 B3', 'E7 E6'],
          'capture':['B2 B4', 'C7 C5', 'B4 C5'],
-         'passant':['C2 C4', 'H7 H6','C4 C5', 'D7 D5', 'C5 D6']
+         'en passant white':['C2 C4', 'H7 H6','C4 C5', 'D7 D5', 'C5 D6'],
+         'en passant black':['A2 A3', 'C7 C5', 'A3 A4', 'C5 C4', 'D2 D4', 'C4 D3']
 }
          
 
