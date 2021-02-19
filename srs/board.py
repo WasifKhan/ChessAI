@@ -69,6 +69,21 @@ class Board:
         piece.location = destination
         self.board[destination[0]][destination[1]] = piece 
         self.board[previous_location[0]][previous_location[1]] = Square(previous_location)
+        # Edge case for en passant pawn capture
+        if len(self.history) > 2:
+            previous_move = self.history[-2]                  
+            if (isinstance(previous_move[0], Pawn) and                        
+                previous_move[1][1] - previous_move[2][1] == 2 and
+                previous_move[2][0] == destination[0] and piece.location[1] == 5):
+                    self.board[destination[0]][destination[1] - 1] = Square((destination[0], destination[1] - 1))
+            elif (isinstance(previous_move[0], Pawn) and                        
+                previous_move[1][1] - previous_move[2][1] == -2 and
+                previous_move[2][0] == destination[0] and piece.location[1] == 2):
+                    self.board[destination[0]][destination[1] + 1] = Square((destination[0], destination[1] + 1))
+                    
+                    
+
+
 
 
     def has_kings(self):
