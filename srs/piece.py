@@ -66,7 +66,25 @@ class Bishop(Piece):
         return 'B' if self.is_white else 'b'
 
     def is_valid_move(self, board, destination):
-        return True
+        if self.is_white:
+            print('Got here')
+            x_direction = destination[0] - self.location[0]
+            y_direction = destination[1] - self.location[1]
+            print(x_direction)
+            print(y_direction)
+            if x_direction == y_direction:
+                # Check X + and Y + plane
+                if (x_direction > 0 and y_direction > 0):
+                    for i in range(1, x_direction):
+                        if not(isinstance(board[self.location[0] + i][self.location[1] + i], Square)):
+                            print('got here 2')                            
+                            return False
+                    if (isinstance(board[destination], Square)):
+                        print('got here1')
+                        return True
+                    if (isinstance(board[destination], self.is_white == False)):
+                        print('got here3')
+                        return True
 
 
 class Pawn(Piece):
