@@ -55,9 +55,77 @@ class Rook(Piece):
         return 'R' if self.is_white else 'r'
 
     def is_valid_move(self, board, destination):
-        return True
+        if self.is_white:
+            # Check for vertical + movement
+            if destination[1] > self.location[1]:
+                for i in range(1, destination[1]):
+                    if (self.location[1] + i == destination[1] and
+                        self.location[0] == destination[0]):
+                        if board[destination].is_white == None:
+                            return True
+            # Check for horizontal + movement
+            if destination[0] > self.location[0]:
+                for i in range(1, destination[0]):
+                    if (self.location[0] + i == destination[0] and
+                        self.location[1] == destination[1]):
+                        if board[destination].is_white == None:
+                            return True
+            # Check for vertical - movement
+            if destination[1] < self.location[1]:
+                for i in range(1, destination[1]):
+                    if (self.location[1] - i == destination[1] and
+                        self.location[0] == destination[0]):
+                        if board[destination].is_white == None:
+                            return True
+            # Check for horizontal - movement
+            if destination[0] > self.location[0]:
+                for i in range(1, destination[0]):
+                    if (self.location[0] - i == destination[0] and
+                        self.location[1] == destination[1]):
+                        if board[destination].is_white == None:
+                            return True
+            if not(isinstance(board[destination], Piece)):
+                return True
 
+            if board[destination].is_white == False:
+                return True
+        
+        # Black Rook
+        if not self.is_white:
+            # Check for vertical + movement
+            if destination[1] > self.location[1]:
+                for i in range(1, destination[1]):
+                    if (self.location[1] + i == destination[1] and
+                        self.location[0] == destination[0]):
+                        if board[destination].is_white == None:
+                            return True
+            # Check for horizontal + movement
+            if destination[0] > self.location[0]:
+                for i in range(1, destination[0]):
+                    if (self.location[0] + i == destination[0] and
+                        self.location[1] == destination[1]):
+                        if board[destination].is_white == None:
+                            return True
+            # Check for vertical - movement
+            if destination[1] < self.location[1]:
+                for i in range(1, destination[1]):
+                    if (self.location[1] - i == destination[1] and
+                        self.location[0] == destination[0]):
+                        if board[destination].is_white == None:
+                            return True
+            # Check for horizontal - movement
+            if destination[0] > self.location[0]:
+                for i in range(1, destination[0]):
+                    if (self.location[0] - i == destination[0] and
+                        self.location[1] == destination[1]):
+                        if board[destination].is_white == None:
+                            return True
+            if not(isinstance(board[destination], Piece)):
+                return True
 
+            if board[destination].is_white == False:
+                return True
+               
 class Bishop(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
@@ -140,15 +208,6 @@ class Bishop(Piece):
                 if board[destination].is_white:
                     return True
 
-                
-
-
-                                
-            
-
-
-
-
 class Pawn(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
@@ -212,8 +271,6 @@ class Pawn(Piece):
                 if (board[destination].is_white == None and
                     board[(destination[0], destination[1] + 1)].is_white == None):
                     return True
-            
-
             
         return False
 
