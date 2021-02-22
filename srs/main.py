@@ -10,4 +10,3 @@ if __name__ == '__main__':
         test_pawn()
     elif user_input == '2':
         run_manual()
-
