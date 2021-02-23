@@ -37,6 +37,5 @@ def state(request):
 def test_backend(state):
     board = state[0]
     moves = state[1]
-    for move in moves:
-        execute(board, *moves)
+    execute(board, *moves)
 
