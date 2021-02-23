@@ -104,7 +104,6 @@ class Bishop(Piece):
         elif not(self.is_white) and not(board[destination].is_white):
             return False
         return True
-   
 
 class Pawn(Piece):
     def __init__(self, is_white, location):

@@ -1,11 +1,12 @@
-
-from board import Board
+from .board import Board
 
 def run_manual():
     board = Board('testWhite', 'testBlack')
     white_turn = True
     while board.has_kings():
+        print('\n' + '=' * 30)
         print(board)
+        print('=' * 30 + '\n')
         # Command format = <Origin> <Destination>
         # Origin = Destination = <Letter><Number>
         if white_turn:
