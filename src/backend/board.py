@@ -1,4 +1,4 @@
-from piece import Square, Rook, Knight, Bishop, Queen, King, Pawn
+from .piece import Square, Rook, Knight, Bishop, Queen, King, Pawn
 
 class Board:
     def __init__(self, white_player, black_player):
@@ -91,7 +91,13 @@ class Board:
 
 
     def __getitem__(self, key):
-        return self.board[key[0]][key[1]]
+        if isinstance(key, tuple):
+            return self.board[key[0]][key[1]]
+        elif isinstance(key, int):
+            return self.board[key]
+
+    def __setitem__(self, key, val):
+        self.board[key] = val
 
 
     def __str__(self):
