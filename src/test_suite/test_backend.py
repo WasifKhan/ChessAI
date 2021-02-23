@@ -1,5 +1,6 @@
 import pytest
 from src.backend.board import Board
+from src.backend.piece import Piece
 from .tests import moves
 
 def execute(board, name, moves, result):
@@ -24,9 +25,12 @@ def execute(board, name, moves, result):
         assert invalid_move == result['status']
     elif 'state' in result:
         for piece in result['state']:
-            assert isinstance(board[piece.location], type(piece))
+            if not(isinstance(piece, Piece)):
+                assert not(isinstance(board[piece.location], Piece)), f'{name} failed'
+            else:
+                assert isinstance(board[piece.location], type(piece)), f'{name} failed'
 
-@pytest.fixture(params=[moves.keys()])
+@pytest.fixture(params=moves)
 def state(request):
     return Board('testWhite', 'testBlack'), request.param
 
@@ -34,4 +38,5 @@ def test_backend(state):
     board = state[0]
     moves = state[1]
     for move in moves:
-        execute(board, move, *(moves[move]))
+        execute(board, *moves)
+
