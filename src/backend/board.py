@@ -104,7 +104,7 @@ class Board:
         output = ''
         for column in range(len(self.board) -1, -1, -1):
             for row in range(len(self.board)):
-                output += f'[{str(self.board[row][column])}]'
+                output += f' {str(self.board[row][column])} '
             output += '\n'
         return output
 
