@@ -55,7 +55,29 @@ class Rook(Piece):
         return 'R' if self.is_white else 'r'
 
     def is_valid_move(self, board, destination):
+        x_direction = destination[0] - self.location[0]
+        y_direction = destination[1] - self.location[1]
+        x_plane = 1 if x_direction > 0 else -1
+        y_plane = 1 if y_direction > 0 else -1
+        
+        # Horizontal movement
+        if (x_direction != 0 and y_direction == 0):
+            for i in range(1, abs(x_direction)):
+                if not(board[self.location[0] + (i * x_plane), self.location[1]].is_white == None):
+                    return False
+        # Vertical movement
+        if (y_direction != 0 and x_direction == 0):
+            for i in range(1, abs(y_direction)):
+                if not(board[self.location[0], self.location[1] + (i * y_plane)].is_white == None):
+                    return False
+        if not(isinstance(board[destination], Piece)):
+            return True        
+        if self.is_white and board[destination].is_white:
+            return False
+        elif not(self.is_white) and not(board[destination].is_white):
+            return False
         return True
+
 
 
 class Bishop(Piece):
