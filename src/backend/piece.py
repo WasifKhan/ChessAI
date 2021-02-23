@@ -55,77 +55,31 @@ class Rook(Piece):
         return 'R' if self.is_white else 'r'
 
     def is_valid_move(self, board, destination):
-        if self.is_white:
-            # Check for vertical + movement
-            if destination[1] > self.location[1]:
-                for i in range(1, destination[1]):
-                    if (self.location[1] + i == destination[1] and
-                        self.location[0] == destination[0]):
-                        if board[destination].is_white == None:
-                            return True
-            # Check for horizontal + movement
-            if destination[0] > self.location[0]:
-                for i in range(1, destination[0]):
-                    if (self.location[0] + i == destination[0] and
-                        self.location[1] == destination[1]):
-                        if board[destination].is_white == None:
-                            return True
-            # Check for vertical - movement
-            if destination[1] < self.location[1]:
-                for i in range(1, destination[1]):
-                    if (self.location[1] - i == destination[1] and
-                        self.location[0] == destination[0]):
-                        if board[destination].is_white == None:
-                            return True
-            # Check for horizontal - movement
-            if destination[0] > self.location[0]:
-                for i in range(1, destination[0]):
-                    if (self.location[0] - i == destination[0] and
-                        self.location[1] == destination[1]):
-                        if board[destination].is_white == None:
-                            return True
-            if not(isinstance(board[destination], Piece)):
-                return True
-
-            if board[destination].is_white == False:
-                return True
+        x_direction = destination[0] - self.location[0]
+        y_direction = destination[1] - self.location[1]
+        x_plane = 1 if x_direction > 0 else -1
+        y_plane = 1 if y_direction > 0 else -1
         
-        # Black Rook
-        if not self.is_white:
-            # Check for vertical + movement
-            if destination[1] > self.location[1]:
-                for i in range(1, destination[1]):
-                    if (self.location[1] + i == destination[1] and
-                        self.location[0] == destination[0]):
-                        if board[destination].is_white == None:
-                            return True
-            # Check for horizontal + movement
-            if destination[0] > self.location[0]:
-                for i in range(1, destination[0]):
-                    if (self.location[0] + i == destination[0] and
-                        self.location[1] == destination[1]):
-                        if board[destination].is_white == None:
-                            return True
-            # Check for vertical - movement
-            if destination[1] < self.location[1]:
-                for i in range(1, destination[1]):
-                    if (self.location[1] - i == destination[1] and
-                        self.location[0] == destination[0]):
-                        if board[destination].is_white == None:
-                            return True
-            # Check for horizontal - movement
-            if destination[0] > self.location[0]:
-                for i in range(1, destination[0]):
-                    if (self.location[0] - i == destination[0] and
-                        self.location[1] == destination[1]):
-                        if board[destination].is_white == None:
-                            return True
-            if not(isinstance(board[destination], Piece)):
-                return True
+        # Horizontal movement
+        if (x_direction != 0 and y_direction == 0):
+            for i in range(1, abs(x_direction)):
+                if not(board[self.location[0] + (i * x_plane), self.location[1]].is_white == None):
+                    return False
+        # Vertical movement
+        if (y_direction != 0 and x_direction == 0):
+            for i in range(1, abs(y_direction)):
+                if not(board[self.location[0], self.location[1] + (i * y_plane)].is_white == None):
+                    return False
+        if not(isinstance(board[destination], Piece)):
+            return True        
+        if self.is_white and board[destination].is_white:
+            return False
+        elif not(self.is_white) and not(board[destination].is_white):
+            return False
+        return True
 
-            if board[destination].is_white == False:
-                return True
-               
+
+
 class Bishop(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
@@ -134,81 +88,6 @@ class Bishop(Piece):
         return 'B' if self.is_white else 'b'
 
     def is_valid_move(self, board, destination):
-<<<<<<< HEAD:src/backend/piece.py
-        if self.is_white:
-            
-                x_direction = destination[0] - self.location[0]
-                y_direction = destination[1] - self.location[1]
-                
-                if x_direction == y_direction:
-                    # Check X + and Y + plane
-                    if (x_direction > 0 and y_direction > 0):
-                        for i in range(1, x_direction):
-                            if board[destination[0] + i, destination[1] + i].is_white == None:
-                                return True
-
-                    if (0 > x_direction and 0 > y_direction):
-                        # Check X- and Y -
-                        for i in range(1, x_direction):
-                            if board[destination[0] - i, destination[1] - i].is_white == None:
-                                return True
-                
-                if x_direction == abs(y_direction):
-                    # Check X + and Y -
-                    if (x_direction > 0 and 0 > y_direction):
-                        for i in range(x_direction):
-                            if board[destination[0] + i, destination[1] - i].is_white == None:
-                                return True
-
-                if abs(x_direction) == y_direction:
-                    # Check X- and Y +
-                    if (0 > x_direction and y_direction > 0):
-                        for i in range(x_direction):
-                            if board[destination[0] - i, destination[1] + i].is_white == None:
-                                return True
-        
-                if not(isinstance(board[destination], Piece)):
-                    return True
-
-                if board[destination].is_white == False:
-                    return True
-
-        # Black Bishop
-        if self.is_white == False:
-                x_direction = destination[0] - self.location[0]
-                y_direction = destination[1] - self.location[1]
-
-                if x_direction == y_direction:
-                    # Check X + and Y + plane
-                    if (x_direction > 0 and y_direction > 0):
-                        for i in range(1, x_direction):
-                            if board[destination[0] + i, destination[1] + i].is_white == None:
-                                return True
-
-                    if (0 > x_direction and 0 > y_direction):
-                        # Check X- and Y -
-                        for i in range(1, x_direction):
-                            if board[destination[0] - i, destination[1] - i].is_white == None:
-                                return True
-                
-                if x_direction == abs(y_direction):
-                    # Check X + and Y -
-                    if (x_direction > 0 and 0 > y_direction):
-                        for i in range(x_direction):
-                            if board[destination[0] + i, destination[1] - i].is_white == None:
-                                return True
-
-                if abs(x_direction) == y_direction:
-                    # Check X- and Y +
-                    if (0 > x_direction and y_direction > 0):
-                        for i in range(x_direction):
-                            if board[destination[0] - i, destination[1] + i].is_white == None:
-                                return True
-                if not(isinstance(board[destination], Piece)):
-                        return True
-                if board[destination].is_white:
-                    return True
-=======
         x_direction = destination[0] - self.location[0]
         y_direction = destination[1] - self.location[1]
         x_plane = 1 if x_direction > 0 else -1
@@ -226,7 +105,6 @@ class Bishop(Piece):
             return False
         return True
    
->>>>>>> 4c5850006768581aa59b014661fa5eeb3f1c2b00:srs/piece.py
 
 class Pawn(Piece):
     def __init__(self, is_white, location):
@@ -291,6 +169,8 @@ class Pawn(Piece):
                 if (board[destination].is_white == None and
                     board[(destination[0], destination[1] + 1)].is_white == None):
                     return True
+            
+
             
         return False
 
