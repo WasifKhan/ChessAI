@@ -11,24 +11,18 @@ def execute(board, name, moves, result):
         origin_x, origin_y = ord(origin[0]) - 65, int(origin[1]) - 1
         destination = move.split(' ')[1]
         destination_x, destination_y= ord(destination[0]) - 65, int(destination[1]) - 1
-        invalid_move = False
         # Execute the move
         piece = board.board[origin_x][origin_y]
         if ((white_turn and piece.is_white) or (not(white_turn) and not(piece.is_white))) and piece.is_valid_move(board, (destination_x, destination_y)):
             board.move(piece, (destination_x, destination_y))
             white_turn = not(white_turn)
-        else:
-            invalid_move = True
     
     # Test for valid state or status
-    if 'status' in result:
-        assert invalid_move == result['status']
-    elif 'state' in result:
-        for piece in result['state']:
-            if not(isinstance(piece, Piece)):
-                assert not(isinstance(board[piece.location], Piece)), f'{name} failed'
-            else:
-                assert isinstance(board[piece.location], type(piece)), f'{name} failed'
+    for piece in result:
+        if not(isinstance(piece, Piece)):
+            assert not(isinstance(board[piece.location], Piece)), f'{name} failed'
+        else:
+            assert isinstance(board[piece.location], type(piece)), f'{name} failed'
 
 @pytest.fixture(params=moves)
 def state(request):
