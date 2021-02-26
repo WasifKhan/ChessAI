@@ -74,8 +74,6 @@ class Queen(Piece):
             return False
         return True
 
-    
-
 class Rook(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
@@ -95,10 +93,12 @@ class Rook(Piece):
                 if not(board[self.location[0] + (i * x_plane), self.location[1]].is_white == None):
                     return False
         # Vertical movement
-        if (y_direction != 0 and x_direction == 0):
+        elif (y_direction != 0 and x_direction == 0):
             for i in range(1, abs(y_direction)):
                 if not(board[self.location[0], self.location[1] + (i * y_plane)].is_white == None):
                     return False
+        else:
+            return False
         if not(isinstance(board[destination], Piece)):
             return True        
         if self.is_white and board[destination].is_white:
@@ -106,8 +106,6 @@ class Rook(Piece):
         elif not(self.is_white) and not(board[destination].is_white):
             return False
         return True
-
-
 
 class Bishop(Piece):
     def __init__(self, is_white, location):
