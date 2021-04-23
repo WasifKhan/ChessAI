@@ -8,15 +8,16 @@ Pieces =
 
 State Space:
 8x8 integers representing pieces on board
-ie. starting board = [
-[4, 3, 2, 6, 5, 2, 3, 4],
-[1, 1, 1, 1, 1, 1, 1, 1],
+ie. starting board = S_0 = [
+[K, R, B, Q, K, B, R, K],
+[P, P, P, P, P, P, P, P],
 [0, 0, 0, 0, 0, 0, 0, 0],
 [0, 0, 0, 0, 0, 0, 0, 0],
 [0, 0, 0, 0, 0, 0, 0, 0],
 [0, 0, 0, 0, 0, 0, 0, 0],
-[1, 1, 1, 1, 1, 1, 1, 1],
-[4, 3, 2, 6, 5, 2, 3, 4]
+[P, P, P, P, P, P, P, P],
+[K, R, B, Q, K, B, R, K],
 ]
+
 
 '''
