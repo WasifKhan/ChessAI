@@ -1,6 +1,16 @@
-from src.backend.piece import Queen, Square
+from src.backend.piece import Queen, Square, Pawn
 
 moves = [
+    # Invalid moves
+    ('Invalid move - white queen jump over pawn',
+        ['D1 D3'],
+        [Queen(is_white=True, location=(3,0))]),
+    ('Invalid move - black queen jump over pawn',
+        ['D2 D4','D7 D5','D1 D3', 'D8 D5', 'E7 E5'],
+        [Pawn(is_white=False, location=(3,4)),
+         Pawn(is_white=False, location=(4,4)),
+         Queen(is_white=True, location=(3,2)),
+         Queen(is_white=False, location=(3,7))]),
     # White queen movements
     ('White queen postive vertical movement',
         ['D2 D4','A7 A5','D1 D3'],
@@ -29,7 +39,6 @@ moves = [
     ('White queen captures white pawn (invalid move)',
         ['D1 D2'],
         [Queen(is_white=True, location=(3,0))]),
-        
     # Black queen movements
     ('Black queen negative vertical movement',
         ['A2 A4','D7 D5','D2 D4','D8 D6'],
