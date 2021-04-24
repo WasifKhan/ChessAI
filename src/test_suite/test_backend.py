@@ -16,7 +16,7 @@ def execute(board, name, moves, result):
         if ((white_turn and piece.is_white) or (not(white_turn) and not(piece.is_white))) and piece.is_valid_move(board, (destination_x, destination_y)):
             board.move(piece, (destination_x, destination_y))
             white_turn = not(white_turn)
-    
+
     # Test for valid state or status
     for piece in result:
         if not(isinstance(piece, Piece)):
