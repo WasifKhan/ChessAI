@@ -1,4 +1,4 @@
-from piece import Square, Rook, Knight, Bishop, Queen, King, Pawn
+from .piece import Square, Rook, Knight, Bishop, Queen, King, Pawn
 
 class Board:
     def __init__(self, white_player, black_player):
@@ -6,7 +6,24 @@ class Board:
         self.black = black_player
         self.history = []
         self.initialize_board()
-        
+
+    def __getitem__(self, key):
+        if isinstance(key, tuple):
+            return self.board[key[0]][key[1]]
+        elif isinstance(key, int):
+            return self.board[key]
+
+    def __setitem__(self, key, val):
+        self.board[key] = val
+
+    def __str__(self):
+        output = ''
+        for column in range(len(self.board) -1, -1, -1):
+            for row in range(len(self.board)):
+                output += f' {str(self.board[row][column])} '
+            output += '\n'
+        return output[0:-1]
+
 
     def initialize_board(self):
         board = [[Square(location=((x-1)*10, y-1)) for x in range(8)] for y in range(8)]
@@ -46,8 +63,10 @@ class Board:
         board[7][7] = Rook(is_white=False, location=(7,7))
         self.board = board
 
+
     def is_valid_move(self, piece, destination):
         return piece.is_valid_move(self.board, destination)
+
 
     def move(self, piece, destination):
         # Edge-case King check
@@ -80,26 +99,9 @@ class Board:
                 previous_move[1][1] - previous_move[2][1] == -2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
                     self.board[destination[0]][destination[1] + 1] = Square((destination[0], destination[1] + 1))
-                    
-                    
-
-
-
+                   
 
     def has_kings(self):
         return True if self.white_king_location and self.black_king_location else False
-
-
-    def __getitem__(self, key):
-        return self.board[key[0]][key[1]]
-
-
-    def __str__(self):
-        output = ''
-        for column in range(len(self.board) -1, -1, -1):
-            for row in range(len(self.board)):
-                output += f'[{str(self.board[row][column])}]'
-            output += '\n'
-        return output
 
 
