@@ -22,6 +22,19 @@ class Knight(Piece):
         return 'K' if self.is_white else 'k'
         
     def is_valid_move(self, board, destination):
+        vertical_move = abs(destination[0] - self.location[0])
+        horizontal_move = abs(destination[1] - self.location[1])
+
+        if not(vertical_move == 1 and horizontal_move == 2) and not(vertical_move == 2 and horizontal_move == 1):
+            print(vertical_move)
+            print(horizontal_move)
+            return False
+        elif not(isinstance(board[destination], Piece)):
+            return True        
+        elif self.is_white and board[destination].is_white:
+            return False
+        elif not(self.is_white) and not(board[destination].is_white):
+            return False
         return True
     
 
@@ -68,7 +81,7 @@ class Queen(Piece):
                     return False
         if not(isinstance(board[destination], Piece)):
             return True        
-        if self.is_white and board[destination].is_white:
+        elif self.is_white and board[destination].is_white:
             return False
         elif not(self.is_white) and not(board[destination].is_white):
             return False
@@ -101,7 +114,7 @@ class Rook(Piece):
             return False
         if not(isinstance(board[destination], Piece)):
             return True        
-        if self.is_white and board[destination].is_white:
+        elif self.is_white and board[destination].is_white:
             return False
         elif not(self.is_white) and not(board[destination].is_white):
             return False
@@ -126,7 +139,7 @@ class Bishop(Piece):
                 return False
         if not(isinstance(board[destination], Piece)):
             return True        
-        if self.is_white and board[destination].is_white:
+        elif self.is_white and board[destination].is_white:
             return False
         elif not(self.is_white) and not(board[destination].is_white):
             return False
