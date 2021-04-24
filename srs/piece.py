@@ -98,8 +98,8 @@ class Bishop(Piece):
                             if board[destination[0] - i, destination[1] + i].is_white == None:
                                 return True
         
-                if not(isinstance(board[destination], Piece)):
-                    return True
+                if board[destination].is_white:
+                    return False
 
                 if board[destination].is_white == False:
                     return True
