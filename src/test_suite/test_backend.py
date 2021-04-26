@@ -3,7 +3,8 @@ from src.backend.board import Board
 from src.backend.piece import Piece
 from .tests import moves
 
-def execute(board, name, moves, result):
+def execute(name, moves, result):
+    board = Board()
     white_turn = True
     for move in moves:
         # Parse the move
@@ -26,10 +27,8 @@ def execute(board, name, moves, result):
 
 @pytest.fixture(params=moves)
 def state(request):
-    return Board('testWhite', 'testBlack'), request.param
+    return request.param
 
 def test_backend(state):
-    board = state[0]
-    moves = state[1]
-    execute(board, *moves)
+    execute(*state)
 
