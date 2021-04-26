@@ -6,7 +6,22 @@ class Board:
         self.black = black_player
         self.history = []
         self.initialize_board()
-
+        self.pieces = {'White':
+                        {'King': [],
+                         'Queen': [],
+                         'Rook': [],
+                         'Knight': [],
+                         'Bishop': [],
+                         'Pawn': []
+                         },
+                       'Black':
+                        {'King': [],
+                         'Queen': [],
+                         'Rook': [],
+                         'Knight': [],
+                         'Bishop': [],
+                         'Pawn': []
+                         }}
     def __getitem__(self, key):
         if isinstance(key, tuple):
             return self.board[key[0]][key[1]]
@@ -28,6 +43,7 @@ class Board:
     def initialize_board(self):
         board = [[Square(location=((x-1)*10, y-1)) for x in range(8)] for y in range(8)]
         board[0][0] = Rook(is_white=True, location=(0,0))
+        self.pieces['White']['Rook'].append((0,0))
         board[1][0] = Knight(is_white=True, location=(1,0))
         board[2][0] = Bishop(is_white=True, location=(2,0))
         board[3][0] = Queen(is_white=True, location=(3,0))
@@ -86,20 +102,19 @@ class Board:
         # Update the board to move piece from previous location to destination
         previous_location = piece.location
         piece.location = destination
-        self.board[destination[0]][destination[1]] = piece 
+        self.board[destination[0]][destination[1]] = piece
         self.board[previous_location[0]][previous_location[1]] = Square(previous_location)
         # Edge case for en passant pawn capture
         if len(self.history) > 2:
-            previous_move = self.history[-2]                  
-            if (isinstance(previous_move[0], Pawn) and                        
+            previous_move = self.history[-2]
+            if (isinstance(previous_move[0], Pawn) and
                 previous_move[1][1] - previous_move[2][1] == 2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 5):
                     self.board[destination[0]][destination[1] - 1] = Square((destination[0], destination[1] - 1))
-            elif (isinstance(previous_move[0], Pawn) and                        
+            elif (isinstance(previous_move[0], Pawn) and
                 previous_move[1][1] - previous_move[2][1] == -2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
                     self.board[destination[0]][destination[1] + 1] = Square((destination[0], destination[1] + 1))
-                   
 
     def has_kings(self):
         return True if self.white_king_location and self.black_king_location else False
