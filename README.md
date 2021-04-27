@@ -2,7 +2,7 @@
 
 Repository containing Chess Engine and ML Model
 
-Todo:
+## TODO
 Wasif:
 - Split testing into unit/integration
 - Get unit testing frameworks together
