@@ -3,7 +3,7 @@
 Repository containing Chess Engine and ML Model
 
 ## TODO
-**Wasif:**
+### **Wasif**
 - Split testing into unit/integration
 - Get unit testing frameworks together
 - Map datapoints to our coordinates
@@ -19,7 +19,7 @@ Repository containing Chess Engine and ML Model
 - Try other networks
 - Tweak qlearning rewards
 
-**Ali:**
+### **Ali**
 - Finish all possible moves
 - Implement king movement
 - Unit test everything
@@ -32,5 +32,8 @@ Repository containing Chess Engine and ML Model
 #### **Frontend done**
 - Optimize backend
 - User-friendly Frontend
+
+### **Zuraze**
+- Lose to AI
 
 ### Project Complete
