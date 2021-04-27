@@ -50,11 +50,11 @@ class DataConverter:
                 for it in range (1, len(game)):
                     move = game[it].split('{')
                     if len(move) > 1:
-                        white_move = re.split('\W', move[0][0:-1])[0]
-                        black_move = re.split('\W', move[-2].split()[-1])[0]
+                        white_move = re.split('[\?!#\+=]', move[0][0:-1])[0]
+                        black_move = re.split('[\?!#\+=]', move[-2].split()[-1])[0]
                     else:
-                        white_move = re.split('\W', move[0].split()[0])[0]
-                        black_move = re.split('\W', move[0].split()[1])[0]
+                        white_move = re.split('[\?!#\+=]', move[0].split()[0])[0]
+                        black_move = re.split('[\?!#\+=]', move[0].split()[1])[0]
                     if it + 1 == len(game) and white_move == black_move:
                         black_move = 'None'
                     datapoint += f'({white_move}, {black_move}), '
@@ -69,12 +69,10 @@ class DataConverter:
         with open(self.destination, 'w') as fp:
             for datapoint in self.data:
                 fp.write(datapoint)
-
-
 '''
-converter = DataConverter(LOCATION, DATASET_LOCATION)
-converter.raw_data_to_dataset()
-
 data_extractor = ExtractData(LOCATION, FILES)
 data_extractor.extract_data()
+
+converter = DataConverter(LOCATION, DATASET_LOCATION)
+converter.raw_data_to_dataset()
 '''
