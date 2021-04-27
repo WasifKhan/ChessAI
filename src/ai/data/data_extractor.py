@@ -57,7 +57,7 @@ class DataConverter:
                         black_move = re.split('[\?!#\+=]', move[0].split()[1])[0]
                     if it + 1 == len(game) and white_move == black_move:
                         black_move = 'None'
-                    datapoint += f'({white_move}, {black_move}), '
+                    datapoint += f"('{white_move}', '{black_move}'), "
                 datapoint = datapoint[0:-2] + ']\n'
                 self.data.append(datapoint)
 
@@ -72,7 +72,6 @@ class DataConverter:
 '''
 data_extractor = ExtractData(LOCATION, FILES)
 data_extractor.extract_data()
-
+'''
 converter = DataConverter(LOCATION, DATASET_LOCATION)
 converter.raw_data_to_dataset()
-'''
