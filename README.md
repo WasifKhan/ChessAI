@@ -3,7 +3,7 @@
 Repository containing Chess Engine and ML Model
 
 ## TODO
-Wasif:
+**Wasif:**
 - Split testing into unit/integration
 - Get unit testing frameworks together
 - Map datapoints to our coordinates
@@ -19,7 +19,7 @@ Wasif:
 - Try other networks
 - Tweak qlearning rewards
 
-Ali:
+**Ali:**
 - Finish all possible moves
 - Implement king movement
 - Unit test everything
