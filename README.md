@@ -30,5 +30,7 @@ Ali:
 - Write Controller to interact Model and View
 - Write Buttons for View
 ### **Frontend done**
+- Optimize backend
+- User-friendly Frontend
 
 ## Project Complete
