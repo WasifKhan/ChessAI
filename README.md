@@ -10,11 +10,11 @@ Repository containing Chess Engine and ML Model
 - Set up various models(fix datapoint mapping)
 - Write AI class (to play with humans/vs other AI=interat with game class)
 - Move w.r.t. various reward functions
-### **Dumb AI done**
+#### **Dumb AI done**
 - Set up qlearning (links game to models>)
 - Train/Test
 - Link intelligent weights to AI class
-### **Smart AI done**
+#### **Smart AI done**
 - Write monitoring scripts
 - Try other networks
 - Tweak qlearning rewards
@@ -25,12 +25,12 @@ Repository containing Chess Engine and ML Model
 - Unit test everything
 - Thorough Integration Testing
 - Finish Game class
-### **Done backend**
+#### **Done backend**
 - Start frontend
 - Write Controller to interact Model and View
 - Write Buttons for View
-### **Frontend done**
+#### **Frontend done**
 - Optimize backend
 - User-friendly Frontend
 
-## Project Complete
+### Project Complete
