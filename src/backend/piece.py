@@ -8,6 +8,9 @@ class Square:
     def __str__(self):
         return '.'
 
+    def __hash__(self):
+        return hash(str(self) + str(self.ID))
+
 class Piece(Square, metaclass=abc.ABCMeta):
     def __init__(self, is_white, location):
         super().__init__(location)
@@ -21,8 +24,11 @@ class Piece(Square, metaclass=abc.ABCMeta):
         raise NotImplemented
 
 class Knight(Piece):
+    ID = 1
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
+        self.ID = Knight.ID
+        Knight.ID += 1
 
     def __str__(self):
         return 'K' if self.is_white else 'k'
@@ -47,8 +53,11 @@ class Knight(Piece):
         return []
 
 class King(Piece):
+    ID = 1
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
+        self.ID = King.ID
+        King.ID += 1
 
     def __str__(self):
         return '$' if self.is_white else '-'
@@ -60,8 +69,11 @@ class King(Piece):
         raise NotImplemented
 
 class Queen(Piece):
+    ID = 1
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
+        self.ID = Queen.ID
+        Queen.ID += 1
 
     def __str__(self):
         return 'Q' if self.is_white else 'q'
@@ -101,8 +113,11 @@ class Queen(Piece):
         raise NotImplemented
 
 class Rook(Piece):
+    ID = 1
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
+        self.ID = Rook.ID
+        Rook.ID += 1
 
     def __str__(self):
         return 'R' if self.is_white else 'r'
@@ -137,8 +152,11 @@ class Rook(Piece):
         raise NotImplemented
 
 class Bishop(Piece):
+    ID = 1
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
+        self.ID = Bishop.ID
+        Bishop.ID += 1
 
     def __str__(self):
         return 'B' if self.is_white else 'b'
@@ -166,8 +184,11 @@ class Bishop(Piece):
 
 
 class Pawn(Piece):
+    ID = 1
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
+        self.ID = Pawn.ID
+        Pawn.ID += 1
 
     def __str__(self):
         return 'P' if self.is_white else 'p'
