@@ -4,7 +4,6 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- Split testing into unit/integration
 - Get unit testing frameworks together
 - Map datapoints to our coordinates
 - Set up various models(fix datapoint mapping)
