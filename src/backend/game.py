@@ -2,7 +2,7 @@
 Class to simulate a game
 '''
 
-from board import Board
+from .board import Board
 
 class Game:
     def __init__(self, p1_name='Player 1', p2_name='Player 2'):

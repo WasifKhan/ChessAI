@@ -37,7 +37,7 @@ class Rook(Piece):
             return False
         return True
 
-    def moves(self):
+    def moves(self, board):
         result = set()
         i = 0
         while self.location[0]+i <= 7:

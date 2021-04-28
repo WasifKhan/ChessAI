@@ -3,9 +3,12 @@ from abc import abstractmethod
 
 
 class Square:
+    ID = 1
     def __init__(self, location):
         self.location = location
+        self.ID = Square.ID
         self.is_white = None
+        Square.ID += 1
 
     def __str__(self):
         return '.'
@@ -24,6 +27,4 @@ class Piece(Square, metaclass=ABCMeta):
 
     @abstractmethod
     def moves(self):
-        raise NotImplemented
-
-
+        raise NotImplementedError

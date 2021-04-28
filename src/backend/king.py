@@ -15,5 +15,5 @@ class King(Piece):
         return True
 
     def moves(self):
-        raise NotImplemented
+        raise NotImplementedError
 
