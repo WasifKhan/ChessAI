@@ -57,8 +57,10 @@ class TestPawn:
 
     def test_moves(self, white_pawn, black_pawn):
         board = Board()
+        print(white_pawn.moves(board))
+        print(black_pawn.moves(board))
         assert white_pawn.moves(board) == {2, 3}
         assert black_pawn.moves(board) == {65, 64}
         board[5,5] = white_pawn
         white_pawn.location=(5,5)
-        assert white_pawn.moves(board) == {54, 56}
+        assert white_pawn.moves(board) == {46, 66}
