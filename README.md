@@ -6,6 +6,7 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - ~~Split testing into unit and integration tests~~
 - ~~Get unit testing frameworks together~~
+- change piece.is_valid_move to board.valid_move(piece, location)
 - Map datapoints to our coordinates
 - Set up various models(fix datapoint mapping)
 - Write AI class (to play with humans/vs other AI=interat with game class)
