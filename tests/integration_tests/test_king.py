@@ -12,6 +12,8 @@ class TestKing(IntegrationTest):
     def state(self, request):
         return request.param
 
+    '''
     def test_moves(self, state):
         self.execute(*state)
+    '''
 

@@ -1,4 +1,7 @@
-from src.backend.piece import Queen, Square, Pawn
+from src.backend.piece import Square
+from src.backend.pawn import Pawn
+from src.backend.queen import Queen
+
 
 moves = [
     # Invalid moves
@@ -68,3 +71,4 @@ moves = [
         ['D2 D4','D8 D5'],
         [Queen(is_white=False, location=(3,7))]),
 ]
+

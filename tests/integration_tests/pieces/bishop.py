@@ -1,4 +1,6 @@
-from src.backend.piece import Bishop, Square
+from src.backend.piece import Square
+from src.backend.bishop import Bishop
+
 
 moves = [
     ('bishop upper right diagonal white movement',
@@ -11,7 +13,6 @@ moves = [
     ('Bishop black capture',
         ['E2 E4', 'E7 E6', 'F1 A6', 'F8 A3', 'A6 B7', 'A3 B2'],
         [Bishop(is_white=False, location=(1,1)),
-         Square(location=(5,7))])
-
-       
+         Square(location=(5,7))]),
 ]
+

@@ -1,4 +1,6 @@
-from src.backend.piece import Rook, Square
+from src.backend.piece import Square
+from src.backend.rook import Rook
+
 
 moves = [
     # White rook movements
@@ -26,7 +28,6 @@ moves = [
     ('White rook captures white pawn (invalid move)',
         ['A1 A2'],
         [Rook(is_white=True, location=(0,0))]),
-    
     # Black rook movements
     ('Black rook negative vertical movement',
         ['A2 A4','A7 A5','A1 A3', 'A8 A6'],
@@ -53,5 +54,5 @@ moves = [
     ('Black rook captures black pawn (invalid move)',
         ['A2 A4','H8 H7'],
         [Rook(is_white=False, location=(7,7))]),
-     
 ]
+

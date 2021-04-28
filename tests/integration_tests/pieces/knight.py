@@ -1,4 +1,6 @@
-from src.backend.piece import Knight, Square
+from src.backend.piece import Square
+from src.backend.knight import Knight
+
 
 moves = [
     ('White Knight opener', 
@@ -14,6 +16,6 @@ moves = [
         [Knight(is_white=True, location=(1,0))]),
     ('White Knight capture',
         ['A2 A3', 'B8 C6', 'G1 F3', 'C6 D4', 'F3 D4'],
-        [Knight(is_white=True, location=(3,3))])
-        
-        ]
+        [Knight(is_white=True, location=(3,3))]),
+]
+

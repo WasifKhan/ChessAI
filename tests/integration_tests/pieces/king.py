@@ -1,4 +1,7 @@
-from src.backend.piece import King, Square, Pawn
+from src.backend.piece import Square
+from src.backend.pawn import Pawn
+from src.backend.king import King
+
 
 moves = [
     ('white king invalid move', 
@@ -10,3 +13,4 @@ moves = [
         [Pawn(is_white=True, location=(3,4)),
          King(is_white=True, location=(1,4))]),
 ]
+

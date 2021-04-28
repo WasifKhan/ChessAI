@@ -1,4 +1,6 @@
-from src.backend.piece import Pawn, Square
+from src.backend.piece import Square
+from src.backend.pawn import Pawn
+
 
 moves = [
     ('black/white pawn move two',
@@ -18,3 +20,4 @@ moves = [
         [Pawn(is_white=True, location=(1,1)),
          Square(location=(1,4))]),
 ]
+
