@@ -42,7 +42,7 @@ class Board:
 
 
     def initialize_board(self):
-        board = [[Square(location=((x-1)*10, y-1)) for x in range(8)] for y in range(8)]
+        board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
         white_rook_1 = Rook(is_white=True, location=(0,0))
         white_rook_2 = Rook(is_white=True, location=(7,0))
         white_knight_1 = Knight(is_white=True, location=(1,0))
@@ -157,7 +157,7 @@ class Board:
         previous_location = piece.location
         piece.location = destination
         if (isinstance(captured_piece :=
-            self.board[destination[0]][destination[1]], Piece)):
+            self[destination], Piece)):
             self.pieces.remove(captured_piece)
         self[destination] = piece
         self[previous_location] = Square(previous_location)
@@ -167,7 +167,7 @@ class Board:
             if (isinstance(previous_move[0], Pawn) and
                 previous_move[1][1] - previous_move[2][1] == 2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 5):
-                    self[(destination[0], destination[1] - 1)] = Square((destination[0], destination[1] - 1))
+                    self[destination[0], destination[1] - 1] = Square((destination[0], destination[1] - 1))
             elif (isinstance(previous_move[0], Pawn) and
                 previous_move[1][1] - previous_move[2][1] == -2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
