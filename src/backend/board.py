@@ -1,4 +1,16 @@
-from .piece import Square, Piece, Rook, Knight, Bishop, Queen, King, Pawn
+from .piece import Square, Piece
+from .rook import Rook
+from .knight import Knight
+from .bishop import Bishop
+from .queen import Queen
+from .king import King
+from .pawn import Pawn
+from .rook import Rook
+from .knight import Knight
+from .bishop import Bishop
+from .queen import Queen
+from .king import King
+from .pawn import Pawn
 
 class Board:
     def __init__(self, white_player='Player 1', black_player='Player 2'):
