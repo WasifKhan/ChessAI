@@ -77,3 +77,4 @@ class Rook(Piece):
                 break
         return result
 
+

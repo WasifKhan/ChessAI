@@ -1,6 +1,6 @@
-from src.backend.piece import Square
-from src.backend.pawn import Pawn
-from src.backend.king import King
+from src.backend.pieces.piece import Square
+from src.backend.pieces.pawn import Pawn
+from src.backend.pieces.king import King
 
 
 moves = [

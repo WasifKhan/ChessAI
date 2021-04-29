@@ -1,5 +1,5 @@
-from src.backend.piece import Square
-from src.backend.bishop import Bishop
+from src.backend.pieces.piece import Square
+from src.backend.pieces.bishop import Bishop
 
 
 moves = [

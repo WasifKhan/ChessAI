@@ -2,7 +2,7 @@
 Unit test for King
 '''
 
-from src.backend.king import King
+from src.backend.pieces.king import King
 
 
 class TestKing:
