@@ -1,5 +1,5 @@
-from src.backend.piece import Square
-from src.backend.rook import Rook
+from src.backend.pieces.piece import Square
+from src.backend.pieces.rook import Rook
 
 
 moves = [

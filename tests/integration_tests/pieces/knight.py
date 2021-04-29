@@ -1,5 +1,5 @@
-from src.backend.piece import Square
-from src.backend.knight import Knight
+from src.backend.pieces.piece import Square
+from src.backend.pieces.knight import Knight
 
 
 moves = [

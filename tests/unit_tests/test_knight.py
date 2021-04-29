@@ -2,7 +2,7 @@
 Unit test for Knight
 '''
 
-from src.backend.knight import Knight
+from src.backend.pieces.knight import Knight
 
 
 class TestKnight:

@@ -18,7 +18,7 @@ result = [Bishop(is_white=True, location=(4,2)),
 '''
 
 from src.backend.board import Board
-from src.backend.piece import Piece
+from src.backend.pieces.piece import Piece
 
 
 class IntegrationTest:

@@ -2,7 +2,7 @@
 Unit test for Queen
 '''
 
-from src.backend.queen import Queen
+from src.backend.pieces.queen import Queen
 
 
 class TestQueen:

@@ -2,7 +2,7 @@
 Unit test for Rook
 '''
 
-from src.backend.rook import Rook
+from src.backend.pieces.rook import Rook
 
 
 class TestRook:
