@@ -3,7 +3,7 @@ Unit test for Pawn
 '''
 
 from pytest import fixture
-from src.backend.pawn import Pawn
+from src.backend.pieces.pawn import Pawn
 from src.backend.board import Board
 
 
