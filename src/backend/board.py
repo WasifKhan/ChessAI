@@ -5,12 +5,6 @@ from .pieces.bishop import Bishop
 from .pieces.queen import Queen
 from .pieces.king import King
 from .pieces.pawn import Pawn
-from .pieces.rook import Rook
-from .pieces.knight import Knight
-from .pieces.bishop import Bishop
-from .pieces.queen import Queen
-from .pieces.king import King
-from .pieces.pawn import Pawn
 
 class Board:
     def __init__(self, white_player='Player 1', black_player='Player 2'):
@@ -38,7 +32,7 @@ class Board:
             for row in range(len(self.board)):
                 output += f' {str(self.board[row][column])} '
             output += '\n'
-        return output[0:-1]
+        return output
 
 
     def initialize_board(self):
