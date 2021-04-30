@@ -18,7 +18,9 @@ class Board:
         if isinstance(key, tuple):
             return self.board[key[0]][key[1]]
         elif isinstance(key, int):
-            return self.board[key]
+            return self.board[key//10][key%10]
+        else:
+            raise IndexError
 
     def __setitem__(self, key, val):
         if isinstance(key, tuple):
@@ -32,7 +34,7 @@ class Board:
             for row in range(len(self.board)):
                 output += f' {str(self.board[row][column])} '
             output += '\n'
-        return output
+        return output[0:-1]
 
 
     def initialize_board(self):

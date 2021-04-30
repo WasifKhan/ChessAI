@@ -18,10 +18,14 @@ class Window(tk.Frame):
 
 
 class View:
-    def print_piece(self):
-        print('test')
+    def action(self, piece):
+        self.interface.add_action(self.squares[piece])
+        print(self.interface)
 
-    def __init__(self):
+    def __init__(self, interface):
+        self.interface = interface
+        self.squares = {}
+
         window = tk.Tk()
         app = Window(window)
         window.wm_title('Beth Harmon')
@@ -35,7 +39,9 @@ class View:
                             relief=tk.RAISED,
                             borderwidth=4)
                 frame.grid(row=7-row, column=column, padx=5, pady=5)
-                piece = tk.Button(master=frame, text=f'({row}, {column})',
-                        command=self.print_piece)
+                piece = tk.Button(master=frame, text=f'({row}, {column})')
+                piece['command'] = lambda r=piece: self.action(r)
                 piece.pack(padx=5, pady=5)
+                self.squares[piece] = column * 10 + row
+        print(interface)
         window.mainloop()
