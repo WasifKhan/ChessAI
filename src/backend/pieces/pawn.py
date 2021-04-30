@@ -93,7 +93,7 @@ class Pawn(Piece):
         If youre on 3/4  prev move from 1/6 from ene pawn
         NEED TO IMPLEMENT EN PASSANT MOVEMENT
         '''
-        if self.history:
+        if board.history:
             if (self.location[1] == 3) and (isinstance(board[self.location[0]-1, self.location[1]]), Pawn) and \
                 board[self.location[0]-1, self.location[1]].is_white is not self.is_white:
                     previous_move = board.history[-1]
