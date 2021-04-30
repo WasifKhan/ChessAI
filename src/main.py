@@ -1,5 +1,6 @@
+from interface import Interface
+from frontend.view import View
+from backend.game import Game
 
 if __name__ == '__main__':
-    from interface import Interface
-
-    Interface()
+    screen = View(Interface(Game()))
