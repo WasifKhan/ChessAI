@@ -6,7 +6,10 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - ~~Split testing into unit and integration tests~~
 - ~~Get unit testing frameworks together~~
-- ~~get baseline interface going (link game with view through `interface.py`~~
+- ~~get baseline interface going (link game with view through `interface.py`~~)
+- export PYTHONDONTWRITEBYTECODE=1 to `~/profile`
+- find . -type f -name "*.py[co]" -delete -or -type d -name "__pycache__" -delete
+- in .gitignore, add `syntax:glob\n*py[cod]\n__pycache__\n
 - Write AI class (to play with humans/vs other AI=interat with game class)
 - #### MILESTONE 1: **Dumb AI done**
 - Map datapoints to our coordinates
