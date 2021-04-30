@@ -100,12 +100,28 @@ class Pawn(Piece):
                     if (isinstance(previous_move[0], Pawn)) and previous_move[1][1] - previous_move[2][1] == -2 and\
                         previous_move[2][0] == self.location[0] - 1:
                         result.add((self.location[0]-1)*10 + self.location[1]-1)
+                        
 
-            if (self.location[1] == 3) and (isinstance(board[self.location[0]-1, self.location[1]]), Pawn) and \
+            if (self.location[1] == 3) and (isinstance(board[self.location[0]+1, self.location[1]]), Pawn) and \
                 board[self.location[0]+1, self.location[1]].is_white is not self.is_white:
                     previous_move = board.history[-1]
                     if (isinstance(previous_move[0], Pawn)) and previous_move[1][1] - previous_move[2][1] == -2 and\
                         previous_move[2][0] == self.location[0] + 1:
                         result.add((self.location[0]+1)*10 + self.location[1]-1)
+                        
+            if (self.location[1] == 4) and (isinstance(board[self.location[0]-1, self.location[1]]), Pawn) and \
+                board[self.location[0]-1, self.location[1]].is_white is not self.is_white:
+                    previous_move = board.history[-1]
+                    if (isinstance(previous_move[0], Pawn)) and previous_move[1][1] - previous_move[2][1] == -2 and\
+                        previous_move[2][0] == self.location[0] - 1:
+                        result.add((self.location[0]-1)*10 + self.location[1]+1)
+            
+            if (self.location[1] == 4) and (isinstance(board[self.location[0]+1, self.location[1]]), Pawn) and \
+                board[self.location[0]+1, self.location[1]].is_white is not self.is_white:
+                    previous_move = board.history[-1]
+                    if (isinstance(previous_move[0], Pawn)) and previous_move[1][1] - previous_move[2][1] == -2 and\
+                        previous_move[2][0] == self.location[0] + 1:
+                        result.add((self.location[0]+1)*10 + self.location[1]+1)
+
         return result
 

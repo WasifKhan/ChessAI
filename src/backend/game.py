@@ -13,7 +13,6 @@ class Game:
         self.board = Board()
         self.white_turn = True
 
-
     def __str__(self):
         ret_val = '\n' + '=' * 30 + '\n'
         ret_val += str(self.board)

@@ -3,6 +3,8 @@ Interface between backend and frontend
 '''
 
 class Interface:
+    def __init__(self):
+        game = Game()
     def __init__(self, game):
         self.game = game
         self.current_move = None
@@ -16,5 +18,4 @@ class Interface:
             self.current_move = None
         else:
             self.current_move = location
-
 

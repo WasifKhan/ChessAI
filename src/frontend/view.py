@@ -10,11 +10,11 @@ class Window(tk.Frame):
         tk.Frame.__init__(self, master)
         self.master = master
         self.pack(fill=tk.BOTH, expand=1)
-        load = Image.open('./frontend/images/bg_chessboard.png')
-        render = ImageTk.PhotoImage(load)
-        img = tk.Label(self, image=render)
-        img.image = render
-        img.place(x=0, y=0)
+        #load = Image.open('./frontend/images/bg_chessboard.png')
+        #render = ImageTk.PhotoImage(load)
+        #img = tk.Label(self, image=render)
+        #img.image = render
+        #img.place(x=0, y=0)
 
 
 class View:
