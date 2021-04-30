@@ -6,11 +6,12 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - ~~Split testing into unit and integration tests~~
 - ~~Get unit testing frameworks together~~
+- get baseline interface going (link game with view through `interface.py`
+- Write AI class (to play with humans/vs other AI=interat with game class)
+- #### MILESTONE 1: **Dumb AI done**
 - Map datapoints to our coordinates
 - Set up various models(fix datapoint mapping)
-- Write AI class (to play with humans/vs other AI=interat with game class)
 - Move w.r.t. various reward functions
-#### MILESTONE 1: **Dumb AI done**
 - Set up qlearning (links game to models>)
 - Train/Test
 - Link intelligent weights to AI class
@@ -23,9 +24,8 @@ Repository containing Chess Engine and ML Model
 - ~~Finish all possible moves~~
 - Implement king movement
 - enpassant/castle/promote
-- check
+- check/checkmate
 - Unit test everything
-- Finish Game class
 - Break integration test into unit tests for board and game
 - Write actual integration tests
 

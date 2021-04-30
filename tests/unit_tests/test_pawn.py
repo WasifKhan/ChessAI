@@ -46,13 +46,13 @@ class TestPawn:
         board[4,4] = white_pawn
         white_pawn.location=(4,4)
         assert white_pawn.is_valid_move(board, (4,5)) == True
-        assert white_pawn.is_valid_move(board, (4,6)) == False 
+        assert white_pawn.is_valid_move(board, (4,6)) == False
         assert white_pawn.is_valid_move(board, (5,4)) == False
         board[5,5] = black_pawn
         black_pawn.location=(5,5)
         assert black_pawn.is_valid_move(board, (5,4)) == True
         assert black_pawn.is_valid_move(board, (4,4)) == True
-        assert black_pawn.is_valid_move(board, (4,5)) == False 
+        assert black_pawn.is_valid_move(board, (4,5)) == False
 
 
     def test_moves(self, white_pawn, black_pawn):
