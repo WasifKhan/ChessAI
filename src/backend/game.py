@@ -11,6 +11,7 @@ class Game:
         self.player_1 = p1_name
         self.player_2 = p2_name
         self.board = Board()
+        self.play_game()
 
 
     def __str__(self):

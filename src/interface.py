@@ -7,5 +7,5 @@ from frontend.view import View
 
 class Interface:
     def __init__(self):
-        view = View()
-        # game = Game()
+        # view = View()
+        game = Game()
