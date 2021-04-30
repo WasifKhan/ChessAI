@@ -16,8 +16,6 @@ class Knight(Piece):
         horizontal_move = abs(destination[1] - self.location[1])
 
         if not(vertical_move == 1 and horizontal_move == 2) and not(vertical_move == 2 and horizontal_move == 1):
-            print(vertical_move)
-            print(horizontal_move)
             return False
         elif not(isinstance(board[destination], Piece)):
             return True
