@@ -22,12 +22,16 @@ class Game:
 
     def move(self, source, destination):
         piece = self.board[source]
+        print(piece)
+        print(piece.location)
+        destination = (destination//10, destination%10)
+        print(destination)
         # Execute move
         if piece.is_white is not None \
                 and ((self.white_turn and piece.is_white) or
                         (not(self.white_turn) and not(piece.is_white))) \
-                and piece.is_valid_move(self.board, (destination//10, destination%10)):
-            self.board.move(piece, (destination//10, destination%10))
+                and piece.is_valid_move(self.board, destination):
+            self.board.move(piece, destination)
             self.white_turn = not(self.white_turn)
             return True
 

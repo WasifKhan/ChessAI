@@ -13,6 +13,8 @@ class Pawn(Piece):
 
     def is_valid_move(self, board, destination):
         if self.is_white:
+            print(self.location)
+            print(destination)
             # Check for diagonal movement
             if (self.location[1] + 1 == destination[1] and
                (self.location[0] + 1 == destination[0] or

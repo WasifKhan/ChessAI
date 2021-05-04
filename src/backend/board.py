@@ -26,13 +26,13 @@ class Board:
         if isinstance(key, tuple):
             self.board[key[0]][key[1]] = val
         elif isinstance(key, int):
-            self.board[key] = val
+            self.board[key//10][key%10] = val
 
     def __str__(self):
         output = ''
         for row in range(len(self.board) -1, -1, -1):
             for column in range(len(self.board)):
-                output += f' {str(self.board[row][column])} '
+                output += f' {str(self.board[column][row])} '
             output += '\n'
         return output[0:-1]
 
@@ -88,11 +88,7 @@ class Board:
         self.pieces.add(white_bishop_2)
         board[6][0] = white_knight_2
         self.pieces.add(white_knight_2)
-<<<<<<< HEAD
         board[7][0] = white_rook_2
-=======
-        board[0][7] = white_rook_2
->>>>>>> 64248dfe458b77324f098ab6f5b283d3cd77ca50
         self.pieces.add(white_rook_2)
         board[0][1] = white_pawn_1
         self.pieces.add(white_pawn_1)
@@ -157,7 +153,7 @@ class Board:
         previous_location = piece.location
         piece.location = destination
         captured_piece = self[destination]
-        if (isinstance(captured_piece,[destination], Piece)):
+        if (isinstance(captured_piece, Piece)):
             self.pieces.remove(captured_piece)
         self[destination] = piece
         self[previous_location] = Square(previous_location)
