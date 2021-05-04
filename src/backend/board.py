@@ -18,7 +18,6 @@ class Board:
         if isinstance(key, tuple):
             return self.board[key[0]][key[1]]
         elif isinstance(key, int):
-            print(self.board[key//10][key%10])
             return self.board[key//10][key%10]
         else:
             raise IndexError
@@ -39,104 +38,108 @@ class Board:
 
 
     def initialize_board(self):
-        board = [[Square(location=(y, x)) for y in range(8)] for x in range(8)]
+        board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
         white_rook_1 = Rook(is_white=True, location=(0,0))
-        white_rook_2 = Rook(is_white=True, location=(0,7))
-        white_knight_1 = Knight(is_white=True, location=(0,1))
-        white_knight_2 = Knight(is_white=True, location=(0,6))
-        white_bishop_1 = Bishop(is_white=True, location=(0,2))
-        white_bishop_2 = Bishop(is_white=True, location=(0,5))
-        white_queen = Queen(is_white=True, location=(0,3))
-        white_king = King(is_white=True, location=(0,4))
-        white_pawn_1 = Pawn(is_white=True, location=(1,0))
+        white_rook_2 = Rook(is_white=True, location=(7,0))
+        white_knight_1 = Knight(is_white=True, location=(1,0))
+        white_knight_2 = Knight(is_white=True, location=(6,0))
+        white_bishop_1 = Bishop(is_white=True, location=(2,0))
+        white_bishop_2 = Bishop(is_white=True, location=(5,0))
+        white_queen = Queen(is_white=True, location=(3,0))
+        white_king = King(is_white=True, location=(4,0))
+        white_pawn_1 = Pawn(is_white=True, location=(0,1))
         white_pawn_2 = Pawn(is_white=True, location=(1,1))
-        white_pawn_3 = Pawn(is_white=True, location=(1,2))
-        white_pawn_4 = Pawn(is_white=True, location=(1,3))
-        white_pawn_5 = Pawn(is_white=True, location=(1,4))
-        white_pawn_6 = Pawn(is_white=True, location=(1,5))
-        white_pawn_7 = Pawn(is_white=True, location=(1,6))
-        white_pawn_8 = Pawn(is_white=True, location=(1,7))
-        black_rook_1 = Rook(is_white=False, location=(7,0))
+        white_pawn_3 = Pawn(is_white=True, location=(2,1))
+        white_pawn_4 = Pawn(is_white=True, location=(3,1))
+        white_pawn_5 = Pawn(is_white=True, location=(4,1))
+        white_pawn_6 = Pawn(is_white=True, location=(5,1))
+        white_pawn_7 = Pawn(is_white=True, location=(6,1))
+        white_pawn_8 = Pawn(is_white=True, location=(7,1))
+        black_rook_1 = Rook(is_white=False, location=(0,7))
         black_rook_2 = Rook(is_white=False, location=(7,7))
-        black_knight_1 = Knight(is_white=False, location=(7,1))
-        black_knight_2 = Knight(is_white=False, location=(7,6))
-        black_bishop_1 = Bishop(is_white=False, location=(7,3))
-        black_bishop_2 = Bishop(is_white=False, location=(7,5))
-        black_queen = Queen(is_white=False, location=(7,3))
-        black_king = King(is_white=False, location=(7,4))
-        black_pawn_1 = Pawn(is_white=False, location=(6,0))
-        black_pawn_2 = Pawn(is_white=False, location=(6,1))
-        black_pawn_3 = Pawn(is_white=False, location=(6,2))
-        black_pawn_4 = Pawn(is_white=False, location=(6,3))
-        black_pawn_5 = Pawn(is_white=False, location=(6,4))
-        black_pawn_6 = Pawn(is_white=False, location=(6,5))
+        black_knight_1 = Knight(is_white=False, location=(1,7))
+        black_knight_2 = Knight(is_white=False, location=(6,7))
+        black_bishop_1 = Bishop(is_white=False, location=(2,7))
+        black_bishop_2 = Bishop(is_white=False, location=(5,7))
+        black_queen = Queen(is_white=False, location=(3,7))
+        black_king = King(is_white=False, location=(4,7))
+        black_pawn_1 = Pawn(is_white=False, location=(0,6))
+        black_pawn_2 = Pawn(is_white=False, location=(1,6))
+        black_pawn_3 = Pawn(is_white=False, location=(2,6))
+        black_pawn_4 = Pawn(is_white=False, location=(3,6))
+        black_pawn_5 = Pawn(is_white=False, location=(4,6))
+        black_pawn_6 = Pawn(is_white=False, location=(5,6))
         black_pawn_7 = Pawn(is_white=False, location=(6,6))
-        black_pawn_8 = Pawn(is_white=False, location=(6,7))
+        black_pawn_8 = Pawn(is_white=False, location=(7,6))
 
 
         board[0][0] = white_rook_1
         self.pieces.add(white_rook_1)
-        board[0][1] = white_knight_1
+        board[1][0] = white_knight_1
         self.pieces.add(white_knight_1)
-        board[0][2] = white_bishop_1
+        board[2][0] = white_bishop_1
         self.pieces.add(white_bishop_1)
-        board[0][3] = white_queen
+        board[3][0] = white_queen
         self.pieces.add(white_queen)
-        board[0][4] = white_king
+        board[4][0] = white_king
         self.white_king = white_king
         self.pieces.add(white_king)
-        board[0][5] = white_bishop_2
+        board[5][0] = white_bishop_2
         self.pieces.add(white_bishop_2)
-        board[0][6] = white_knight_2
+        board[6][0] = white_knight_2
         self.pieces.add(white_knight_2)
+<<<<<<< HEAD
+        board[7][0] = white_rook_2
+=======
         board[0][7] = white_rook_2
+>>>>>>> 64248dfe458b77324f098ab6f5b283d3cd77ca50
         self.pieces.add(white_rook_2)
-        board[1][0] = white_pawn_1
+        board[0][1] = white_pawn_1
         self.pieces.add(white_pawn_1)
         board[1][1] = white_pawn_2
         self.pieces.add(white_pawn_2)
-        board[1][2] = white_pawn_3
+        board[2][1] = white_pawn_3
         self.pieces.add(white_pawn_3)
-        board[1][3] = white_pawn_4
+        board[3][1] = white_pawn_4
         self.pieces.add(white_pawn_4)
         board[4][1] = white_pawn_5
         self.pieces.add(white_pawn_5)
-        board[1][5] = white_pawn_6
+        board[5][1] = white_pawn_6
         self.pieces.add(white_pawn_6)
-        board[1][6] = white_pawn_7
+        board[6][1] = white_pawn_7
         self.pieces.add(white_pawn_7)
-        board[1][7] = white_pawn_8
+        board[7][1] = white_pawn_8
         self.pieces.add(white_pawn_8)
-        board[6][0] = black_pawn_1
+        board[0][6] = black_pawn_1
         self.pieces.add(black_pawn_1)
-        board[6][1] = black_pawn_2
+        board[1][6] = black_pawn_2
         self.pieces.add(black_pawn_2)
-        board[6][2] = black_pawn_3
+        board[2][6] = black_pawn_3
         self.pieces.add(black_pawn_3)
-        board[6][3] = black_pawn_4
+        board[3][6] = black_pawn_4
         self.pieces.add(black_pawn_4)
-        board[6][4] = black_pawn_5
+        board[4][6] = black_pawn_5
         self.pieces.add(black_pawn_5)
-        board[6][5] = black_pawn_6
+        board[5][6] = black_pawn_6
         self.pieces.add(black_pawn_6)
         board[6][6] = black_pawn_7
         self.pieces.add(black_pawn_7)
-        board[6][7] = black_pawn_8
+        board[7][6] = black_pawn_8
         self.pieces.add(black_pawn_8)
-        board[7][0] = black_rook_1
+        board[0][7] = black_rook_1
         self.pieces.add(black_rook_1)
-        board[7][1] = black_knight_1
+        board[1][7] = black_knight_1
         self.pieces.add(black_knight_1)
-        board[7][2] = black_bishop_1
+        board[2][7] = black_bishop_1
         self.pieces.add(black_bishop_1)
-        board[7][3] = black_queen
+        board[3][7] = black_queen
         self.pieces.add(black_queen)
-        board[7][4] = black_king
+        board[4][7] = black_king
         self.black_king = black_king
         self.pieces.add(black_king)
-        board[7][5] = black_bishop_2
+        board[5][7] = black_bishop_2
         self.pieces.add(black_bishop_2)
-        board[7][6] = black_knight_2
+        board[6][7] = black_knight_2
         self.pieces.add(black_knight_2)
         board[7][7] = black_rook_2
         self.pieces.add(black_rook_2)
@@ -154,7 +157,7 @@ class Board:
         previous_location = piece.location
         piece.location = destination
         captured_piece = self[destination]
-        if (isinstance(captured_piece, Piece)):
+        if (isinstance(captured_piece,[destination], Piece)):
             self.pieces.remove(captured_piece)
         self[destination] = piece
         self[previous_location] = Square(previous_location)
