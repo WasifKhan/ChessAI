@@ -18,11 +18,9 @@ class Window(tk.Frame):
 
 
 class View:
-    def action(self, piece):
-        self.interface.add_action(self.squares[piece])
-
     def __init__(self, interface):
         self.interface = interface
+        self.versus_AI()
         self.squares = {}
 
         window = tk.Tk()
@@ -43,3 +41,11 @@ class View:
                 piece.pack(padx=5, pady=5)
                 self.squares[piece] = column * 10 + row
         window.mainloop()
+
+    def versus_AI(self):
+        self.interface.versus_AI()
+
+    def action(self, piece):
+        self.interface.add_action(self.squares[piece])
+
+
