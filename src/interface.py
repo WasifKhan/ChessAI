@@ -31,7 +31,7 @@ class Interface:
                     print(f'{self.game.p2_name} move: {ai_move[0]} -> {ai_move[1]}')
         else:
             print('Invalid move.\nPlease enter a valid move.')
-        print(self.game)
+        print(self)
 
 
     def get_scoreboard(self):
