@@ -18,24 +18,6 @@ class Interface:
     def versus_AI(self, difficulty=0):
         self.AI = AI(0)
 
-    def add_action(self, location):
-        if (source := self.current_move) is not None:
-            if self.game.move(source, location):
-                self.current_move = None
-                print(f'move: {source} -> {location}')
-                print(self.game)
-            else:
-                print('Invalid move.\nPlease enter a valid move.')
-                print(self.game)
-            if self.AI:
-                source, location = self.AI.get_move(self.game.board)
-                if self.game.move(source, location):
-                    print(f'AI move: {source} -> {location}')
-                    print(self.game)
-        else:
-            self.current_move = location
-
-
     def set_game_type(self, human=False):
         return True
 
@@ -43,7 +25,16 @@ class Interface:
         return True
 
     def add_move(self, source, destination):
-        return True
+        if self.game.move(source, destination):
+            print(f'Move: {source} -> {destination}')
+            if self.AI \
+                and (ai_move := self.AI.get_move(self.game.board)) \
+                and self.game.move(ai_move[0], ai_move[1]):
+                    print(f'AI Move: {ai_move[0]} -> {ai_move[1]}')
+        else:
+            print('Invalid move.\nPlease enter a valid move.')
+        print(self.game)
+
 
     def get_scoreboard(self):
         return True
