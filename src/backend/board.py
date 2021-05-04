@@ -152,8 +152,8 @@ class Board:
         # Update the board to move piece from previous location to destination
         previous_location = piece.location
         piece.location = destination
-        if (isinstance(captured_piece :=
-            self[destination], Piece)):
+        captured_piece = self[destination]
+        if (isinstance(captured_piece, Piece)):
             self.pieces.remove(captured_piece)
         self[destination] = piece
         self[previous_location] = Square(previous_location)
