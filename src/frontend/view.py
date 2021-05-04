@@ -20,7 +20,6 @@ class Window(tk.Frame):
 class View:
     def action(self, piece):
         self.interface.add_action(self.squares[piece])
-        print(self.interface)
 
     def __init__(self, interface):
         self.interface = interface
@@ -43,5 +42,4 @@ class View:
                 piece['command'] = lambda r=piece: self.action(r)
                 piece.pack(padx=5, pady=5)
                 self.squares[piece] = column * 10 + row
-        print(interface)
         window.mainloop()

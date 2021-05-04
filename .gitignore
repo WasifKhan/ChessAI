@@ -1,1 +1,3 @@
-__pycache__/
+syntax:glob
+*py[cod]
+__pycache__
