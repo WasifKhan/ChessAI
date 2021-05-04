@@ -31,8 +31,8 @@ class Board:
 
     def __str__(self):
         output = ''
-        for column in range(len(self.board) -1, -1, -1):
-            for row in range(len(self.board)):
+        for row in range(len(self.board) -1, -1, -1):
+            for column in range(len(self.board)):
                 output += f' {str(self.board[row][column])} '
             output += '\n'
         return output[0:-1]
@@ -89,7 +89,7 @@ class Board:
         self.pieces.add(white_bishop_2)
         board[0][6] = white_knight_2
         self.pieces.add(white_knight_2)
-        board[0]7] = white_rook_2
+        board[0][7] = white_rook_2
         self.pieces.add(white_rook_2)
         board[1][0] = white_pawn_1
         self.pieces.add(white_pawn_1)
