@@ -41,5 +41,5 @@ class View:
                 piece = tk.Button(master=frame, text=f'({column}, {row})')
                 piece['command'] = lambda r=piece: self.action(r)
                 piece.pack(padx=5, pady=5)
-                self.squares[piece] = row * 10 + column
+                self.squares[piece] = column * 10 + row
         window.mainloop()
