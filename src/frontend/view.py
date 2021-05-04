@@ -5,6 +5,8 @@ View to host chess engine
 import tkinter as tk
 from PIL import Image, ImageTk
 
+
+
 class Window(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
@@ -19,8 +21,20 @@ class Window(tk.Frame):
 
 class View:
     def __init__(self, interface):
+        '''
+        The following code should be in buttons initiated by the user.
+        Currently store here until calls are done
+        '''
+        interface.versus_AI()
+        interface.set_player_names('Player 1', 'AI')
+        scoreboard = interface.get_scoreboard()
+        score = interface.get_score('Player 1', 'AI')
+        game_over = interface.game_over()
+        play_again = interface.play_again(True)
+        '''
+        End of code that should be inside buttons. Therest belongs in init
+        '''
         self.interface = interface
-        self.versus_AI()
         self.squares = {}
         self.current_click = None
 

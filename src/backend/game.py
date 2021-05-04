@@ -7,17 +7,23 @@ from .board import Board
 
 
 class Game:
-    def __init__(self, p1_name='Player 1', p2_name='Player 2'):
-        self.player_1 = p1_name
-        self.player_2 = p2_name
+    def __init__(self):
+        self.p1_name = 'Player 1'
+        self.p2_name = 'Player 2'
         self.board = Board()
         self.white_turn = True
 
     def __str__(self):
-        ret_val = '\n' + '=' * 30 + '\n'
+        ret_val = '\n' + self.p2_name
+        ret_val += '\n' + '=' * 30 + '\n'
         ret_val += str(self.board)
         ret_val += '\n' + '=' * 30 + '\n'
+        ret_val += self.p1_name + '\n'
         return ret_val
+
+    def set_names(self, p1_name, p2_name):
+        self.p1_name = p1_name
+        self.p2_name = p2_name
 
 
     def move(self, source, destination):
