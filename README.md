@@ -22,12 +22,12 @@ Repository containing Chess Engine and ML Model
 
 ### **Ali**
 - ~~Finish all possible moves~~
-- Implement king movement
-- enpassant/castle/promote
-- check/checkmate
 - Unit test everything
 - Break integration test into unit tests for board and game
 - Write actual integration tests
+- Implement king movement
+- enpassant/castle/promote
+- check/checkmate
 
 #### MILESTONE 1: **Done backend**
 - Start frontend
