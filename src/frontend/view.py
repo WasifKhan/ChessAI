@@ -38,7 +38,7 @@ class View:
                             relief=tk.RAISED,
                             borderwidth=4)
                 frame.grid(row=7-row, column=column, padx=5, pady=5)
-                piece = tk.Button(master=frame, text=f'({row}, {column})')
+                piece = tk.Button(master=frame, text=f'({column}, {row})')
                 piece['command'] = lambda r=piece: self.action(r)
                 piece.pack(padx=5, pady=5)
                 self.squares[piece] = row * 10 + column
