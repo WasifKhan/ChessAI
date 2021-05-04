@@ -24,6 +24,9 @@ class Interface:
                 self.current_move = None
                 print(f'move: {source} -> {location}')
                 print(self.game)
+            else:
+                print('Invalid move.\nPlease enter a valid move.')
+                print(self.game)
             if self.AI:
                 source, location = self.AI.get_move(self.game.board)
                 if self.game.move(source, location):
