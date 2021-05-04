@@ -16,17 +16,22 @@ class Board:
 
     def __getitem__(self, key):
         if isinstance(key, tuple):
-            return self.board[key[0]][key[1]]
+            x, y = key[0], key[1]
         elif isinstance(key, int):
-            return self.board[key//10][key%10]
-        else:
-            raise IndexError
+            x, y = key//10, key%10
+        if x >= 0 and y >= 0 and x < len(self.board) and y < len(self.board[x]):
+            return self.board[x][y]
+        return None
 
     def __setitem__(self, key, val):
         if isinstance(key, tuple):
-            self.board[key[0]][key[1]] = val
+            x, y = key[0], key[1]
         elif isinstance(key, int):
-            self.board[key//10][key%10] = val
+            x, y=  key//10, key%10
+        if x >= 0 and y >= 0 and x < len(self.board) and y < len(self.board[x]):
+            self.board[x][y] = val
+        else:
+            raise IndexError
 
     def __str__(self):
         output = ''

@@ -14,6 +14,8 @@ class AI:
             if not(piece.is_white):
                 my_pieces.append(piece)
         rand_piece = random.randint(0, max(0, len(my_pieces) - 1))
+        while len(my_pieces[rand_piece].moves(board)) == 0:
+            rand_piece = random.randint(0, max(0, len(my_pieces)))
 
         piece = my_pieces[rand_piece]
         moves = list(piece.moves(board))

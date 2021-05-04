@@ -27,21 +27,21 @@ class Knight(Piece):
 
     def moves(self, board):
         result = set()
-        if (piece := board[self.location[0]+1, self.location[1]+2].is_white) is not self.is_white:
+        if (piece := board[self.location[0]+1, self.location[1]+2]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
-        if (piece := board[self.location[0]-1, self.location[1]+2].is_white) is not self.is_white:
+        if (piece := board[self.location[0]-1, self.location[1]+2]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
-        if (piece := board[self.location[0]+1, self.location[1]-2].is_white) is not self.is_white:
+        if (piece := board[self.location[0]+1, self.location[1]-2]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
-        if (piece := board[self.location[0]-1, self.location[1]-2].is_white) is not self.is_white:
+        if (piece := board[self.location[0]-1, self.location[1]-2]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
-        if (piece := board[self.location[0]+2, self.location[1]+1].is_white) is not self.is_white:
+        if (piece := board[self.location[0]+2, self.location[1]+1]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
-        if (piece := board[self.location[0]-2, self.location[1]+1].is_white) is not self.is_white:
+        if (piece := board[self.location[0]-2, self.location[1]+1]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
-        if (piece := board[self.location[0]+2, self.location[1]-1].is_white) is not self.is_white:
+        if (piece := board[self.location[0]+2, self.location[1]-1]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
-        if (piece := board[self.location[0]-2, self.location[1]-1].is_white) is not self.is_white:
+        if (piece := board[self.location[0]-2, self.location[1]-1]) and piece.is_white is not self.is_white:
             result.add(piece.location[0]*10 + piece.location[1])
         return result
 
