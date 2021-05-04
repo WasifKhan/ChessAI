@@ -25,6 +25,6 @@ class King(Piece):
                     return False
         return True
 
-    def moves(self):
-        raise NotImplementedError
+    def moves(self, board):
+        return set()
 
