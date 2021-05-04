@@ -15,6 +15,7 @@ class Interface:
         if (source := self.current_move) is not None:
             self.game.move(source, location)
             self.current_move = None
+            print(f'move: {source} -> {location}')
             print(self.game)
         else:
             self.current_move = location
