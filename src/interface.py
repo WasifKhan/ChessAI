@@ -13,10 +13,12 @@ class Interface:
 
     def add_action(self, location):
         if (source := self.current_move) is not None:
-            self.game.move(source, location)
-            self.current_move = None
-            print(f'move: {source} -> {location}')
-            print(self.game)
+            print(source)
+            print(location)
+            if self.game.move(source, location):
+                self.current_move = None
+                print(f'move: {source} -> {location}')
+                print(self.game)
         else:
             self.current_move = location
 
