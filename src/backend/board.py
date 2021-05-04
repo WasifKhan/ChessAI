@@ -38,7 +38,7 @@ class Board:
 
 
     def initialize_board(self):
-        board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
+        board = [[Square(location=(y, x)) for y in range(8)] for x in range(8)]
         white_rook_1 = Rook(is_white=True, location=(0,0))
         white_rook_2 = Rook(is_white=True, location=(0,7))
         white_knight_1 = Knight(is_white=True, location=(0,1))
