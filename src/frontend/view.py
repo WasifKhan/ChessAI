@@ -30,7 +30,7 @@ class View:
         window.wm_title('Beth Harmon')
         window.geometry('640x430')
 
-        for row in range(7, -1, -1):
+        for row in range(8):
             window.columnconfigure(row, weight=1, minsize=75)
             window.rowconfigure(row, weight=1, minsize=50)
             for column in range(8):
@@ -41,5 +41,5 @@ class View:
                 piece = tk.Button(master=frame, text=f'({row}, {column})')
                 piece['command'] = lambda r=piece: self.action(r)
                 piece.pack(padx=5, pady=5)
-                self.squares[piece] = column * 10 + row
+                self.squares[piece] = row * 10 + column
         window.mainloop()

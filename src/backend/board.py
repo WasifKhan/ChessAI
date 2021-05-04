@@ -18,6 +18,7 @@ class Board:
         if isinstance(key, tuple):
             return self.board[key[0]][key[1]]
         elif isinstance(key, int):
+            print(self.board[key//10][key%10])
             return self.board[key//10][key%10]
         else:
             raise IndexError
@@ -38,7 +39,7 @@ class Board:
 
 
     def initialize_board(self):
-        board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
+        board = [[Square(location=(y, x)) for y in range(8)] for x in range(8)]
         white_rook_1 = Rook(is_white=True, location=(0,0))
         white_rook_2 = Rook(is_white=True, location=(7,0))
         white_knight_1 = Knight(is_white=True, location=(1,0))

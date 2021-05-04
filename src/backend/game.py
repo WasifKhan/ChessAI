@@ -29,6 +29,9 @@ class Game:
                 and piece.is_valid_move(self.board, (destination//10, destination%10)):
             self.board.move(piece, (destination//10, destination%10))
             self.white_turn = not(self.white_turn)
+            return True
+
         else:
             print('invalid move, please enter a valid move')
+            return False
 
