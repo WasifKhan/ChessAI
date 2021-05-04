@@ -7,7 +7,7 @@ Repository containing Chess Engine and ML Model
 - ~~Split testing into unit and integration tests~~
 - ~~Get unit testing frameworks together~~
 - ~~get baseline interface going (link game with view through `interface.py`~~)
-- Write AI class (to play with humans/vs other AI=interat with game class)
+- ~~Write AI class (to play with humans/vs other AI=interat with game class)~~
 - #### MILESTONE 1: **Dumb AI done**
 - Map datapoints to our coordinates
 - Set up various models(fix datapoint mapping)
