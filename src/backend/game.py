@@ -22,8 +22,6 @@ class Game:
 
     def move(self, source, destination):
         piece = self.board[source]
-        print(piece)
-        print(piece.location)
         destination = (destination//10, destination%10)
         print(destination)
         # Execute move
