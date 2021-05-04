@@ -28,7 +28,7 @@ class View:
         window = tk.Tk()
         app = Window(window)
         window.wm_title('Beth Harmon')
-        window.geometry('1080x720')
+        window.geometry('640x430')
 
         for row in range(7, -1, -1):
             window.columnconfigure(row, weight=1, minsize=75)
