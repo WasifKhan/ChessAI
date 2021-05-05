@@ -32,9 +32,8 @@ class Interface:
             print(self)
             return True
         else:
-            print('Invalid move.\nPlease enter a valid move.')
+            print('Invalid move.\nPlease enter a valid move.\n')
             return False
-
 
     def get_scoreboard(self):
         return True
