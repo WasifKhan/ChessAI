@@ -26,5 +26,5 @@ class Piece(Square, metaclass=ABCMeta):
         self.location = location
 
     @abstractmethod
-    def moves(self):
+    def moves(self, board):
         raise NotImplementedError

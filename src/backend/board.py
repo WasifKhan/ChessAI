@@ -7,26 +7,10 @@ from .pieces.king import King
 from .pieces.pawn import Pawn
 
 class Board:
-    def __init__(self, white_player='Player 1', black_player='Player 2'):
-        self.white = white_player
-        self.black = black_player
+    def __init__(self):
         self.history = []
         self.pieces = set()
-        self.initialize_board()
-
-    def __getitem__(self, key):
-        if isinstance(key, tuple):
-            return self.board[key[0]][key[1]]
-        elif isinstance(key, int):
-            return self.board[key//10][key%10]
-        else:
-            raise IndexError
-
-    def __setitem__(self, key, val):
-        if isinstance(key, tuple):
-            self.board[key[0]][key[1]] = val
-        elif isinstance(key, int):
-            self.board[key//10][key%10] = val
+        self._initialize_board()
 
     def __str__(self):
         output = ''
@@ -36,8 +20,54 @@ class Board:
             output += '\n'
         return output[0:-1]
 
+    def __getitem__(self, key):
+        if isinstance(key, tuple):
+            x, y = key[0], key[1]
+        elif isinstance(key, int):
+            x, y = key//10, key%10
+        if x >= 0 and y >= 0 and x < len(self.board) and y < len(self.board[x]):
+            return self.board[x][y]
+        return None
 
-    def initialize_board(self):
+    def __setitem__(self, key, val):
+        if isinstance(key, tuple):
+            x, y = key[0], key[1]
+        elif isinstance(key, int):
+            x, y=  key//10, key%10
+        if x >= 0 and y >= 0 and x < len(self.board) and y < len(self.board[x]):
+            self.board[x][y] = val
+        else:
+            raise IndexError
+
+    def is_valid_move(self, piece, destination):
+        return piece.is_valid_move(self.board, destination)
+
+    def move(self, piece, destination):
+        self.history.append((piece, piece.location, destination))
+        # Update the board to move piece from previous location to destination
+        previous_location = piece.location
+        piece.location = destination
+        captured_piece = self[destination]
+        if (isinstance(captured_piece, Piece)):
+            self.pieces.remove(captured_piece)
+        self[destination] = piece
+        self[previous_location] = Square(previous_location)
+        # Edge case for en passant pawn capture
+        if len(self.history) > 2:
+            previous_move = self.history[-2]
+            if (isinstance(previous_move[0], Pawn) and
+                previous_move[1][1] - previous_move[2][1] == 2 and
+                previous_move[2][0] == destination[0] and piece.location[1] == 5):
+                    self[destination[0], destination[1] - 1] = Square((destination[0], destination[1] - 1))
+            elif (isinstance(previous_move[0], Pawn) and
+                previous_move[1][1] - previous_move[2][1] == -2 and
+                previous_move[2][0] == destination[0] and piece.location[1] == 2):
+                    self[(destination[0], destination[1] + 1)] = Square((destination[0], destination[1] + 1))
+
+    def has_kings(self):
+        return True if self.white_king in self.pieces and self.black_king in self.pieces else False
+
+    def _initialize_board(self):
         board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
         white_rook_1 = Rook(is_white=True, location=(0,0))
         white_rook_2 = Rook(is_white=True, location=(7,0))
@@ -140,36 +170,5 @@ class Board:
         board[7][7] = black_rook_2
         self.pieces.add(black_rook_2)
         self.board = board
-
-
-    def is_valid_move(self, piece, destination):
-        return piece.is_valid_move(self.board, destination)
-
-
-    def move(self, piece, destination):
-        self.history.append((piece, piece.location, destination))
-
-        # Update the board to move piece from previous location to destination
-        previous_location = piece.location
-        piece.location = destination
-        captured_piece = self[destination]
-        if (isinstance(captured_piece, Piece)):
-            self.pieces.remove(captured_piece)
-        self[destination] = piece
-        self[previous_location] = Square(previous_location)
-        # Edge case for en passant pawn capture
-        if len(self.history) > 2:
-            previous_move = self.history[-2]
-            if (isinstance(previous_move[0], Pawn) and
-                previous_move[1][1] - previous_move[2][1] == 2 and
-                previous_move[2][0] == destination[0] and piece.location[1] == 5):
-                    self[destination[0], destination[1] - 1] = Square((destination[0], destination[1] - 1))
-            elif (isinstance(previous_move[0], Pawn) and
-                previous_move[1][1] - previous_move[2][1] == -2 and
-                previous_move[2][0] == destination[0] and piece.location[1] == 2):
-                    self[(destination[0], destination[1] + 1)] = Square((destination[0], destination[1] + 1))
-
-    def has_kings(self):
-        return True if self.white_king in self.pieces and self.black_king in self.pieces else False
 
 

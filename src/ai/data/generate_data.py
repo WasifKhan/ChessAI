@@ -2,14 +2,16 @@
 File to extract chess games data from the web
 '''
 
-import bz2
+from bz2 import BZ2Decompressor
 from urllib.request import urlopen
 from files import files as FILES
-import os
+from os import listdir
 import re
 
+
 LOCATION = 'raw_data/'
-DATASET_LOCATION = 'dataset/data.txt'
+DATASET_LOCATION = 'data.txt'
+
 
 class ExtractData:
     def __init__(self, location, files):
@@ -19,7 +21,7 @@ class ExtractData:
         self.chunk = 16 * 1024
 
     def extract_file(self, file, ID):
-        decompressor = bz2.BZ2Decompressor()
+        decompressor = BZ2Decompressor()
         filename = self.location + self.filename + str(ID) + '.txt'
         try:
             with open(filename, 'wb') as fp:
@@ -62,7 +64,7 @@ class DataConverter:
                 self.data.append(datapoint)
 
     def raw_data_to_dataset(self):
-        for filename in os.listdir(self.source):
+        for filename in listdir(self.source):
             with open(self.source + filename) as fp:
                 lines = fp.readlines()
                 self.extract_moves(lines)

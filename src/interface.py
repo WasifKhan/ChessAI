@@ -2,12 +2,13 @@
 Interface between backend and frontend
 '''
 
-from backend.game import Game
 from ai.ai import AI
 
+
+
 class Interface:
-    def __init__(self, player_1='Player1', player_2='Player 2'):
-        self.game = Game(player_1, player_2)
+    def __init__(self, game):
+        self.game = game
         self.current_move = None
         self.AI = None
         print(self.game)
@@ -18,17 +19,29 @@ class Interface:
     def versus_AI(self, difficulty=0):
         self.AI = AI(0)
 
-    def add_action(self, location):
-        if (source := self.current_move) is not None:
-            if self.game.move(source, location):
-                self.current_move = None
-                print(f'move: {source} -> {location}')
-                print(self.game)
-            if self.AI:
-                source, location = self.AI.get_move(self.game.board)
-                if self.game.move(source, location):
-                    print(f'AI move: {source} -> {location}')
-                    print(self.game)
-        else:
-            self.current_move = location
+    def set_player_names(self, p1_name='Player 1', p2_name='AI'):
+        self.game.set_names(p1_name, p2_name)
 
+    def add_move(self, source, destination):
+        if self.game.move(source, destination):
+            print(f'{self.game.p1_name} move: {source} -> {destination}')
+            if self.AI \
+                and (ai_move := self.AI.get_move(self.game.board)) \
+                and self.game.move(ai_move[0], ai_move[1]):
+                    print(f'{self.game.p2_name} move: {ai_move[0]} -> {ai_move[1]}')
+        else:
+            print('Invalid move.\nPlease enter a valid move.')
+        print(self)
+
+
+    def get_scoreboard(self):
+        return True
+
+    def get_score(self, player1, player2=None):
+        return True
+
+    def game_over(self):
+        return False
+
+    def play_again(self, yes=True):
+        return True
