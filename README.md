@@ -30,6 +30,9 @@ Repository containing Chess Engine and ML Model
 - Implement king movement
 - enpassant/castle/promote
 - check/checkmate
+- optimizations
+ - change coordinate system to 2-digit int
+ - remove `if x.is_white: ... else: ...` by inverting board at start/end of code
 
 #### MILESTONE 1: **Done backend**
 - Start frontend
