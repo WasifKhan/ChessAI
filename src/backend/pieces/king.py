@@ -9,7 +9,7 @@ class King(Piece):
         King.ID += 1
 
     def __str__(self):
-        return '$' if self.is_white else '-'
+        return 'K' if self.is_white else 'k'
 
     def is_valid_move(self, board, destination):
         x_dir = abs(self.location[0] - destination[0])
