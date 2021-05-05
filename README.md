@@ -22,7 +22,7 @@ Repository containing Chess Engine and ML Model
 
 ### **Ali**
 - ~~Finish all possible moves~~
-- Unit test everything
+- ~~Unit test everything~~
 - Break integration test into unit tests for board and game
 - Write actual integration tests
 - Implement king movement
