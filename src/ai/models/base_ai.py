@@ -7,8 +7,8 @@ import abc
 
 
 class AI(metaclass=abc.ABCMeta):
-    def __init__(self, board):
-        self.board = board
+    def __init__(self):
+        pass
 
     @classmethod
     def board_to_datapoint(self):
