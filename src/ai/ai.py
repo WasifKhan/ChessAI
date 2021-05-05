@@ -2,11 +2,20 @@
 Main AI Engine
 '''
 
+from .model_ID import MODELS
+
 import random
 
 class AI:
-    def __init__(self, level):
-        self.level = level
+    def __init__(self, difficulty):
+        # self._load_AI(difficulty)
+        pass
+
+    def _load_AI(self, difficulty):
+        ai, model = MODELS[difficulty]
+        exec_str = f'from .models.{ai} import {model} as bla'
+        exec(exec_str)
+        self.ai = bla()
 
     def get_move(self, board):
         my_pieces = list()

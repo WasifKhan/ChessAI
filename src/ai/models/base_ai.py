@@ -4,6 +4,8 @@ Abstract Base Class for AI Engines
 
 import abc
 
+
+
 class AI(metaclass=abc.ABCMeta):
     def __init__(self, board):
         self.board = board
