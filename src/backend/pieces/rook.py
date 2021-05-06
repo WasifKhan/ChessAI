@@ -6,6 +6,7 @@ class Rook(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
         self.ID = Rook.ID
+        self.value = 5
         Rook.ID += 1
 
     def __str__(self):

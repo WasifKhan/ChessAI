@@ -17,13 +17,14 @@ class Interface:
         return str(self.game)
 
     def versus_AI(self, difficulty=0):
-        self.AI = AI(0)
+        self.AI = AI(difficulty)
 
     def set_player_names(self, p1_name='Player 1', p2_name='AI'):
         self.game.set_names(p1_name, p2_name)
 
     def add_move(self, source, destination):
         if self.game.move(source, destination):
+            print('='*30)
             print(f'{self.game.p1_name} move: {source} -> {destination}')
             if self.AI \
                 and (ai_move := self.AI.get_move(self.game.board)) \

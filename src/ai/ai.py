@@ -12,7 +12,7 @@ class AI:
 
     def _load_AI(self, difficulty):
         ai_file, ai_cls = MODELS[difficulty]
-        exec(f'from .models.{ai_file} import {ai_cls} as ai')
+        exec(f'from .models.{ai_file}.{ai_file} import {ai_cls} as ai')
         model = eval('ai')
         self.ai = model()
 
