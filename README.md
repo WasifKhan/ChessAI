@@ -11,6 +11,7 @@ Repository containing Chess Engine and ML Model
 - ~~get unit test framework for board/game going~~
 - #### MILESTONE 1: **Dumb AI done**
 - implement resgin=behind by 2+ for 3+ moves
+  - implement `white_lead` in board.py
 - seperate board.pieces into black.pieces and white.pieces
 - simulate games for AI vs AI (apart of `Game` class)
 - Set up RNN/RNN,CNN/Greedy/Greedy+exploit
