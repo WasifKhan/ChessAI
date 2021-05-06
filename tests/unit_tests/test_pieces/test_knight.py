@@ -51,8 +51,8 @@ class TestKnight:
         board = Board()
         board[3,4] = white_knight
         white_knight.location =(3,4)
-        white_knight.moves(board) == {22, 42, 53, 55, 46, 26, 15, 13}
+        assert white_knight.moves(board) == {22, 42, 53, 55, 46, 26, 15, 13}
         board[3,3] = black_knight
         black_knight.location =(3,3)
-        black_knight.moves(board) == {21, 41, 52, 54, 45, 25, 14, 12}
+        assert black_knight.moves(board) == {21, 41, 52, 54, 45, 25, 14, 12}
 

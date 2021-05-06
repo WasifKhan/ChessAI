@@ -56,6 +56,6 @@ class TestRook:
         white_rook.location=(2,3)
         board[3,3] = black_rook
         black_rook.location=(3,3)
-        white_rook.moves(board) == {22, 13, 3, 24, 25, 26, 33}
-        black_rook.moves(board) == {23, 32, 31, 43,53, 63, 73, 34, 35}
+        assert white_rook.moves(board) == {22, 13, 3, 24, 25, 26, 33}
+        assert black_rook.moves(board) == {23, 32, 31, 43,53, 63, 73, 34, 35}
 
