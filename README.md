@@ -16,6 +16,7 @@ Repository containing Chess Engine and ML Model
 - Set up qlearning (links game to models>)
 - Train/Test
 - Link intelligent weights to AI class
+- IReinfLearn to learn reward
 #### MILESTONE 2: **Smart AI done**
 - Write monitoring scripts
 - Try other networks
