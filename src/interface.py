@@ -9,7 +9,6 @@ from ai.ai import AI
 class Interface:
     def __init__(self, game):
         self.game = game
-        self.current_move = None
         self.AI = None
         print(self.game)
 
@@ -23,7 +22,16 @@ class Interface:
         self.game.set_names(p1_name, p2_name)
 
     def game_over(self, root):
-        print(self)
+        print('*'*30)
+        if not self.game.is_game_over():
+            if self.game.white_turn:
+                print('*' * 7 + f'{self.game.p1_name} resigned' + '*' * 6)
+            else:
+                print(f'{self.game.p2_name} resigned')
+
+        print('*'*30)
+        print('*'*11 + 'GAME OVER' + '*'*10)
+        print('*'*30)
         self.game.game_over()
         root.destroy()
 
@@ -35,12 +43,14 @@ class Interface:
                 self.game_over()
                 return True
             if self.AI:
-                if (ai_move := self.AI.get_move(self.game.board)) \
-                    and self.game.move(ai_move[0], ai_move[1]):
+                if (ai_move := self.AI.get_move(self.game.board)):
+                    self.game.move(ai_move[0], ai_move[1])
                     print(f'{self.game.p2_name} move: {ai_move[0]} -> {ai_move[1]}')
                     if self.game.is_game_over():
                         self.game_over()
                         return True
+                else:
+                    self.game_over()
             print(self)
             return True
         else:

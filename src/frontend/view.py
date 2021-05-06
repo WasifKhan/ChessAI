@@ -64,7 +64,7 @@ class View:
         root.mainloop()
 
     def click_resign(self):
-        self.interface.game_over(root)
+        self.interface.game_over(self.root)
 
     def click_piece(self, piece):
         if not self.current_click:
