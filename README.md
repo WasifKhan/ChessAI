@@ -30,10 +30,10 @@ Repository containing Chess Engine and ML Model
 - enpassant/castle/promote
 - check/checkmate
 - write 2 system tests
+- type documentation
 - optimizations
   - change coordinate system to 2-digit int
   - remove `if x.is_white: ... else: ...` by inverting board at start/end of code
-  - check unnecessary type casting through functions(ie.get_move)
 
 #### MILESTONE 1: **Done backend**
 - Start frontend
