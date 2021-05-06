@@ -29,10 +29,11 @@ class Interface:
                 and (ai_move := self.AI.get_move(self.game.board)) \
                 and self.game.move(ai_move[0], ai_move[1]):
                     print(f'{self.game.p2_name} move: {ai_move[0]} -> {ai_move[1]}')
+            print(self)
+            return True
         else:
-            print('Invalid move.\nPlease enter a valid move.')
-        print(self)
-
+            print('Invalid move.\nPlease enter a valid move.\n')
+            return False
 
     def get_scoreboard(self):
         return True

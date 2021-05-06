@@ -23,8 +23,8 @@ class TestKnight:
         assert black_knight.location[1] == 7
 
     def test_str(self, white_knight, black_knight):
-        assert str(white_knight) == 'K'
-        assert str(black_knight) == 'k'
+        assert str(white_knight) == 'N'
+        assert str(black_knight) == 'n'
 
     def test_is_valid_move(self, white_knight, black_knight):
         board = Board()

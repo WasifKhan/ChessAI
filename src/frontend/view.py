@@ -32,7 +32,8 @@ class View:
         game_over = interface.game_over()
         play_again = interface.play_again(True)
         '''
-        End of code that should be inside buttons. Therest belongs in init
+        End of code that should be inside buttons. 
+        The code below belongs in init
         '''
         self.interface = interface
         self.squares = {}

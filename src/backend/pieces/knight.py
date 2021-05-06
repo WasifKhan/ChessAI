@@ -9,7 +9,7 @@ class Knight(Piece):
         Knight.ID += 1
 
     def __str__(self):
-        return 'K' if self.is_white else 'k'
+        return 'N' if self.is_white else 'n'
 
     def is_valid_move(self, board, destination):
         vertical_move = abs(destination[0] - self.location[0])

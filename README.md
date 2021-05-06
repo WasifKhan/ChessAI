@@ -8,6 +8,7 @@ Repository containing Chess Engine and ML Model
 - ~~Get unit testing frameworks together~~
 - ~~get baseline interface going (link game with view through `interface.py`~~)
 - ~~Write AI class (to play with humans/vs other AI=interat with game class)~~
+- get unit test framework for board/game going
 - #### MILESTONE 1: **Dumb AI done**
 - Map datapoints to our coordinates
 - Set up various models(fix datapoint mapping)
@@ -22,12 +23,16 @@ Repository containing Chess Engine and ML Model
 
 ### **Ali**
 - ~~Finish all possible moves~~
-- Unit test everything
+- ~~Unit test everything~~
 - Break integration test into unit tests for board and game
 - Write actual integration tests
 - Implement king movement
 - enpassant/castle/promote
 - check/checkmate
+- write 2 system tests
+- optimizations
+  - change coordinate system to 2-digit int
+  - remove `if x.is_white: ... else: ...` by inverting board at start/end of code
 
 #### MILESTONE 1: **Done backend**
 - Start frontend
