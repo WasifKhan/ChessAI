@@ -36,3 +36,6 @@ class King(Piece):
     def moves(self, board):
         return set()
 
+    def checkmate(self, board):
+        return False
+

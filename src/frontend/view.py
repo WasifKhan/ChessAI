@@ -29,24 +29,24 @@ class View:
         interface.set_player_names('Player 1', 'AI')
         scoreboard = interface.get_scoreboard()
         score = interface.get_score('Player 1', 'AI')
-        game_over = interface.game_over()
         play_again = interface.play_again(True)
         '''
-        End of code that should be inside buttons. 
+        End of code that should be inside buttons.
         The code below belongs in init
         '''
         self.interface = interface
         self.squares = {}
         self.current_click = None
 
-        window = tk.Tk()
-        app = Window(window)
-        window.wm_title('Beth Harmon')
-        window.geometry('640x430')
+        root = tk.Tk()
+        self.root = root
+        app = Window(root)
+        root.wm_title('Beth Harmon')
+        root.geometry('640x470')
 
         for row in range(8):
-            window.columnconfigure(row, weight=1, minsize=75)
-            window.rowconfigure(row, weight=1, minsize=50)
+            root.columnconfigure(row, weight=1, minsize=75)
+            root.rowconfigure(row, weight=1, minsize=50)
             for column in range(8):
                 frame = tk.Frame(master=app,
                             relief=tk.RAISED,
@@ -56,7 +56,15 @@ class View:
                 piece['command'] = lambda r=piece: self.click_piece(r)
                 piece.pack(padx=5, pady=5)
                 self.squares[piece] = column * 10 + row
-        window.mainloop()
+        resign = tk.Frame(master=root, relief=tk.RAISED, borderwidth=6)
+        resign.pack(side=tk.BOTTOM)
+        resign_button = tk.Button(master=resign, text='Resign', fg='red')
+        resign_button['command'] = lambda: self.click_resign()
+        resign_button.pack(side=tk.BOTTOM)
+        root.mainloop()
+
+    def click_resign(self):
+        self.interface.game_over(root)
 
     def click_piece(self, piece):
         if not self.current_click:

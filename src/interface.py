@@ -22,14 +22,25 @@ class Interface:
     def set_player_names(self, p1_name='Player 1', p2_name='AI'):
         self.game.set_names(p1_name, p2_name)
 
+    def game_over(self, root):
+        print(self)
+        self.game.game_over()
+        root.destroy()
+
     def add_move(self, source, destination):
         if self.game.move(source, destination):
             print('='*30)
             print(f'{self.game.p1_name} move: {source} -> {destination}')
-            if self.AI \
-                and (ai_move := self.AI.get_move(self.game.board)) \
-                and self.game.move(ai_move[0], ai_move[1]):
+            if self.game.is_game_over():
+                self.game_over()
+                return True
+            if self.AI:
+                if (ai_move := self.AI.get_move(self.game.board)) \
+                    and self.game.move(ai_move[0], ai_move[1]):
                     print(f'{self.game.p2_name} move: {ai_move[0]} -> {ai_move[1]}')
+                    if self.game.is_game_over():
+                        self.game_over()
+                        return True
             print(self)
             return True
         else:
@@ -41,9 +52,6 @@ class Interface:
 
     def get_score(self, player1, player2=None):
         return True
-
-    def game_over(self):
-        return False
 
     def play_again(self, yes=True):
         return True

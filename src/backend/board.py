@@ -10,6 +10,7 @@ class Board:
     def __init__(self):
         self.history = []
         self.pieces = set()
+        self.game_over = False
         self._initialize_board()
 
     def __str__(self):
@@ -60,6 +61,10 @@ class Board:
                 previous_move[1][1] - previous_move[2][1] == -2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
                     self[(destination[0], destination[1] + 1)] = Square((destination[0], destination[1] + 1))
+        # Check if the move resulted in checkmate
+        if piece.is_white and self.black_king.checkmate(self.board) \
+            or (not(piece.is_white) and self.white_king.checkmate(self.board)):
+            board.game_over = True
 
     def _initialize_board(self):
         board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
@@ -164,5 +169,4 @@ class Board:
         board[7][7] = black_rook_2
         self.pieces.add(black_rook_2)
         self.board = board
-
 
