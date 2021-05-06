@@ -39,9 +39,6 @@ class Board:
         else:
             raise IndexError
 
-    def is_valid_move(self, piece, destination):
-        return piece.is_valid_move(self.board, destination)
-
     def move(self, piece, destination):
         self.history.append((piece, piece.location, destination))
         # Update the board to move piece from previous location to destination
@@ -63,9 +60,6 @@ class Board:
                 previous_move[1][1] - previous_move[2][1] == -2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
                     self[(destination[0], destination[1] + 1)] = Square((destination[0], destination[1] + 1))
-
-    def has_kings(self):
-        return True if self.white_king in self.pieces and self.black_king in self.pieces else False
 
     def _initialize_board(self):
         board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
