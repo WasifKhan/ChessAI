@@ -6,10 +6,14 @@ class Pawn(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
         self.ID = Pawn.ID
+        self.value = 1
         Pawn.ID += 1
 
     def __str__(self):
         return 'P' if self.is_white else 'p'
+
+    def value(self):
+        return 1
 
     def is_valid_move(self, board, destination):
         if self.is_white:

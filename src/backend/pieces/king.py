@@ -6,10 +6,14 @@ class King(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
         self.ID = King.ID
+        self.value = 100
         King.ID += 1
 
     def __str__(self):
         return 'K' if self.is_white else 'k'
+
+    def value(self):
+        return 100
 
     def is_valid_move(self, board, destination):
         x_dir = abs(self.location[0] - destination[0])

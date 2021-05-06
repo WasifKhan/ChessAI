@@ -32,7 +32,12 @@ Input Layer: 64 Neurons = S0 = [
 [5, 3, 3, 9, 100, 3, 3, 5]
 ]
 
-Output Layer = 124 Neurons = (16 Pawn Actions + 28 Bishop Actions + 16 Knight Actions + 28 Rook Actions + 28 Queen Actions + 8 King Actions) =  
+Output Layer = 124 Neurons = (16 Pawn Actions
+                              + 28 Bishop Actions
+                              + 16 Knight Actions
+                              + 28 Rook Actions
+                              + 28 Queen Actions
+                              + 8 King Actions) =
 PAWN
 1 - P1 - Up 1
 2 - P1 - Up 2
@@ -49,7 +54,7 @@ PAWN
 13 - P7 - Up 1
 14 - P7 - Up 2
 15 - P8 - Up 1
-16 - P8 - Up 2  
+16 - P8 - Up 2
 
 BISHOP
 1 - B1 - +Slope to Index0

@@ -2,16 +2,19 @@
 Baseline AI performing random moves
 '''
 
-from .base_ai import AI
+from ai.models.base_ai import AI
 from random import randint
 
 
 
 class RandomAI(AI):
-    def __init__(self):
-        pass
+    def __init__(self, is_white=False):
+        super().__init__(is_white)
 
-    def get_move(self, board):
+    def _trained(self):
+        return True
+
+    def _predict_move(self, board):
         my_pieces = list()
         for piece in board.pieces:
             if not(piece.is_white):
@@ -22,10 +25,7 @@ class RandomAI(AI):
 
         piece = my_pieces[rand_piece]
         moves = list(piece.moves(board))
-
         rand_move = randint(0, max(0, len(moves) - 1))
-
-
         source = piece.location[0]*10 + piece.location[1]
         destination = moves[rand_move]
         return (source, destination)

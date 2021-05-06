@@ -6,10 +6,14 @@ class Knight(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
         self.ID = Knight.ID
+        self.value = 3
         Knight.ID += 1
 
     def __str__(self):
         return 'N' if self.is_white else 'n'
+
+    def value(self):
+        return 3
 
     def is_valid_move(self, board, destination):
         vertical_move = abs(destination[0] - self.location[0])

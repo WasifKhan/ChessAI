@@ -6,10 +6,14 @@ class Bishop(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
         self.ID = Bishop.ID
+        self.value = 3
         Bishop.ID += 1
 
     def __str__(self):
         return 'B' if self.is_white else 'b'
+
+    def value(self):
+        return 3
 
     def is_valid_move(self, board, destination):
         x_direction = destination[0] - self.location[0]
