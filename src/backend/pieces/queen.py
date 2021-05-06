@@ -6,6 +6,7 @@ class Queen(Piece):
     def __init__(self, is_white, location):
         super().__init__(is_white, location)
         self.ID = Queen.ID
+        self.value = 9
         Queen.ID += 1
 
     def __str__(self):

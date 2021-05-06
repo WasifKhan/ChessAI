@@ -15,9 +15,9 @@ class Game:
 
     def __str__(self):
         ret_val = '\n' + self.p2_name
-        ret_val += '\n' + '=' * 30 + '\n'
+        ret_val += '\n' + '-' * 23 + '\n'
         ret_val += str(self.board)
-        ret_val += '\n' + '=' * 30 + '\n'
+        ret_val += '\n' + '-' * 23 + '\n'
         ret_val += self.p1_name + '\n'
         return ret_val
 

@@ -8,6 +8,7 @@ class Square:
         self.location = location
         self.ID = Square.ID
         self.is_white = None
+        self.value = 0
         Square.ID += 1
 
     def __str__(self):
@@ -15,7 +16,6 @@ class Square:
 
     def __hash__(self):
         return hash(str(self) + str(self.ID))
-
 
 class Piece(Square, metaclass=ABCMeta):
     def __init__(self, is_white, location):
