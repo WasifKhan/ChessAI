@@ -57,8 +57,8 @@ class TestBishop:
         board = Board()
         board[3,2] = white_bishop
         white_bishop.location=(3,2)
-        white_bishop.moves(board) == {43, 54, 65, 76, 23, 14, 5}
+        assert white_bishop.moves(board) == {43, 54, 65, 76, 23, 14, 5}
         board[4,5] = black_bishop
         black_bishop.location=(4,5)
-        black_bishop.moves(board) == {34, 23, 12, 1, 54, 63, 72}
+        assert black_bishop.moves(board) == {34, 23, 12, 1, 54, 63, 72}
 
