@@ -10,8 +10,15 @@ Repository containing Chess Engine and ML Model
 - ~~Write AI class (to play with humans/vs other AI=interat with game class)~~
 - ~~get unit test framework for board/game going~~
 - #### MILESTONE 1: **Dumb AI done**
+- simulate games for AI vs AI (apart of `Game` class)
+  - storing these games should be same type as raw_dat_to_board
 - Map datapoints to our coordinates
+  - `raw_data_to_board` function in `data_extractor.py` -store data in file(`data/` directory)
 - Set up various models(fix datapoint mapping)
+  - implement `train`, store result in `models/{model}/weights.txt
+- implement `trained` by checking for valid `weights.txt` file and initializing `self.predictor`
+- implement `predict_move`
+- ### MILESTONE 1.5 base smart AI done ###
 - Move w.r.t. various reward functions
 - Set up qlearning (links game to models>)
 - Train/Test
@@ -31,6 +38,7 @@ Repository containing Chess Engine and ML Model
 - enpassant/castle/promote
 - check/checkmate
 - write 2 system tests
+- implement scoreboard + visualization
 - type documentation
 - optimizations
   - change coordinate system to 2-digit int
