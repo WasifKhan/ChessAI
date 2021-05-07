@@ -7,7 +7,8 @@ import abc
 
 
 class AI(metaclass=abc.ABCMeta):
-    def __init__(self, is_white=False):
+    def __init__(self, name='AI', is_white=False):
+        self.name = name
         self.is_white = is_white
 
     def _board_to_datapoint(self, board):

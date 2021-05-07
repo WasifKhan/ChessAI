@@ -67,13 +67,13 @@ class View:
         self.interface.game_over(self.root)
 
     def click_piece(self, piece):
-        if not self.current_click:
-            self.current_click = self.squares[piece]
-        else:
+        if self.current_click:
             result = self.interface.add_move(self.current_click, self.squares[piece])
             self.current_click = None
-            if result is None:
+            if self.interface.AI and self.interface.ai_move() is None:
                 self.click_resign()
+        else:
+            self.current_click = self.squares[piece]
 
 
     def versus_AI(self):

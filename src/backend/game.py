@@ -7,9 +7,9 @@ from .board import Board
 
 
 class Game:
-    def __init__(self):
-        self.p1_name = 'Player 1'
-        self.p2_name = 'AI'
+    def __init__(self, p1_name='Player 1', p2_name='AI'):
+        self.p1_name = p1_name
+        self.p2_name = p2_name
         self.board = Board()
         self.white_turn = True
 
