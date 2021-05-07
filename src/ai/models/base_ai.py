@@ -20,7 +20,7 @@ class AI(metaclass=abc.ABCMeta):
         raise NotImplemented
 
     def _board_to_datapoint(self, board):
-        datapoint = [[board[column,row].value for column in range(8)] for row in range(8)]
+        datapoint = [([board[column,row].value, board[column,row].is_white) for column in range(8)] for row in range(8)]
         return datapoint
 
     def _resign(self, board, is_white):
