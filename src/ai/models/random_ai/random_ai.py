@@ -15,10 +15,7 @@ class RandomAI(AI):
         return True
 
     def _predict_move(self, board):
-        my_pieces = list()
-        for piece in board.pieces:
-            if not(piece.is_white):
-                my_pieces.append(piece)
+        my_pieces = list(board.white_pieces) if self.is_white else list(board.black_pieces)
         rand_piece = randint(0, max(0, len(my_pieces) - 1))
         while len(my_pieces[rand_piece].moves(board)) == 0:
             rand_piece = randint(0, max(0, len(my_pieces) - 1))

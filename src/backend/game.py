@@ -25,7 +25,6 @@ class Game:
         self.p1_name = p1_name
         self.p2_name = p2_name
 
-
     def move(self, source, destination):
         piece = self.board[source]
         destination = (destination//10, destination%10)
@@ -39,3 +38,9 @@ class Game:
             return True
         return False
 
+    def is_game_over(self):
+        return self.board.game_over
+
+    def game_over(self):
+        # Save and record the game
+        pass
