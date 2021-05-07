@@ -27,7 +27,7 @@ class Interface:
             if self.game.white_turn:
                 print('*' * 7 + f'{self.game.p1_name} resigned' + '*' * 6)
             else:
-                print(f'{self.game.p2_name} resigned')
+                print('*' * 10 + f'{self.game.p2_name} resigned' + '*' * 9)
 
         print('*'*30)
         print('*'*11 + 'GAME OVER' + '*'*10)
@@ -50,12 +50,11 @@ class Interface:
                         self.game_over()
                         return True
                 else:
-                    self.game_over()
+                    return None
             print(self)
             return True
-        else:
-            print('Invalid move.\nPlease enter a valid move.\n')
-            return False
+        print('Invalid move.\nPlease enter a valid move.\n')
+        return False
 
     def get_scoreboard(self):
         return True

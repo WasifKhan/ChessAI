@@ -70,8 +70,11 @@ class View:
         if not self.current_click:
             self.current_click = self.squares[piece]
         else:
-            self.interface.add_move(self.current_click, self.squares[piece])
+            result = self.interface.add_move(self.current_click, self.squares[piece])
             self.current_click = None
+            if result is None:
+                self.click_resign()
+
 
     def versus_AI(self):
         self.interface.versus_AI()
