@@ -58,28 +58,31 @@ class Interface:
         print('Invalid move.\nPlease enter a valid move.\n')
         return False
 
-    def simulate_games(self, num_games=0):
+    def _sim_game(self, pace):
         print((' ' * 8 + '\n') * 50)
         for i in range(2):
             print('Preparing game...')
-            sleep(1)
+            sleep(1/pace)
         self.game.board.__init__()
         print(self)
+        self.set_player_names('White AI', 'Black AI')
+        white_turn = True
+        while not self.game.is_game_over():
+            player = 'White AI' if white_turn else 'Black AI'
+            for i in range(2):
+                print(f'{player} is thinking...')
+                sleep(0.7/pace)
+            move = self.ai_move(white_turn)
+            if move is None:
+                break
+            white_turn = not(white_turn)
+            if white_turn:
+                print(self)
+                sleep(2/pace)
+
+    def simulate_games(self, num_games=0):
         if not num_games:
-            self.set_player_names('White AI', 'Black AI')
-            white_turn = True
-            while not self.game.is_game_over():
-                player = 'White AI' if white_turn else 'Black AI'
-                for i in range(2):
-                    print(f'{player} is thinking...')
-                    sleep(0.7)
-                move = self.ai_move(white_turn)
-                if move is None:
-                    break
-                white_turn = not(white_turn)
-                if white_turn:
-                    print(self)
-                    sleep(2)
+            self._sim_game(1.5)
 
     def get_scoreboard(self):
         return True
