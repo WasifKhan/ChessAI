@@ -20,7 +20,7 @@ class AI(metaclass=abc.ABCMeta):
     def _train(self):
         raise NotImplemented
 
-    def _should_resign(self, board):
+    def _resign(self, board):
         if len(board.history) < 4:
             return False
         turns_ago_2 = board.history[-3][3]
@@ -42,4 +42,4 @@ class AI(metaclass=abc.ABCMeta):
     def get_move(self, board):
         if not self._trained():
             self._train()
-        return None if self._should_resign(board) else self._predict_move(board)
+        return None if self._resign(board) else self._predict_move(board)
