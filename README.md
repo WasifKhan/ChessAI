@@ -10,6 +10,7 @@ Repository containing Chess Engine and ML Model
 - ~~Write AI class (to play with humans/vs other AI=interat with game class)~~
 - ~~get unit test framework for board/game going~~
 - #### MILESTONE 1: **Dumb AI done**
+- Something wrong with the square 0,0
 - implement resgin=behind by 2+ for 3+ moves
   - implement `white_lead` in board.py
 - seperate board.pieces into black.pieces and white.pieces
