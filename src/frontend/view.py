@@ -56,12 +56,21 @@ class View:
                 piece['command'] = lambda r=piece: self.click_piece(r)
                 piece.pack(padx=5, pady=5)
                 self.squares[piece] = column * 10 + row
-        resign = tk.Frame(master=root, relief=tk.RAISED, borderwidth=6)
-        resign.pack(side=tk.BOTTOM)
-        resign_button = tk.Button(master=resign, text='Resign', fg='red')
+        btm_frame = tk.Frame(master=root, relief=tk.RAISED, borderwidth=6)
+        btm_frame.pack(side=tk.BOTTOM)
+        resign_button = tk.Button(master=btm_frame, text='Resign', fg='red')
         resign_button['command'] = lambda: self.click_resign()
-        resign_button.pack(side=tk.BOTTOM)
+        resign_button.pack(side=tk.LEFT)
+
+        sim_games_button = tk.Button(master=btm_frame, text='Simulate Games', fg='blue')
+        sim_games_button['command'] = lambda: self.simulate_games()
+        sim_games_button.pack(side=tk.LEFT)
+
         root.mainloop()
+
+    def simulate_games(self):
+        self.interface.simulate_games()
+        self.click_resign()
 
     def click_resign(self):
         self.interface.game_over(self.root)
@@ -72,6 +81,7 @@ class View:
             self.current_click = None
             if self.interface.AI and self.interface.ai_move() is None:
                 self.click_resign()
+            print(self.interface)
         else:
             self.current_click = self.squares[piece]
 

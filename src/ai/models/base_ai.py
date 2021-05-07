@@ -7,13 +7,8 @@ import abc
 
 
 class AI(metaclass=abc.ABCMeta):
-    def __init__(self, name='AI', is_white=False):
+    def __init__(self, name='AI'):
         self.name = name
-        self.is_white = is_white
-
-    def _board_to_datapoint(self, board):
-        datapoint = [[board[column,row].value for column in range(8)] for row in range(8)]
-        return datapoint
 
     def _trained(self):
         raise NotImplemented
@@ -21,26 +16,23 @@ class AI(metaclass=abc.ABCMeta):
     def _train(self):
         raise NotImplemented
 
-    def _resign(self, board):
-        if len(board.history) < 4:
-            return False
-        turns_ago_2 = board.history[-3][3]
-        turn_ago_1 = board.history[-1][3]
-        if self.is_white:
-            if turns_ago_2 <= -2 and turn_ago_1 <= -2:
-                return True
-            else:
-                return False
-        else:
-            if turns_ago_2 >= 2 and turn_ago_1 >= 2:
-                return True
-            else:
-                return False
-
-    def _predict_move(self, board):
+    def _predict_move(self, board, is_white):
         raise NotImplemented
 
-    def get_move(self, board):
+    def _board_to_datapoint(self, board):
+        datapoint = [[board[column,row].value for column in range(8)] for row in range(8)]
+        return datapoint
+
+    def _resign(self, board, is_white):
+        if len(board.history) < 3:
+            return False
+        prior_turns = [board.history[i][3] for i in range(-3, 0, 1)]
+        if is_white and max(prior_turns) <= -2 \
+            or (not is_white and min(prior_turns) >= 2):
+                return True
+        return False
+
+    def get_move(self, board, is_white):
         if not self._trained():
             self._train()
-        return None if self._resign(board) else self._predict_move(board)
+        return None if self._resign(board, is_white) else self._predict_move(board, is_white)

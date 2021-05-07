@@ -14,5 +14,5 @@ class AI:
         model = eval('ai')
         self.ai = model()
 
-    def get_move(self, board):
-        return self.ai.get_move(board)
+    def get_move(self, board, is_white=False):
+        return self.ai.get_move(board, is_white)

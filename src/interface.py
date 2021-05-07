@@ -3,6 +3,7 @@ Interface between backend and frontend
 '''
 
 from ai.ai import AI
+from time import sleep
 
 
 
@@ -35,14 +36,14 @@ class Interface:
         self.game.game_over()
         root.destroy()
 
-    def ai_move(self):
-        if (ai_move := self.AI.get_move(self.game.board)):
+    def ai_move(self, is_white=False):
+        if (ai_move := self.AI.get_move(self.game.board, is_white)):
             self.game.move(ai_move[0], ai_move[1])
-            print(f'{self.AI.name} move: {ai_move[0]} -> {ai_move[1]}')
+            name = self.game.p2_name if self.game.white_turn else self.game.p1_name
+            print('='*30)
+            print(f'{name} move: {ai_move[0]} -> {ai_move[1]}')
             if self.game.is_game_over():
                 self.game_over()
-            else:
-                print(self)
             return True
         return None
 
@@ -54,11 +55,32 @@ class Interface:
             if self.game.is_game_over():
                 self.game_over()
                 return True
-            if not self.AI:
-                print(self)
             return True
         print('Invalid move.\nPlease enter a valid move.\n')
         return False
+
+    def simulate_games(self, num_games=0):
+        print((' ' * 8 + '\n') * 30)
+        for i in range(3):
+            print('Preparing game...')
+            sleep(1)
+        self.game.board.__init__()
+        print(self)
+        if not num_games:
+            self.set_player_names('White AI', 'Black AI')
+            white_turn = True
+            while not self.game.is_game_over():
+                player = 'White AI' if white_turn else 'Black AI'
+                for i in range(2):
+                    print(f'{player} is thinking...')
+                    sleep(1)
+                move = self.ai_move(white_turn)
+                if move is None:
+                    break
+                white_turn = not(white_turn)
+                if white_turn:
+                    print(self)
+                    sleep(3)
 
     def get_scoreboard(self):
         return True
