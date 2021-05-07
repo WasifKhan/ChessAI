@@ -4,14 +4,6 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- ~~Split testing into unit and integration tests~~
-- ~~Get unit testing frameworks together~~
-- ~~get baseline interface going (link game with view through `interface.py`~~)
-- ~~Write AI class (to play with humans/vs other AI=interat with game class)~~
-- ~~get unit test framework for board/game going~~
-- #### MILESTONE 1: **Dumb AI done**
-- ~~implement resgin=behind by 2+ for 3+ moves~~
-- ~~seperate board.pieces into black.pieces and white.pieces~~
 - simulate games for AI vs AI (apart of `Game` class)
 - Set up RNN/RNN,CNN/Greedy/Greedy+exploit
   - implement `train`, store result in `models/{model}/weights.txt
@@ -31,15 +23,15 @@ Repository containing Chess Engine and ML Model
 - Tweak qlearning rewards
 
 ### **Ali**
-- ~~Finish all possible moves~~
-- ~~Unit test pieces~~
 - unit tests for board and game
 - Write actual integration tests (one for why moves needs to be updated after each move)
   - i think it only needs tobe updated before a king moves
 - Implement king movement
 - enpassant/castle/promote
 - check/checkmate
-- Something wrong with the square 0,0
+- Something wrong:
+  - with the square 0,0
+  - pawn capture pawn 2,5 -> 1,6
 - write 2 system tests
 - implement scoreboard + visualization
 - type documentation
