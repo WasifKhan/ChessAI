@@ -5,7 +5,7 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - simulate games for AI vs AI (apart of `Game` class)
-  - acyclic graph where edge a->b = a wins vs b
+  - file containing matrix where cell I,j = player I wins vs player j
   - scoreboard class has an attribute players= Players()
   - players.add(), player in players, players.add_game(player1, player2, winner), players.get_score(player), players
 Get_scoreboard(), players.get_score(player1, player2)
