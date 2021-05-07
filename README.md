@@ -29,7 +29,9 @@ Repository containing Chess Engine and ML Model
 - Implement king movement
 - enpassant/castle/promote
 - check/checkmate
-- Something wrong with the square 0,0
+- Something wrong:
+  - with the square 0,0
+  - pawn capture pawn 2,5 -> 1,6
 - write 2 system tests
 - implement scoreboard + visualization
 - type documentation
