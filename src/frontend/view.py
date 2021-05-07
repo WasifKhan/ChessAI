@@ -26,9 +26,9 @@ class View:
         Currently store here until calls are done
         '''
         interface.versus_AI()
-        interface.set_player_names('Player 1', 'AI')
+        interface.set_player_names('Player 1', 'Black AI')
         scoreboard = interface.get_scoreboard()
-        score = interface.get_score('Player 1', 'AI')
+        score = interface.get_score('Player 1', 'Black AI')
         play_again = interface.play_again(True)
         '''
         End of code that should be inside buttons.
@@ -79,7 +79,7 @@ class View:
         if self.current_click:
             result = self.interface.add_move(self.current_click, self.squares[piece])
             self.current_click = None
-            if self.interface.AI and self.interface.ai_move() is None:
+            if self.interface.AI and self.interface.ai_move(False) is None:
                 self.click_resign()
             print(self.interface)
         else:
