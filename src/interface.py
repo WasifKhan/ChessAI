@@ -74,6 +74,7 @@ class Interface:
         print((' ' * 8 + '\n') * 50)
         for i in range(2):
             print('Preparing game...')
+            sleep(2)
         self.game.board.__init__()
         print(self)
         self.set_player_names('White AI', 'Black AI')
@@ -82,12 +83,14 @@ class Interface:
             player = 'White AI' if white_turn else 'Black AI'
             for i in range(2):
                 print(f'{player} is thinking...')
+                sleep(0.5)
             move = self.ai_move(white_turn)
             if move is None:
                 break
             white_turn = not(white_turn)
             if white_turn:
                 print(self)
+                sleep(1.5)
         return not(self.game.white_turn)
 
     def simulate_games(self, num_games=0):
