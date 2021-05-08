@@ -64,9 +64,9 @@ class TestQueen:
         board = Board()
         board[2,3] = white_queen
         white_queen.location=(2,3)
+        assert white_queen.moves(board) == {33 ,43, 53, 63, 73, 32, 22, 12, 13, 3, 14, 5, 24, 25, 26, 34, 45, 56}
         board[4,3] = black_queen
         black_queen.location=(4,3)
-        assert white_queen.moves(board) == {33, 43, 22, 12, 13, 3, 14, 5, 24, 25, 26, 34, 45, 56}
         assert black_queen.moves(board) == {33, 23, 32, 21, 42, 41, 52, 61, 53, 63, 73, 54, 65, 44, 45, 34, 25}
 
 
