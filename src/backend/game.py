@@ -41,6 +41,8 @@ class Game:
     def is_game_over(self):
         return self.board.game_over
 
-    def game_over(self):
+    def game_over(self, save=True, result=None):
+        if not save:
+            return
         # Save and record the game
         pass

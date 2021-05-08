@@ -23,7 +23,8 @@ class Bishop(Piece):
         if abs(x_direction) != abs(y_direction):
             return False
         for i in range(1, x_direction):
-            if not(board[self.location[0] + (i * x_plane), self.location[1] + (i*y_plane)].is_white == None):
+            if not(board[self.location[0] + (i * x_plane),
+                         self.location[1] + (i*y_plane)].is_white == None):
                 return False
         if not(isinstance(board[destination], Piece)):
             return True
@@ -37,7 +38,6 @@ class Bishop(Piece):
         result = set()
         i = 1
         while self.location[0]+i <= 7 and self.location[1]+i <=7:
-            print('inside 1')
             if (piece:= board[self.location[0]+i, self.location[1]+i]) and piece.is_white is None:
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
@@ -47,7 +47,6 @@ class Bishop(Piece):
                 break
         i = 1
         while self.location[0]+i <= 7 and self.location[1]-i >=0:
-            print('inside 2')
             if (piece:= board[self.location[0]+i, self.location[1]-i]) and piece.is_white is None:
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
@@ -57,10 +56,7 @@ class Bishop(Piece):
                 break
         i = 1
         while self.location[0]-i >= 0 and self.location[1]+i <=7:
-            print('inside 3')
             piece= board[self.location[0]-i, self.location[1]+i]
-            print(piece)
-            print(piece.is_white)
             if (piece:= board[self.location[0]-i, self.location[1]+i]) and piece.is_white is None:
 
                 result.add(piece.location[0]*10 + piece.location[1])
@@ -71,7 +67,6 @@ class Bishop(Piece):
                 break
         i = 1
         while self.location[0]+i >=0 and self.location[1]-i >=0:
-            print('inside 4')
             if (piece:= board[self.location[0]-i, self.location[1]-i]) and piece.is_white is None:
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
@@ -79,6 +74,5 @@ class Bishop(Piece):
                 if (piece:= board[self.location[0]-i, self.location[1]-i]) and piece.is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
-        print(result)
         return result
 
