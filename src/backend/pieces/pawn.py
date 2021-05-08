@@ -36,17 +36,17 @@ class Pawn(Piece):
                 if board[destination].is_white == None:
                     return True
             # Check for vertical movement - 2 squares
-            elif (self.location[1] + 2 == destination[1] and 
-                  self.location[0] == destination[0] and 
-                  self.location[1] == 1):
+            elif (self.location[1] + 2 == destination[1] \
+                    and self.location[0] == destination[0] \
+                    and self.location[1] == 1):
                 if (board[destination].is_white == None and
                     board[(destination[0], destination[1] - 1)].is_white == None):
                     return True
         else:
             # Check for diagonal movement
-            if (self.location[1] - 1 == destination[1] and
-               (self.location[0] + 1 == destination[0] or
-                self.location[0] - 1 == destination[0])):
+            if self.location[1] - 1 == destination[1] \
+                and self.location[0] + 1 == destination[0] \
+                or self.location[0] - 1 == destination[0]:
                 if board[destination].is_white:
                     return True
                 # Check for en passant movement    
@@ -74,7 +74,7 @@ class Pawn(Piece):
         result = set()
         y_direction = 1 if self.is_white else -1
         # Single vertical movement
-        if (piece:= board[self.location[0], self.location[1] + y_direction]).is_white is None:
+        if (piece:= board[self.location[0], self.location[1] + y_direction]) is not None and piece.is_white is None:
             result.add(piece.location[0] * 10 + piece.location[1])
         # Double vertical movement
         if (self.location[1] == 1 and self.is_white) or (self.location[1] == 6 and not(self.is_white)):
@@ -82,15 +82,24 @@ class Pawn(Piece):
                 result.add(piece.location[0] * 10 + piece.location[1])
         # Capture
         if (self.location[0] == 0):
-            if (piece:= board[self.location[0] + 1, self.location[1] + y_direction]).is_white is not self.is_white and piece.is_white is not None:
+            if (piece:= board[self.location[0] + 1, self.location[1] + y_direction]) is not None \
+                and piece.is_white is not None \
+                and piece.is_white is not self.is_white:
                 result.add(piece.location[0] * 10 + piece.location[1])
         elif (self.location[0] == 7):
-            if (piece:= board[self.location[0] - 1, self.location[1] + y_direction]).is_white is not self.is_white and piece.is_white is not None:
+            if (piece:= board[self.location[0] - 1, self.location[1] + y_direction]) is not None \
+                and piece.is_white is not None \
+                and piece.is_white is not self.is_white:
                 result.add(piece.location[0] * 10 + piece.location[1])
         else:
-            if (piece:= board[self.location[0] + 1, self.location[1] + y_direction]).is_white is not self.is_white and piece.is_white is not None:
-                result.add(piece.location[0] * 10 + piece.location[1])
-            if (piece:= board[self.location[0] - 1, self.location[1] + y_direction]).is_white is not self.is_white and piece.is_white is not None:
+            if (piece:= board[self.location[0] + 1, self.location[1] + y_direction]) is not None \
+                and piece.is_white is not None \
+                and piece.is_white is not self.is_white:
+                    result.add(piece.location[0] * 10 + piece.location[1])
+            if (piece:= board[self.location[0] - 1, self.location[1] +
+                y_direction]) is not None \
+                and piece.is_white is not None \
+                and piece.is_white is not self.is_white:
                 result.add(piece.location[0] * 10 + piece.location[1])
         # En passant
         '''
