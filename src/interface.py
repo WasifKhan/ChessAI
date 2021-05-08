@@ -24,6 +24,7 @@ class Interface:
 
     def game_over(self, root):
         print('*'*30)
+        winner = not(self.game.white_turn)
         if not self.game.is_game_over():
             if self.game.white_turn:
                 print('*' * 7 + f'{self.game.p1_name} resigned' + '*' * 6)
@@ -58,11 +59,21 @@ class Interface:
         print('Invalid move.\nPlease enter a valid move.\n')
         return False
 
-    def _sim_game(self, pace):
+    def _sim_many(self):
+        self.game.board.__init__()
+        self.set_player_names('White AI', 'Black AI')
+        white_turn = True
+        while not self.game.is_game_over():
+            move = self.ai_move(white_turn)
+            if move is None:
+                break
+            white_turn = not(white_turn)
+        return not(self.game.white_turn)
+
+    def _sim_game(self):
         print((' ' * 8 + '\n') * 50)
         for i in range(2):
             print('Preparing game...')
-            sleep(1/pace)
         self.game.board.__init__()
         print(self)
         self.set_player_names('White AI', 'Black AI')
@@ -71,18 +82,27 @@ class Interface:
             player = 'White AI' if white_turn else 'Black AI'
             for i in range(2):
                 print(f'{player} is thinking...')
-                sleep(0.7/pace)
             move = self.ai_move(white_turn)
             if move is None:
                 break
             white_turn = not(white_turn)
             if white_turn:
                 print(self)
-                sleep(2/pace)
+        return not(self.game.white_turn)
 
     def simulate_games(self, num_games=0):
         if not num_games:
-            self._sim_game(1.5)
+            white_win = self._sim_game()
+            return white_win
+        white_wins, black_wins = 0,0
+        for i in range(num_games):
+            if self._sim_many():
+                white_wins += 1
+            else:
+                black_wins += 1
+        print(white_wins)
+        print(black_wins)
+
 
     def get_scoreboard(self):
         return True

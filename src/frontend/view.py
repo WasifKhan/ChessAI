@@ -69,7 +69,7 @@ class View:
         root.mainloop()
 
     def simulate_games(self):
-        self.interface.simulate_games()
+        self.interface.simulate_games(100)
         self.click_resign()
 
     def click_resign(self):
