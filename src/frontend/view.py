@@ -79,7 +79,7 @@ class View:
         if self.current_click:
             result = self.interface.add_move(self.current_click, self.squares[piece])
             self.current_click = None
-            if self.interface.AI and self.interface.ai_move(False) is None:
+            if self.interface.versus_ai and self.interface.ai_move(False) is None:
                 self.click_resign()
             print(self.interface)
         else:
