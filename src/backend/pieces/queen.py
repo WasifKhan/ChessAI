@@ -51,7 +51,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]+i, self.location[1]+i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]+i, self.location[1]+i]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         i = 0
@@ -60,7 +60,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]+i, self.location[1]-i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]+i, self.location[1]-i]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         i = 0
@@ -69,7 +69,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]-i, self.location[1]+i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]-i, self.location[1]+i]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         i = 0
@@ -78,7 +78,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]-i, self.location[1]-i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]-i, self.location[1]-i]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         i = 0
@@ -87,7 +87,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]+i, self.location[1]].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]+i, self.location[1]]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         i = 0
@@ -96,7 +96,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]-i, self.location[1]].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]-i, self.location[1]]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         i = 0
@@ -105,7 +105,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0], self.location[1]+i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0], self.location[1]+i]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         i = 0
@@ -114,7 +114,7 @@ class Queen(Piece):
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0], self.location[1]-i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0], self.location[1]-i]).is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
         return result

@@ -35,41 +35,50 @@ class Bishop(Piece):
 
     def moves(self, board):
         result = set()
-        i = 0
+        i = 1
         while self.location[0]+i <= 7 and self.location[1]+i <=7:
-            if (piece:= board[self.location[0]+i, self.location[1]+i]).is_white is None:
+            print('inside 1')
+            if (piece:= board[self.location[0]+i, self.location[1]+i]) and piece.is_white is None:
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]+i, self.location[1]+i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]+i, self.location[1]+i]) and piece.is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
-        i = 0
+        i = 1
         while self.location[0]+i <= 7 and self.location[1]-i >=0:
-            if (piece:= board[self.location[0]+i, self.location[1]-i]).is_white is None:
+            print('inside 2')
+            if (piece:= board[self.location[0]+i, self.location[1]-i]) and piece.is_white is None:
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]+i, self.location[1]-i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]+i, self.location[1]-i]) and piece.is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
-        i = 0
+        i = 1
         while self.location[0]-i >= 0 and self.location[1]+i <=7:
-            if (piece:= board[self.location[0]-i, self.location[1]+i]).is_white is None:
+            print('inside 3')
+            piece= board[self.location[0]-i, self.location[1]+i]
+            print(piece)
+            print(piece.is_white)
+            if (piece:= board[self.location[0]-i, self.location[1]+i]) and piece.is_white is None:
+
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]-i, self.location[1]+i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]-i, self.location[1]+i]) and piece.is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
-        i = 0
+        i = 1
         while self.location[0]+i >=0 and self.location[1]-i >=0:
-            if (piece:= board[self.location[0]-i, self.location[1]-i]).is_white is None:
+            print('inside 4')
+            if (piece:= board[self.location[0]-i, self.location[1]-i]) and piece.is_white is None:
                 result.add(piece.location[0]*10 + piece.location[1])
                 i += 1
             else:
-                if (piece:= board[self.location[0]-i, self.location[1]-i].is_white) is not self.is_white:
+                if (piece:= board[self.location[0]-i, self.location[1]-i]) and piece.is_white is not self.is_white:
                     result.add(piece.location[0]*10 + piece.location[1])
                 break
+        print(result)
         return result
 
