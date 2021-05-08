@@ -2,13 +2,11 @@
 Interface between backend and frontend
 '''
 
-from chess_types import Game, View, AI
-
 
 class Interface:
-    def __init__(self, game: Game, ai: AI):
+    def __init__(self, game, ai):
         self.game = game
-        self.AI = ai
+        self.ai = ai
         self.versus_ai = False
         print(self.game)
 
@@ -21,7 +19,7 @@ class Interface:
     def set_player_names(self, p1_name: str, p2_name: str) -> None:
         self.game.set_names(p1_name, p2_name)
 
-    def game_over(self, root: View) -> None:
+    def game_over(self, root) -> None:
         print('*'*30)
         winner = not(self.game.white_turn)
         if not self.game.is_game_over():
@@ -36,20 +34,13 @@ class Interface:
         root.destroy()
 
     def ai_move(self, is_white: bool) -> bool:
-        if (ai_move := self.AI.get_move(self.game.board, is_white)):
-            self.game.move(ai_move[0], ai_move[1])
-            name = self.game.p2_name if self.game.white_turn else self.game.p1_name
-            print('='*30)
-            print(f'{name} move: {ai_move[0]} -> {ai_move[1]}')
-            if self.game.is_game_over():
-                self.game_over()
-            return True
+        if (ai_move := self.ai.get_move(self.game.board, is_white)):
+            return self.add_move(ai_move[0], ai_move[1])
         return None
 
     def add_move(self, source: int, destination) -> bool:
         if self.game.move(source, destination):
             name = self.game.p2_name if self.game.white_turn else self.game.p1_name
-            print('='*30)
             print(f'{name} move: {source} -> {destination}')
             if self.game.is_game_over():
                 self.game_over()
