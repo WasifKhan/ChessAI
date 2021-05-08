@@ -20,19 +20,14 @@ class Interface:
     def set_player_names(self, p1_name: str, p2_name: str) -> None:
         self.game.set_names(p1_name, p2_name)
 
-    def game_over(self, root) -> None:
+    def game_over(self) -> None:
         print('*'*30)
         winner = not(self.game.white_turn)
         if not self.game.is_game_over():
-            if self.game.white_turn:
-                print('*' * 7 + f'{self.game.p1_name} resigned' + '*' * 6)
-            else:
-                print('*' * 7 + f'{self.game.p2_name} resigned' + '*' * 6)
-        print('*'*30)
-        print('*'*11 + 'GAME OVER' + '*'*10)
-        print('*'*30)
+            loser = self.game.p1_name if self.game.white_turn else self.game.p2_name
+            print('*' * 7 + f'{loser} resigned' + '*' * 6)
+        print(('*'*30 + '\n') + ('*'*11 + 'GAME OVER' + '*'*10 + '\n') + ('*'*30))
         self.game.game_over()
-        root.destroy()
 
     def ai_move(self, is_white: bool) -> bool:
         if (ai_move := self.ai.get_move(self.game.board, is_white)):
@@ -65,7 +60,13 @@ class Interface:
             else:
                 black_wins += 1
                 print('Black wins')
+        self.game.__init__('Player 1', 'Black AI')
         print(f'score: {white_wins}-{black_wins}')
+
+    def play_again(self, yes: bool=True):
+        self.game.__init__(self.game.p1_name, self.game.p2_name)
+        print(self.game)
+        return True
 
     def get_scoreboard(self):
         return True
@@ -73,5 +74,4 @@ class Interface:
     def get_score(self, player1: str, player2: str=None):
         return True
 
-    def play_again(self, yes: bool=True):
-        return True
+

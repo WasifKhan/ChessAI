@@ -29,7 +29,6 @@ class View:
         interface.set_player_names('Player 1', 'Black AI')
         scoreboard = interface.get_scoreboard()
         score = interface.get_score('Player 1', 'Black AI')
-        play_again = interface.play_again(True)
         '''
         End of code that should be inside buttons.
         The code below belongs in init
@@ -53,38 +52,43 @@ class View:
                             borderwidth=4)
                 frame.grid(row=7-row, column=column, padx=5, pady=5)
                 piece = tk.Button(master=frame, text=f'({column}, {row})')
-                piece['command'] = lambda r=piece: self.click_piece(r)
+                piece['command'] = lambda r=piece: self.piece(r)
                 piece.pack(padx=5, pady=5)
                 self.squares[piece] = column * 10 + row
         btm_frame = tk.Frame(master=root, relief=tk.RAISED, borderwidth=6)
         btm_frame.pack(side=tk.BOTTOM)
         resign_button = tk.Button(master=btm_frame, text='Resign', fg='red')
-        resign_button['command'] = lambda: self.click_resign()
+        resign_button['command'] = lambda: self.resign()
         resign_button.pack(side=tk.LEFT)
 
         sim_games_button = tk.Button(master=btm_frame, text='Simulate Games', fg='blue')
         sim_games_button['command'] = lambda: self.simulate_games()
         sim_games_button.pack(side=tk.LEFT)
 
+        play_again_button = tk.Button(master=btm_frame, text='Play Again', fg='green')
+        play_again_button['command'] = lambda: self.play_again()
+        play_again_button.pack(side=tk.LEFT)
+
         root.mainloop()
 
     def simulate_games(self):
         self.interface.simulate_games(100)
-        self.click_resign()
 
-    def click_resign(self):
-        self.interface.game_over(self.root)
+    def play_again(self):
+        self.interface.play_again()
 
-    def click_piece(self, piece):
+    def resign(self):
+        self.interface.game_over()
+
+    def piece(self, piece):
         if self.current_click:
             if (result := self.interface.add_move(self.current_click, self.squares[piece])):
                 if self.interface.versus_ai and self.interface.ai_move(False) is None:
-                    self.click_resign()
+                    self.resign()
                 print(self.interface)
             self.current_click = None
         else:
             self.current_click = self.squares[piece]
-
 
     def versus_AI(self):
         self.interface.versus_AI()
