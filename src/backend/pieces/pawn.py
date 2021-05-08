@@ -83,7 +83,7 @@ class Pawn(Piece):
         # Capture
         if (self.location[0] == 0):
             if (piece:= board[self.location[0] + 1, self.location[1] + y_direction]).is_white is not self.is_white and piece.is_white is not None:
-                result.add(piece.location[0] * 10 + piece.location[1]) 
+                result.add(piece.location[0] * 10 + piece.location[1])
         elif (self.location[0] == 7):
             if (piece:= board[self.location[0] - 1, self.location[1] + y_direction]).is_white is not self.is_white and piece.is_white is not None:
                 result.add(piece.location[0] * 10 + piece.location[1])

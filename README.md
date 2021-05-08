@@ -5,7 +5,11 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - simulate games for AI vs AI (apart of `Game` class)
-- Set up RNN/RNN,CNN/Greedy/Greedy+exploit
+  - file containing matrix where cell I,j = player I wins vs player j
+  - scoreboard class has an attribute players= Players()
+  - players.add(), player in players, players.add_game(player1, player2, winner), players.get_score(player), players
+Get_scoreboard(), players.get_score(player1, player2)
+- Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
   - implement `train`, store result in `models/{model}/weights.txt
   - storing these games should be same type as raw_dat_to_board
 - Map datapoints to our coordinates
@@ -29,7 +33,9 @@ Repository containing Chess Engine and ML Model
 - Implement king movement
 - enpassant/castle/promote
 - check/checkmate
-- Something wrong with the square 0,0
+- Something wrong:
+  - with the square 0,0
+  - pawn capture pawn 2,5 -> 1,6
 - write 2 system tests
 - implement scoreboard + visualization
 - type documentation
