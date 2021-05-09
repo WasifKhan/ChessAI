@@ -27,7 +27,8 @@ class Interface:
             loser = self.game.p1_name if self.game.white_turn else self.game.p2_name
             print('*' * 7 + f'{loser} resigned' + '*' * 6)
         print(('*'*30 + '\n') + ('*'*11 + 'GAME OVER' + '*'*10 + '\n') + ('*'*30))
-        self.game.game_over()
+        self.game.game_over(1, 0) if loser==self.game.p2_name else self.game.game_over(0, 1)
+        self.play_again()
 
     def ai_move(self, is_white: bool) -> bool:
         if (ai_move := self.ai.get_move(self.game.board, is_white)):
@@ -61,15 +62,19 @@ class Interface:
                 black_wins += 1
                 print('Black wins')
         self.game.__init__('Player 1', 'Black AI')
+        self.game.game_over(white_wins, black_wins)
         print(f'score: {white_wins}-{black_wins}')
 
     def play_again(self, yes: bool=True):
+        print('*'*30 + '\n')
+        print('Reseting game...')
+        print('*'*30 + '\n')
         self.game.__init__(self.game.p1_name, self.game.p2_name)
         print(self.game)
         return True
 
     def get_scoreboard(self):
-        return True
+        return self.game.get_scoreboard()
 
     def get_score(self, player1: str, player2: str=None):
         return True

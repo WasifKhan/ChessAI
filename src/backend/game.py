@@ -3,7 +3,7 @@ Class to simulate a game
 '''
 
 from .board import Board
-
+from .scoreboard.scoreboard import Scoreboard
 
 
 class Game:
@@ -11,6 +11,7 @@ class Game:
         self.p1_name = p1_name
         self.p2_name = p2_name
         self.board = Board()
+        self.scoreboard = Scoreboard()
         self.white_turn = True
 
     def __str__(self):
@@ -20,6 +21,9 @@ class Game:
         ret_val += '\n' + '-' * 23 + '\n'
         ret_val += self.p1_name + '\n'
         return ret_val
+
+    def _add_games(self, player1, player2, p1_wins, p2_wins):
+        self.scoreboard.add_games(player1, player2, p1_wins, p2_wins)
 
     def set_names(self, p1_name, p2_name):
         self.p1_name = p1_name
@@ -41,8 +45,14 @@ class Game:
     def is_game_over(self):
         return self.board.game_over
 
-    def game_over(self, save=True, result=None):
-        if not save:
-            return
-        # Save and record the game
-        pass
+    def game_over(self, p1_wins, p2_wins):
+        self._add_games(self.p1_name, self.p2_name, p1_wins, p2_wins)
+
+    def get_scoreboard(self):
+        return self.scoreboard.get_scoreboard()
+
+    def get_score(self, player1, player2=None):
+        return self.scoreboard.get_score(player1, player2)
+
+    def reset_score(self, player1, player2=None):
+        self.scoreboard.reset_score(player1, player2)
