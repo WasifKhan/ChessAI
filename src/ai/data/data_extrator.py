@@ -4,13 +4,14 @@ File to extract chess games data from the web
 
 from bz2 import BZ2Decompressor
 from urllib.request import urlopen
-from raw_data.files import files as FILES
+from ai.data.raw_data.files import files as FILES
 from os import listdir
-import re
+from re import split
 
 
-LOCATION = 'raw_data/data_files/'
-DATASET_LOCATION = 'data.txt'
+
+SOURCE = 'ai/data/raw_data/data_files/'
+DESTINATION = 'ai/data/data.txt'
 
 
 class DataExtractor:
@@ -25,35 +26,35 @@ class DataExtractor:
     def _extract_file(self, file, ID):
         decompressor = BZ2Decompressor()
         filename = self.source + self.filename + str(ID) + '.txt'
-        try:
-            with open(filename, 'wb') as fp:
-                req = urlopen(file)
-                while chunk := req.read(self.chunk):
-                    decomp = decompressor.decompress(chunk)
-                    if decomp:
-                        fp.write(decomp)
-        except EOFError:
-            fp.close()
-            return
+        with open(filename, 'wb') as fp:
+            req = urlopen(file)
+            while chunk := req.read(self.chunk):
+                decomp = decompressor.decompress(chunk)
+                if decomp:
+                    fp.write(decomp)
 
     def download_raw_data(self):
+        if len(listdir(self.source)) > 0:
+            return
         for ID in range(len(self.files)):
-            self._extract_file(self.files[ID], ID)
-
+            try:
+                self._extract_file(self.files[ID], ID)
+            except EOFError:
+                continue
 
     def _extract_moves(self, lines):
         for line in lines[:-1]:
             if line[0] == '1':
-                game = re.split('[\d]+\.\s', line)
+                game = split('[\d]+\.\s', line)
                 datapoint = '['
                 for it in range (1, len(game)):
                     move = game[it].split('{')
                     if len(move) > 1:
-                        white_move = re.split('[\?!#\+=]', move[0][0:-1])[0]
-                        black_move = re.split('[\?!#\+=]', move[-2].split()[-1])[0]
+                        white_move = split('[\?!#\+=]', move[0][0:-1])[0]
+                        black_move = split('[\?!#\+=]', move[-2].split()[-1])[0]
                     else:
-                        white_move = re.split('[\?!#\+=]', move[0].split()[0])[0]
-                        black_move = re.split('[\?!#\+=]', move[0].split()[1])[0]
+                        white_move = split('[\?!#\+=]', move[0].split()[0])[0]
+                        black_move = split('[\?!#\+=]', move[0].split()[1])[0]
                     if it + 1 == len(game) and white_move == black_move:
                         black_move = 'None'
                     datapoint += f"('{white_move}', '{black_move}'), "
@@ -61,6 +62,8 @@ class DataExtractor:
                 self.data.append(datapoint)
 
     def raw_data_to_dataset(self):
+        if 'data.txt' in listdir('ai/data/'):
+            return
         for filename in listdir(self.source):
             with open(self.source + filename) as fp:
                 lines = fp.readlines()
@@ -69,6 +72,5 @@ class DataExtractor:
             for datapoint in self.data:
                 fp.write(datapoint)
 
-data_extractor = DataExtractor(FILES, LOCATION, DATASET_LOCATION)
-# data_extractor.download_raw_data()
-# data_extractor.raw_data_to_dataset()
+
+data_extractor = DataExtractor(FILES, SOURCE, DESTINATION)
