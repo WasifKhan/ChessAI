@@ -35,4 +35,4 @@ class AI(metaclass=abc.ABCMeta):
     def get_move(self, board, is_white):
         if not self._trained():
             self._train()
-        return None if self._resign(board, is_white) else self._predict_move(board, is_white)
+        return False if self._resign(board, is_white) else self._predict_move(board, is_white)

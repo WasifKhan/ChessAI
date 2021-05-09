@@ -83,7 +83,7 @@ class View:
     def piece(self, piece):
         if self.current_click:
             if (result := self.interface.add_move(self.current_click, self.squares[piece])):
-                if self.interface.versus_ai and self.interface.ai_move(False) is None:
+                if self.interface.versus_ai and not self.interface.ai_move(False):
                     self.resign()
                     return
                 print(self.interface)

@@ -2,7 +2,6 @@
 Interface between backend and frontend
 '''
 
-from time import sleep
 
 class Interface:
     def __init__(self, game, ai):
@@ -31,9 +30,9 @@ class Interface:
         self.play_again()
 
     def ai_move(self, is_white: bool) -> bool:
-        if (ai_move := self.ai.get_move(self.game.board, is_white)):
-            return self.add_move(ai_move[0], ai_move[1])
-        return None
+        return self.add_move(ai_move[0], ai_move[1]) \
+                if (ai_move := self.ai.get_move(self.game.board, is_white)) \
+                else ai_move
 
     def add_move(self, source: int, destination) -> bool:
         if self.game.move(source, destination):
@@ -52,7 +51,7 @@ class Interface:
             self.game.__init__('White AI', 'Black AI')
             white_turn = True
             while not self.game.is_game_over():
-                if (move := self.ai_move(white_turn)) is None:
+                if not(move := self.ai_move(white_turn)):
                     break
                 white_turn = not(white_turn)
             if not(self.game.white_turn):
@@ -77,6 +76,6 @@ class Interface:
         return self.game.get_scoreboard()
 
     def get_score(self, player1: str, player2: str=None):
-        return True
+        return self.game.get_score(player1, player2)
 
 
