@@ -4,8 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- can make ai_move and ai_get_move return false as opposed to None. No need to differentiate ai move anymore since we have separate ai_move functio
-- clean up `dat_extractor`(current classes can just be functions inside an overall class with 1 extra function that maps data points into a new directory) + try getting all games(maybe a file cap? Try new file each 10k lines)
+- try getting all games - 900kbyte file cap at the moment!
 - simulate games for AI vs AI (apart of `Game` class)
   - db contains `players`=(ID,name) and `scores`=(ID,ID, score)
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
