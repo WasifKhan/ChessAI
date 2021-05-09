@@ -4,6 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
+- can make ai_move and ai_get_move return false as opposed to None. No need to differentiate ai move anymore since we have separate ai_move function
 - simulate games for AI vs AI (apart of `Game` class)
   - db contains `players`=(ID,name) and `scores`=(ID,ID, score)
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
