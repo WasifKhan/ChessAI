@@ -34,7 +34,7 @@ class DataExtractor:
                     fp.write(decomp)
 
     def download_raw_data(self):
-        if len(listdir(self.source)) > 0:
+        if len(listdir(self.source)) > 1:
             return
         for ID in range(len(self.files)):
             try:
