@@ -61,7 +61,7 @@ class DataExtractor:
                 datapoint = datapoint[0:-2] + ']\n'
                 self.data.append(datapoint)
 
-    def raw_data_to_dataset(self):
+    def clean_raw_data(self):
         if 'data.txt' in listdir('ai/data/'):
             return
         for filename in listdir(self.source):
@@ -72,5 +72,7 @@ class DataExtractor:
             for datapoint in self.data:
                 fp.write(datapoint)
 
+    def raw_data_to_dataset(self):
+        pass
 
 data_extractor = DataExtractor(FILES, SOURCE, DESTINATION)

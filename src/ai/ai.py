@@ -10,6 +10,7 @@ from .data.data_extrator import data_extractor
 class AI:
     def __init__(self, name='AI', difficulty=0):
         data_extractor.download_raw_data()
+        data_extractor.clean_raw_data()
         data_extractor.raw_data_to_dataset()
 
         ai_file, ai_cls = MODELS[difficulty]
