@@ -5,10 +5,9 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - simulate games for AI vs AI (apart of `Game` class)
-  - file containing matrix where cell I,j = player I wins vs player j
+  - db contains `players`=(ID,name) and `scores`=(ID,ID, score)
   - scoreboard class has an attribute players= Players()
-  - players.add(), player in players, players.add_game(player1, player2, winner), players.get_score(player), players
-Get_scoreboard(), players.get_score(player1, player2)
+  - players.add(), player in players, players.add_game(player1, player2, winner), players.get_score(player), players.get_scoreboard(), players.get_score(player1, player2)
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
   - implement `train`, store result in `models/{model}/weights.txt
   - storing these games should be same type as raw_dat_to_board
