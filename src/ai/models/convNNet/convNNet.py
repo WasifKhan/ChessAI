@@ -2,8 +2,9 @@
 AI Implemented Using A Convolutional Neural Network
 '''
 
-from ai.models.base_ai import AI
 from os import listdir
+from ai.models.base_ai import AI
+
 
 
 class ConvNNet(AI):
