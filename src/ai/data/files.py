@@ -2,6 +2,8 @@
 File containing links to chess games database
 '''
 
+destination = 'ai/data/dataset/'
+
 files = ['https://database.lichess.org/standard/lichess_db_standard_rated_2021-03.pgn.bz2',
 	'https://database.lichess.org/standard/lichess_db_standard_rated_2021-02.pgn.bz2',
 	'https://database.lichess.org/standard/lichess_db_standard_rated_2021-01.pgn.bz2',
