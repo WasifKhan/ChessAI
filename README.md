@@ -4,7 +4,6 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- try getting all games - 900kbyte file cap at the moment!
 - simulate games for AI vs AI (apart of `Game` class)
   - db contains `players`=(ID,name) and `scores`=(ID,ID, score)
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
