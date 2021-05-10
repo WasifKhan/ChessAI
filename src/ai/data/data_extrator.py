@@ -16,10 +16,6 @@ from ai.data.files import destination as DESTINATION, files as FILES
 
 
 class DataExtractor:
-    def __init__(self, files, destination):
-        self.files = files
-        self.destination = destination
-
     def _convert_to_datapoint(self, line):
         return line
 
@@ -40,22 +36,22 @@ class DataExtractor:
         return self._convert_to_datapoint(datapoint[0:-2] + ']\n')
 
     def raw_data_to_dataset(self):
-        if len(listdir(self.destination)) > 1:
+        if len(listdir(DESTINATION)) > 1:
             return
-        for ID in range(5):#len(self.files)):
+        for ID in range(5):#len(FILES)):
             try:
-                lines = BZ2File(urlopen(self.files[ID]), 'r')
+                lines = BZ2File(urlopen(FILES[ID]), 'r')
                 it = iter(lines)
                 '''
                 Can remove notion of index once ready to use
-                Also change this loop to be len(self.files) and change the
+                Also change this loop to be len(FILES) and change the
                 inner loop to be 'for _ in range(ten_million)'
                 '''
                 index = 0
                 while line := next(it):
                     if index == 8:
                         raise StopIteration
-                    filename = f'{self.destination}data_{str(ID)}_{index}.txt'
+                    filename = f'{DESTINATION}data_{str(ID)}_{index}.txt'
                     print(f'Processing: {ID}.({index}/30) / 100 ')
                     with open(filename, 'w') as fp:
                         for _ in range(100000):#00):
@@ -67,4 +63,4 @@ class DataExtractor:
                 continue
         print('Done downloading dataset')
 
-data_extractor = DataExtractor(FILES, DESTINATION)
+data_extractor = DataExtractor()
