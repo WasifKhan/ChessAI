@@ -27,11 +27,18 @@ class AI(metaclass=ABCMeta):
         return self._prediction_to_board(prediction)
 
     def _board_to_datapoint(self, board, is_white):
-        datapoint = [[board[column,row].value \
-                    if board[column,row].is_white == is_white \
-                    else board[column,row].value * -1 \
-                for column in range(8)] \
-                for row in range(7, -1, -1)]
+        if is_white:
+            datapoint = [[board[column,row].value \
+                        if board[column,row].is_white == is_white \
+                        else board[column,row].value * -1 \
+                    for column in range(8)] \
+                    for row in range(8)]
+        else:
+            datapoint = [[board[column,row].value \
+                        if board[column,row].is_white == is_white \
+                        else board[column,row].value * -1 \
+                    for column in range(8)] \
+                    for row in range(7, -1, -1)]
         return datapoint
 
     def _generate_datapoint(self, moves):
