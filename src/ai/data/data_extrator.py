@@ -16,9 +16,6 @@ from ai.data.files import destination as DESTINATION, files as FILES
 
 
 class DataExtractor:
-    def _convert_to_datapoint(self, line):
-        return line
-
     def _extract_moves(self, line):
         game = split('[\d]+\.\s', line)
         datapoint = '['
@@ -33,7 +30,11 @@ class DataExtractor:
             if it + 1 == len(game) and white_move == black_move:
                 black_move = 'None'
             datapoint += f"('{white_move}', '{black_move}'), "
-        return self._convert_to_datapoint(datapoint[0:-2] + ']\n')
+        return datapoint[0:-2] + ']\n'
+
+    def _raw_data_to_datapoint(self, line):
+        move = self._extract_moves(line)
+        return move
 
     def raw_data_to_dataset(self):
         if len(listdir(DESTINATION)) > 1:
@@ -56,8 +57,8 @@ class DataExtractor:
                     with open(filename, 'w') as fp:
                         for _ in range(100000):#00):
                             if (move := str(next(it)))[2] == '1':
-                                moves = self._extract_moves(move)
-                                fp.write(moves)
+                                datapoint = self._raw_data_to_datapoint(move)
+                                fp.write(datapoint)
                     index += 1
             except StopIteration:
                 continue
