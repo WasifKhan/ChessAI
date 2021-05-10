@@ -5,7 +5,7 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
-  - implement `train`, store result in `models/{model}/weights.txt
+  - implement `_train` methods
   - `raw_data_to_datapoint` function in `data_extractor.py` and `generate_datapoint(moves)` in `ai.py`
 - implement `predict_move`
 - #### MILESTONE 1.5 base smart AI done
