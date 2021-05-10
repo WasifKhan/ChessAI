@@ -9,6 +9,8 @@ import abc
 class AI(metaclass=abc.ABCMeta):
     def __init__(self, name='AI'):
         self.name = name
+        if not self._trained():
+            self._train()
 
     def _trained(self):
         raise NotImplemented
@@ -33,6 +35,4 @@ class AI(metaclass=abc.ABCMeta):
         return False
 
     def get_move(self, board, is_white):
-        if not self._trained():
-            self._train()
         return False if self._resign(board, is_white) else self._predict_move(board, is_white)
