@@ -7,8 +7,7 @@ import abc
 
 
 class AI(metaclass=abc.ABCMeta):
-    def __init__(self, name='AI'):
-        self.name = name
+    def __init__(self):
         if not self._trained():
             self._train()
 

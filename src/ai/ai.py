@@ -8,7 +8,7 @@ from .data.data_extrator import data_extractor
 
 
 class AI:
-    def __init__(self, name='AI', difficulty=0):
+    def __init__(self, difficulty=0, name='AI'):
         # The following line take approximately 15 hours to run to train AI
         data_extractor.raw_data_to_dataset()
 
