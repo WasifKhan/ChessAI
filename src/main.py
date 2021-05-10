@@ -4,4 +4,4 @@ if __name__ == '__main__':
     from backend.game import Game
     from ai.ai import AI
 
-    View(Interface(Game(), AI()))
+    View(Interface(Game(), AI(0)))

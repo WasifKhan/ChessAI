@@ -8,8 +8,8 @@ from random import randint
 
 
 class RandomAI(AI):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, location):
+        super().__init__(location)
 
     def _trained(self):
         return True
