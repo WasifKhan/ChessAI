@@ -3,11 +3,14 @@ Interface between backend and frontend
 '''
 
 
+
 class Interface:
     def __init__(self, game, ai):
+        from ai.data.data_extractor import DataExtractor
         self.game = game
         self.ai = ai
         self.versus_ai = False
+        DataExtractor(game).raw_data_to_dataset()
         print(self.game)
 
     def __str__(self):

@@ -16,10 +16,13 @@ from ai.data.files import destination as DESTINATION, files as FILES
 
 
 class DataExtractor:
+    def __init__(self, game):
+        self.game = game
+
     def _extract_moves(self, line):
         game = split('[\d]+\.\s', line)
         datapoint = '['
-        for it in range (1, len(game)):
+        for it in range (1, len(game) - 1):
             move = game[it].split('{')
             if len(move) > 1:
                 white_move = split('[\?!#\+=]', move[0][0:-1])[0]
@@ -27,17 +30,47 @@ class DataExtractor:
             else:
                 white_move = split('[\?!#\+=]', move[0].split()[0])[0]
                 black_move = split('[\?!#\+=]', move[0].split()[1])[0]
-            if it + 1 == len(game) and white_move == black_move:
-                black_move = 'None'
+            datapoint += f"('{white_move}', '{black_move}'), "
+        move = game[-1].split('{')
+        if len(move) > 1:
+            white_move = split('[\?!#\+=]', move[0][0:-1])[0]
+            black_move = split('[\?!#\+=]', move[-2].split()[-1])[0]
+        else:
+            white_move = split('[\?!#\+=]', move[0].split()[0])[0]
+            black_move = split('[\?!#\+=]', move[0].split()[1])[0]
+        if white_move == black_move:
+            black_move = 'None'
+        elif '*' in black_move:
+            black_move = 'None'
+        elif '1-0' in black_move:
+            black_move = 'None'
+        elif '1/2' in black_move:
+            black_move = 'Draw'
+        elif '0-1' in black_move:
+            white_move = 'None'
+            black_move = 'None'
+        if not white_move == 'None':
             datapoint += f"('{white_move}', '{black_move}'), "
         return datapoint[0:-2] + ']\n'
-
-    def _raw_data_to_datapoint(self, line):
-        move = self._extract_moves(line)
+    
+    def _convert_move(self, move):
         return move
 
+    def _raw_data_to_datapoint(self, line):
+        datapoint = '['
+        moves = eval(self._extract_moves(line))
+        for move in moves:
+            white_move, black_move = move
+            white_move = self._convert_move(white_move)
+            #self.game.move(white_move)
+            black_move = self._convert_move(black_move)
+            #self.game.move(black_move)
+            datapoint += f"('{white_move}', '{black_move}'), "
+        datapoint = datapoint[0:-2] + ']\n'
+        return datapoint 
+
     def raw_data_to_dataset(self):
-        if len(listdir(DESTINATION)) > 1:
+        if len(listdir(DESTINATION)) > 2:
             return
         for ID in range(5):#len(FILES)):
             try:
@@ -63,5 +96,3 @@ class DataExtractor:
             except StopIteration:
                 continue
         print('Done downloading dataset')
-
-data_extractor = DataExtractor()
