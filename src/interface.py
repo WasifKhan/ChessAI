@@ -2,55 +2,41 @@
 Interface between backend and frontend
 '''
 
-from ai.ai import AI
-from time import sleep
-
-
 
 class Interface:
-    def __init__(self, game):
+    def __init__(self, game, ai):
         self.game = game
-        self.AI = None
+        self.ai = ai
+        self.versus_ai = False
         print(self.game)
 
     def __str__(self):
         return str(self.game)
 
-    def versus_AI(self, difficulty=0):
-        self.AI = AI(name='AI', difficulty=difficulty)
+    def versus_AI(self) -> None:
+        self.versus_ai = True
 
-    def set_player_names(self, p1_name, p2_name):
+    def set_player_names(self, p1_name: str, p2_name: str) -> None:
         self.game.set_names(p1_name, p2_name)
 
-    def game_over(self, root):
+    def game_over(self) -> None:
         print('*'*30)
         winner = not(self.game.white_turn)
         if not self.game.is_game_over():
-            if self.game.white_turn:
-                print('*' * 7 + f'{self.game.p1_name} resigned' + '*' * 6)
-            else:
-                print('*' * 7 + f'{self.game.p2_name} resigned' + '*' * 6)
-        print('*'*30)
-        print('*'*11 + 'GAME OVER' + '*'*10)
-        print('*'*30)
-        self.game.game_over()
-        root.destroy()
+            loser = self.game.p1_name if self.game.white_turn else self.game.p2_name
+            print('*' * 7 + f'{loser} resigned' + '*' * 6)
+        print(('*'*30 + '\n') + ('*'*11 + 'GAME OVER' + '*'*10 + '\n') + ('*'*30))
+        self.game.game_over(1, 0) if loser==self.game.p2_name else self.game.game_over(0, 1)
+        self.play_again()
 
-    def ai_move(self, is_white):
-        if (ai_move := self.AI.get_move(self.game.board, is_white)):
-            self.game.move(ai_move[0], ai_move[1])
-            name = self.game.p2_name if self.game.white_turn else self.game.p1_name
-            print('='*30)
-            print(f'{name} move: {ai_move[0]} -> {ai_move[1]}')
-            if self.game.is_game_over():
-                self.game_over()
-            return True
-        return None
+    def ai_move(self, is_white: bool) -> bool:
+        return self.add_move(ai_move[0], ai_move[1]) \
+                if (ai_move := self.ai.get_move(self.game.board, is_white)) \
+                else ai_move
 
-    def add_move(self, source, destination):
+    def add_move(self, source: int, destination) -> bool:
         if self.game.move(source, destination):
             name = self.game.p2_name if self.game.white_turn else self.game.p1_name
-            print('='*30)
             print(f'{name} move: {source} -> {destination}')
             if self.game.is_game_over():
                 self.game_over()
@@ -59,59 +45,37 @@ class Interface:
         print('Invalid move.\nPlease enter a valid move.\n')
         return False
 
-    def _sim_many(self):
-        self.game.board.__init__()
-        self.set_player_names('White AI', 'Black AI')
-        white_turn = True
-        while not self.game.is_game_over():
-            move = self.ai_move(white_turn)
-            if move is None:
-                break
-            white_turn = not(white_turn)
-        return not(self.game.white_turn)
-
-    def _sim_game(self):
-        print((' ' * 8 + '\n') * 50)
-        for i in range(2):
-            print('Preparing game...')
-            sleep(2)
-        self.game.board.__init__()
-        print(self)
-        self.set_player_names('White AI', 'Black AI')
-        white_turn = True
-        while not self.game.is_game_over():
-            player = 'White AI' if white_turn else 'Black AI'
-            for i in range(2):
-                print(f'{player} is thinking...')
-                sleep(0.5)
-            move = self.ai_move(white_turn)
-            if move is None:
-                break
-            white_turn = not(white_turn)
-            if white_turn:
-                print(self)
-                sleep(1.5)
-        return not(self.game.white_turn)
-
-    def simulate_games(self, num_games=0):
-        if not num_games:
-            white_win = self._sim_game()
-            return white_win
+    def simulate_games(self, num_games: int):
         white_wins, black_wins = 0,0
         for i in range(num_games):
-            if self._sim_many():
+            self.game.__init__('White AI', 'Black AI')
+            white_turn = True
+            while not self.game.is_game_over():
+                if not(move := self.ai_move(white_turn)):
+                    break
+                white_turn = not(white_turn)
+            if not(self.game.white_turn):
                 white_wins += 1
+                print('White wins')
             else:
                 black_wins += 1
-        print(white_wins)
-        print(black_wins)
+                print('Black wins')
+        self.game.__init__('Player 1', 'Black AI')
+        self.game.game_over(white_wins, black_wins)
+        print(f'score: {white_wins}-{black_wins}')
 
+    def play_again(self, yes: bool=True):
+        print('*'*30 + '\n')
+        print('Reseting game...')
+        print('*'*30 + '\n')
+        self.game.__init__(self.game.p1_name, self.game.p2_name)
+        print(self.game)
+        return True
 
     def get_scoreboard(self):
-        return True
+        return self.game.get_scoreboard()
 
-    def get_score(self, player1, player2=None):
-        return True
+    def get_score(self, player1: str, player2: str=None):
+        return self.game.get_score(player1, player2)
 
-    def play_again(self, yes=True):
-        return True
+

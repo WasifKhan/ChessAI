@@ -8,8 +8,8 @@ from random import randint
 
 
 class RandomAI(AI):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, location):
+        super().__init__(location)
 
     def _trained(self):
         return True
@@ -19,7 +19,6 @@ class RandomAI(AI):
         rand_piece = randint(0, max(0, len(my_pieces) - 1))
         while len(my_pieces[rand_piece].moves(board)) == 0:
             rand_piece = randint(0, max(0, len(my_pieces) - 1))
-
         piece = my_pieces[rand_piece]
         moves = list(piece.moves(board))
         rand_move = randint(0, max(0, len(moves) - 1))
