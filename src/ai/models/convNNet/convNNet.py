@@ -9,21 +9,22 @@ from numpy import array
 from numpy import std
 from matplotlib import pyplot
 from sklearn.model_selection import KFold
-from keras.datasets import mnist
-from keras.utils import to_categorical
-from keras.models import Sequential
-from keras.models import load_model
-from keras.models import save_model
-from keras.layers import Conv2D
-from keras.layers import MaxPooling2D
-from keras.layers import Dense
-from keras.layers import Flatten
-from keras.optimizers import SGD
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import load_model
+from tensorflow.keras.models import save_model
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import MaxPooling2D
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.optimizers import SGD
 
 
 class ConvNNet(AI):
     def __init__(self, location):
         super().__init__(location)
+        self._build_model()
 
     def _build_model(self):
         model = Sequential()
@@ -39,9 +40,8 @@ class ConvNNet(AI):
 
     def _train_model(self):
         self.scores, self.histories = list(), list()
-        splits = 2 #CHANGE TO 5 when done
+        splits = 4 #CHANGE TO 5 when done
         kfold = KFold(splits, shuffle=True, random_state=1)
-        # INCORRECT ATM
         dataX, dataY = list(), list()
         for i, data in enumerate(self._get_datapoint()):
             if i == 2:
@@ -85,6 +85,82 @@ class ConvNNet(AI):
         pyplot.boxplot(self.scores)
         pyplot.show()
 
+    def _board_to_datapoint(self, board, is_white):
+        if is_white:
+            datapoint = [[board[column,row].value \
+                        if board[column,row].is_white == is_white \
+                        else board[column,row].value * -1 \
+                    for column in range(8)] \
+                    for row in range(8)]
+        else:
+            datapoint = [[board[column,row].value \
+                        if board[column,row].is_white == is_white \
+                        else board[column,row].value * -1 \
+                    for column in range(8)] \
+                    for row in range(7, -1, -1)]
+        datapoint = array(datapoint)
+        datapoint = datapoint.reshape(1, 8, 8, 1)
+        return datapoint
+
+    def _generate_datapoint(self, moves, iter=[0]):
+        '''
+        APART OF TRAINING
+        THIS FUNCTION SHOULD DO THE load_dataset() in the cNN tutorial
+        Map list of moves into: (np.array(shape=(X,8,8,1), np.array(X, 124,1))
+        '''
+        test_data_x_0 = [[5, 3, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, -1, -1, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_0 = [0] * 124
+        test_data_y_0[9] = 1
+        test_data_x_1 = [[5, 3, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 0, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0],
+                [0, 0, 0, 0, -1, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, -1, 0, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_1 = [0] * 124
+        test_data_y_1[47] = 1
+        test_data_x_2 = [[5, 3, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 0, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0],
+                [0, 0, 0, -1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, -1, 0, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_2 = [0] * 124
+        test_data_y_2[9] = 1
+        test_data_x_3 = [[5, 0, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 3, 0, 0, 0, 0, 0],
+                [0, 0, 0, -1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, 0, -1, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_3 = [0] * 124
+        test_data_y_3[46] = 1
+        ret_val = ([test_data_x_0, test_data_x_1], [test_data_y_0,
+            test_data_y_1])
+        if iter[0] % 2 == 0:
+            ret_val = ([test_data_x_2, test_data_x_3], [test_data_y_2, test_data_y_3])
+        iter[0] += 1
+        return ret_val
+
+    def _prediction_to_board(self, prediction):
+        '''
+        APART OF TESTING
+        '''
+        return prediction
+
     def _load_model(self):
-        return self.model.load_model(self.location + '/brain.h5')
+        self.model = load_model(self.location + '/brain.h5')
 
