@@ -13,8 +13,6 @@ class AI(metaclass=ABCMeta):
             self._build_model()
             self._train_model()
             self._evaluate_model()
-        self._load_model()
-
 
     def _trained(self):
         return True if 'brain.h5' in listdir(self.location) else False
@@ -37,6 +35,8 @@ class AI(metaclass=ABCMeta):
         return False
 
     def _predict_move(self, board, is_white):
+        if not self.model:
+            self._load_model()
         prediction = self.model.predict(self._board_to_datapoint(board, is_white))
         return self._prediction_to_board(prediction)
 
