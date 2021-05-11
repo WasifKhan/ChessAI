@@ -14,7 +14,7 @@ class AI(metaclass=ABCMeta):
             self._train()
 
     def _trained(self):
-        return True if 'weights.h5' in listdir(self.location) else False
+        return True if 'brain.h5' in listdir(self.location) else False
 
     def _train(self):
         self._build_model()
@@ -41,14 +41,60 @@ class AI(metaclass=ABCMeta):
                     for row in range(7, -1, -1)]
         return datapoint
 
-    def _generate_datapoint(self, moves):
+    def _generate_datapoint(self, moves, iter=[0]):
         '''
-        Map list of moves into:
-        np.array(board), np.array([{0,1}] * 124)
+        THIS FUNCTION SHOULD DO THE load_dataset() in the cNN tutorial
+        Map list of moves into: (np.array(shape=(X,8,8,1), np.array(X, 124,1))
         '''
-        return moves
+        test_data_x_0 = [[5, 3, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, -1, -1, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_0 = [0] * 124
+        test_data_y_0[9] = 1
+        test_data_x_1 = [[5, 3, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 0, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0],
+                [0, 0, 0, 0, -1, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, -1, 0, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_1 = [0] * 124
+        test_data_y_1[47] = 1
+        test_data_x_2 = [[5, 3, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 0, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0],
+                [0, 0, 0, -1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, -1, 0, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_2 = [0] * 124
+        test_data_y_2[9] = 1
+        test_data_x_3 = [[5, 0, 3, 9, 100, 3, 3, 5],
+                [1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 3, 0, 0, 0, 0, 0],
+                [0, 0, 0, -1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [-1, -1, 0, -1, -1, -1, -1, -1],
+                [-5, -3, -3, -9, -100, -3, -3, -5]]
+        test_data_y_3 = [0] * 124
+        test_data_y_3[46] = 1
+        # SPLIT INTO 2 games!
+        ret_val = ([test_data_x_0, test_data_x_1], [test_data_y_0,
+            test_data_y_1])
+        if iter[0] % 2 == 0:
+            ret_val = ([test_data_x_2, test_data_x_3], [test_data_y_2, test_data_y_3])
+        iter[0] += 1
+        return ret_val
 
-    def _get_data_points(self):
+    def _get_datapoint(self):
         dataset_path = './ai/data/dataset/'
         for data in listdir(dataset_path):
             if data[0] == 'd':
