@@ -61,5 +61,10 @@ class TestKing:
         board[2,3] = black_king
         black_king.location=(2,3)
         assert black_king.moves(board) == {13, 14, 24, 34, 33}
+        
+        # (5,5) == False is passing in is.valid
+        # but its showing up in moves sets
+
+        
 
 
