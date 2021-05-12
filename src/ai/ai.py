@@ -15,5 +15,8 @@ class AI:
         self.name = name
         self.ai = model(location)
 
+    def trained(self):
+        return self.ai.trained()
+
     def get_move(self, board, is_white=False):
         return self.ai.get_move(board, is_white)

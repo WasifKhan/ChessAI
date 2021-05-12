@@ -108,6 +108,7 @@ class ConvNNet(AI):
         THIS FUNCTION SHOULD DO THE load_dataset() in the cNN tutorial
         Map list of moves into: (np.array(shape=(X,8,8,1), np.array(X, 124,1))
         '''
+        moves = eval(moves)
         test_data_x_0 = [[5, 3, 3, 9, 100, 3, 3, 5],
                 [1, 1, 1, 1, 1, 1, 1, 1],
                 [0, 0, 0, 0, 0, 0, 0, 0],

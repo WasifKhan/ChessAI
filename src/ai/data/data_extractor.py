@@ -58,7 +58,7 @@ class DataExtractor:
             if len(move) == 3:
                 destination = (piece.location[0]+2, piece.location[1])
             else:
-                destination = (piece.location[0]-2, piece.location[1])
+                destination = (piece.location[0]-3, piece.location[1])
             if piece.is_valid_move(self.game.board, destination):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
