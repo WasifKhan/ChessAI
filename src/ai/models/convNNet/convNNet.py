@@ -3,15 +3,7 @@ AI Implemented Using A Convolutional Neural Network
 '''
 
 from ai.models.base_ai import AI
-from os import listdir
-from numpy import mean, array, std
-from matplotlib import pyplot
-from sklearn.model_selection import KFold
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.models import Sequential, load_model, save_model
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
-from tensorflow.keras.optimizers import SGD
+
 
 
 class ConvNNet(AI):
@@ -19,6 +11,13 @@ class ConvNNet(AI):
         super().__init__(location)
 
     def _build_model(self):
+        from os import listdir
+        if 'brain.h5' in listdir(self.location):
+            self.model = load_model(self.location + '/brains.h5')
+            return
+        from tensorflow.keras.models import load_model, Sequential
+        from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
+        from tensorflow.keras.optimizers import SGD
         model = Sequential()
         model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', input_shape=(8, 8, 1)))
         model.add(MaxPooling2D((2, 2)))
@@ -29,9 +28,11 @@ class ConvNNet(AI):
         opt = SGD(lr=0.01, momentum=0.9)
         model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
         self.model = model
+        self._train_model(game)
 
     def _train_model(self, game):
         from ai.data.data_extractor import DataExtractor
+        from sklearn.model_selection import KFold
         data_extractor = DataExtractor(game)
         data_extractor.download_raw_data()
 
@@ -61,8 +62,11 @@ class ConvNNet(AI):
             self.scores.append(acc)
             self.histories.append(history)
         self.model.save(f'{self.location}/brain.h5')
+        self._evaluate_model()
 
     def _evaluate_model(self):
+        from matplotlib import pyplot
+        from numpy import mean, array, std
         for i in range(len(self.histories)):
             # plot loss
             pyplot.subplot(2, 1, 1)
@@ -81,7 +85,7 @@ class ConvNNet(AI):
         pyplot.boxplot(self.scores)
         pyplot.show()
 
-    def _board_to_datapoint(self, board, is_white):
+    def _board_to_dp(self, board, is_white):
         if is_white:
             datapoint = [[board[column,row].value \
                         if board[column,row].is_white == is_white \
@@ -100,6 +104,6 @@ class ConvNNet(AI):
 
     def _prediction_to_board(self, prediction):
         '''
-        APART OF TESTING
+        APART OF USING AI
         '''
         return prediction

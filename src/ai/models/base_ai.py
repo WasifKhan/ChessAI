@@ -3,7 +3,7 @@ Abstract Base Class for AI Engines
 '''
 
 from abc import ABCMeta
-from os import listdir
+
 
 
 class AI(metaclass=ABCMeta):
@@ -11,11 +11,8 @@ class AI(metaclass=ABCMeta):
         self.location = location
 
     def train(self, game):
-        if not 'brains.h5' in listdir(self.location):
-            self._build_model()
-            self._train_model(game)
-            self._evaluate_model()
-        self.model = load_model(self.location + '/brains.h5')
+        if not self.model:
+            self._build_model(game)
 
     def predict(self, board, is_white):
         prediction = self.model.predict(self._board_to_dp(board, is_white))
