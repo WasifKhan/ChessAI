@@ -102,10 +102,7 @@ class Pawn(Piece):
                 and piece.is_white is not self.is_white:
                 result.add(piece.location[0] * 10 + piece.location[1])
         # En passant
-        '''
-        If youre on 3/4  prev move from 1/6 from ene pawn
-        NEED TO IMPLEMENT EN PASSANT MOVEMENT
-        '''
+        
         if board.history:
             if self.location[1] == 3 and isinstance(board[self.location[0]-1, self.location[1]], Pawn) and \
                 board[self.location[0]-1, self.location[1]].is_white is not self.is_white:
