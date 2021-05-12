@@ -9,12 +9,12 @@ from os import listdir
 class AI(metaclass=ABCMeta):
     def __init__(self, location):
         self.location = location
-        if not self.trained():
+        if not self._trained():
             self._build_model()
             self._train_model()
             self._evaluate_model()
 
-    def trained(self):
+    def _trained(self):
         return True if 'brain.h5' in listdir(self.location) else False
 
     def _get_datapoint(self):

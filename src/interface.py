@@ -11,7 +11,7 @@ class Interface:
         self.game = game
         self.ai = ai
         self.versus_ai = False
-        DataExtractor(Game()).raw_data_to_dataset()
+        # DataExtractor(Game()).raw_data_to_dataset()
         print(self.game)
 
     def __str__(self):

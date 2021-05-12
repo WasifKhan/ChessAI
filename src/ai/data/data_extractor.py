@@ -110,15 +110,16 @@ class DataExtractor:
             matches = 0
             if ord(identifier) >= 97:
                 for candidate in candidates:
-                    if candidate.location[x] == ord(identifier)-97:
+                    if candidate.location[0] == ord(identifier)-97:
                         piece = candidate
                         matches += 1
             else:
                 for candidate in candidates:
-                    if candidate.location[y] == int(identifier)-1:
+                    if candidate.location[1] == int(identifier)-1:
                         piece = candidate
                         matches += 1
             if matches == 0 or matches > 1:
+                print(f'move was: {move}')
                 raise Exception
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 
@@ -136,13 +137,13 @@ class DataExtractor:
                 raise Exception
             black_source, black_destination = self._convert_move(black_move, False)
             print(self.game.board)
-            sleep(1)
+            sleep(0.3)
             if not self.game.move(black_source, black_destination):
                 print(self.game)
                 print(f'Invalid move: {black_move}')
                 raise Exception
             print(self.game.board)
-            sleep(1)
+            sleep(0.3)
             datapoint += f"(({white_source}, {white_destination}), ({black_source}, {black_destination})), "
         datapoint = datapoint[0:-2] + ']\n'
         return datapoint
