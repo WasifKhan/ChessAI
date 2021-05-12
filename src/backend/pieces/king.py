@@ -37,13 +37,19 @@ class King(Piece):
     def moves(self, board):
         result = set()
         possible_location = {piece.location[0]*10 + piece.location[1] \
-            for row in range(-1, 2) for col in range(-1, 2) if (row or col) and (piece := board[self.location[0]+row*10, self.location[1]+col])}
+            for row in range(-1, 2) for col in range(-1, 2) if (row or col) and (piece := board[self.location[0]+row, self.location[1]+col])}
         opposing_attacks = set()
         for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
-            if ...: # need to implement edge case for pawn
-                ...
+            if isinstance(piece, Pawn): # need to implement edge case for pawn
+                direction = 1 if piece.is_white else -1
+                opposing_attacks.add((piece.location[0]+1)*10 + (piece.location[1]+direction))
+                opposing_attacks.add((piece.location[0]-1)*10 + (piece.location[1]+direction))
+            elif isinstance(piece, King):
+                cells_around_king = {cell.location[0]*10 + cell.location[1] \
+                    for row in range(-1, 2) for col in range(-1, 2) if (row or col) and (cell := board[piece.location[0]+row, piece.location[1]+col])}
+                opposing_attacks |= cells_around_king
             else:
-                opposing_attacks.add(piece.move(board))
+                opposing_attacks |= piece.moves(board)
         result = possible_location - opposing_attacks
         return result
 
