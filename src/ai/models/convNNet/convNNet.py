@@ -2,29 +2,21 @@
 AI Implemented Using A Convolutional Neural Network
 '''
 
-from os import listdir
 from ai.models.base_ai import AI
-from numpy import mean
-from numpy import array
-from numpy import std
+from os import listdir
+from numpy import mean, array, std
 from matplotlib import pyplot
 from sklearn.model_selection import KFold
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.models import load_model
-from tensorflow.keras.models import save_model
-from tensorflow.keras.layers import Conv2D
-from tensorflow.keras.layers import MaxPooling2D
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
+from tensorflow.keras.models import Sequential, load_model, save_model
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
 from tensorflow.keras.optimizers import SGD
 
 
 class ConvNNet(AI):
     def __init__(self, location):
         super().__init__(location)
-        self._build_model()
 
     def _build_model(self):
         model = Sequential()
@@ -38,12 +30,16 @@ class ConvNNet(AI):
         model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
         self.model = model
 
-    def _train_model(self):
+    def _train_model(self, game):
+        from ai.data.data_extractor import DataExtractor
+        data_extractor = DataExtractor(game)
+        data_extractor.download_raw_data()
+
         self.scores, self.histories = list(), list()
         splits = 4 #CHANGE TO 5 when done
         kfold = KFold(splits, shuffle=True, random_state=1)
         dataX, dataY = list(), list()
-        for i, data in enumerate(self._get_datapoint()):
+        for i, data in enumerate(data_extractor.get_datapoint()):
             if i == 2:
                 break
             [dataX.append(board) for board in data[0]]
@@ -102,66 +98,8 @@ class ConvNNet(AI):
         datapoint = datapoint.reshape(1, 8, 8, 1)
         return datapoint
 
-    def _generate_datapoint(self, moves, iter=[0]):
-        '''
-        APART OF TRAINING
-        THIS FUNCTION SHOULD DO THE load_dataset() in the cNN tutorial
-        Map list of moves into: (np.array(shape=(X,8,8,1), np.array(X, 124,1))
-        '''
-        moves = eval(moves)
-        test_data_x_0 = [[5, 3, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, -1, -1, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_0 = [0] * 124
-        test_data_y_0[9] = 1
-        test_data_x_1 = [[5, 3, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 0, 1, 1, 1],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0],
-                [0, 0, 0, 0, -1, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, -1, 0, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_1 = [0] * 124
-        test_data_y_1[47] = 1
-        test_data_x_2 = [[5, 3, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 0, 1, 1, 1],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0],
-                [0, 0, 0, -1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, -1, 0, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_2 = [0] * 124
-        test_data_y_2[9] = 1
-        test_data_x_3 = [[5, 0, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [0, 0, 3, 0, 0, 0, 0, 0],
-                [0, 0, 0, -1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, 0, -1, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_3 = [0] * 124
-        test_data_y_3[46] = 1
-        ret_val = ([test_data_x_0, test_data_x_1], [test_data_y_0,
-            test_data_y_1])
-        if iter[0] % 2 == 0:
-            ret_val = ([test_data_x_2, test_data_x_3], [test_data_y_2, test_data_y_3])
-        iter[0] += 1
-        return ret_val
-
     def _prediction_to_board(self, prediction):
         '''
         APART OF TESTING
         '''
         return prediction
-
-    def _load_model(self):
-        self.model = load_model(self.location + '/brain.h5')
-

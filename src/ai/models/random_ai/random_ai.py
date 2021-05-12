@@ -11,10 +11,10 @@ class RandomAI(AI):
     def __init__(self, location):
         super().__init__(location)
 
-    def _trained(self):
+    def train(self, game):
         return True
 
-    def _predict_move(self, board, is_white):
+    def predict(self, board, is_white):
         my_pieces = list(board.white_pieces) if is_white else list(board.black_pieces)
         rand_piece = randint(0, max(0, len(my_pieces) - 1))
         while len(my_pieces[rand_piece].moves(board)) == 0:

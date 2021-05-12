@@ -6,18 +6,16 @@ Interface between backend and frontend
 
 class Interface:
     def __init__(self, game, ai):
-        from ai.data.data_extractor import DataExtractor
-        from backend.game import Game
         self.game = game
         self.ai = ai
         self.versus_ai = False
-        # DataExtractor(Game()).raw_data_to_dataset()
         print(self.game)
 
     def __str__(self):
         return str(self.game)
 
     def versus_AI(self) -> None:
+        self.ai.train(self.game)
         self.versus_ai = True
 
     def set_player_names(self, p1_name: str, p2_name: str) -> None:
@@ -35,7 +33,7 @@ class Interface:
 
     def ai_move(self, is_white: bool) -> bool:
         return self.add_move(ai_move[0], ai_move[1]) \
-                if (ai_move := self.ai.get_move(self.game.board, is_white)) \
+                if (ai_move := self.ai.predict(self.game.board, is_white)) \
                 else ai_move
 
     def add_move(self, source: int, destination) -> bool:

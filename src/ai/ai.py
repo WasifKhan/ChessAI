@@ -15,8 +15,8 @@ class AI:
         self.name = name
         self.ai = model(location)
 
-    def trained(self):
-        return self.ai.trained()
+    def train(self, game):
+        return self.ai.train(game)
 
-    def get_move(self, board, is_white=False):
-        return self.ai.get_move(board, is_white)
+    def predict(self, board, is_white=False):
+        return self.ai.predict(board, is_white)
