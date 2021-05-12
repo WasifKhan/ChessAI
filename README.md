@@ -4,10 +4,10 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- need to make ai/ai.py more interfacable with base_ai.py
+- make ai/ai.py more interfacable with base_ai.py
   - data_extractor + generate_datapoint both need games...
   - data_extractor should NOT be called independently after changing interface
-  - `generate_datapoint(moves)` in `ai.py` and `prediction_to_board`
+  - implement `generate_datapoint(moves)` and `prediction_to_board`
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
@@ -20,15 +20,13 @@ Repository containing Chess Engine and ML Model
 - Tweak qlearning rewards
 
 ### **Ali**
+- implement promote/check/checkmate
 - unit tests for board and game
 - Write actual integration tests (one for why moves needs to be updated after each move)
   - i think it only needs tobe updated before a king moves
-- Implement king movement
-- enpassant/castle/promote
-- check/checkmate
 - Something wrong:
-  - with the square 0,0
-  - pawn capture pawn 2,5 -> 1,6
+  - with the square 0,0(UI)
+  - pawn capture pawn 2,5 -> 1,6(backend)
 - write 2 system tests
 - implement scoreboard + visualization
   - db contains `players`=(ID,name) and `scores`=(ID,ID, score)
