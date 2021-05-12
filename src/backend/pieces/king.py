@@ -1,6 +1,7 @@
 from io import DEFAULT_BUFFER_SIZE
 from .piece import Piece
 from .pawn import Pawn
+from .rook import Rook
 
 class King(Piece):
     ID = 1
@@ -12,11 +13,31 @@ class King(Piece):
 
     def __str__(self):
         return 'K' if self.is_white else 'k'
+    
+    def _castle(self, board, destination):
+        # Left Castle
+        if self.location[0] - destination//10 == 3 and self.location[1] == destination%10:
+            if isinstance(board[0,0], Rook):
+                for square in range(1,4):
+                    for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
+                        if not isinstance(piece, King) and ((self.location[0] - square)*10 + self.location[1]) in piece.moves(board):
+                            return False
+                return True
+        # Right Castle
+        elif destination//10 - self.location[0] == 2 and self.location[1] == destination%10:
+            if isinstance(board[7,0], Rook):
+                for square in range(1,3):
+                    for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
+                        if not isinstance(piece, King) and ((self.location[0] + square)*10 + self.location[1]) in piece.moves(board):
+                            return False
+                return True
 
     def value(self):
         return 100
 
     def is_valid_move(self, board, destination):
+        if self._castle(board, destination[0]*10 + destination[1]):
+            return True
         x_dir = abs(self.location[0] - destination[0])
         y_dir = abs(self.location[1] - destination[1])
         if x_dir > 1 or  y_dir > 1:
@@ -36,6 +57,10 @@ class King(Piece):
 
     def moves(self, board):
         result = set()
+        if self._castle(board, (self.location[0]-3)*10 + self.location[1]):
+            result.add((self.location[0]-3)*10 + self.location[1])
+        elif self._castle(board, (self.location[0]+2)*10 + self.location[1]):
+            result.add((self.location[0]+2)*10 + self.location[1])
         possible_location = {piece.location[0]*10 + piece.location[1] \
             for row in range(-1, 2) for col in range(-1, 2) if (row or col) and (piece := board[self.location[0]+row, self.location[1]+col])}
         opposing_attacks = set()
