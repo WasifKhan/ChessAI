@@ -48,6 +48,20 @@ class Board:
 
     def move(self, piece, destination):
         self.history.append((piece, piece.location, destination, self.board_value()))
+        # Edge case for castling
+        if isinstance(piece, King):
+            if piece.location[0] - destination[0] == 3:
+                rook_location = destination[0]-1, destination[1]
+                rook = self[rook_location]
+                rook.location = piece.location[0]-1, piece.location[1]
+                self[piece.location[0]-1, piece.location[1]] = rook
+                self[rook_location] = Square(rook_location)
+            elif destination[0] - piece.location[0] == 2:
+                rook_location = destination[0]+1, destination[1]
+                rook = self[rook_location]
+                rook.location = piece.location[0]+1, piece.location[1]
+                self[piece.location[0]+1, piece.location[1]] = rook
+                self[rook_location] = Square(rook_location)
         # Update the board to move piece from previous location to destination
         previous_location = piece.location
         piece.location = destination
