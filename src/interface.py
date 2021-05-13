@@ -3,18 +3,20 @@ Interface between backend and frontend
 '''
 
 
+from backend.game import Game
+from ai.ai import AI
+
 
 class Interface:
-    def __init__(self, game, ai):
-        self.game = game
-        self.ai = ai
+    def __init__(self):
+        self.game = Game()
         self.versus_ai = False
-        print(self.game)
 
     def __str__(self):
         return str(self.game)
 
-    def versus_AI(self) -> None:
+    def versus_AI(self, difficulty) -> None:
+        self.ai = AI(difficulty)
         self.ai.train(self.game)
         self.versus_ai = True
 
@@ -50,7 +52,7 @@ class Interface:
     def simulate_games(self, num_games: int):
         white_wins, black_wins = 0,0
         for i in range(num_games):
-            self.game.__init__('White AI', 'Black AI')
+            self.game = Game('White AI', 'Black AI')
             white_turn = True
             while not self.game.is_game_over():
                 if not(move := self.ai_move(white_turn)):
@@ -62,7 +64,7 @@ class Interface:
             else:
                 black_wins += 1
                 print('Black wins')
-        self.game.__init__('Player 1', 'Black AI')
+        self.game = Game('Player 1', 'Black AI')
         self.game.game_over(white_wins, black_wins)
         print(f'score: {white_wins}-{black_wins}')
 
@@ -70,8 +72,8 @@ class Interface:
         print('*'*30 + '\n')
         print('Reseting game...')
         print('*'*30 + '\n')
-        self.game.__init__(self.game.p1_name, self.game.p2_name)
-        print(self.game)
+        self.game = Game(self.game.p1_name, self.game.p2_name)
+        print(self)
         return True
 
     def get_scoreboard(self):
