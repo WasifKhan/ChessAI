@@ -5,7 +5,7 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - implement `moves_to_prediction` and `prediction_to_moves`
-  - everyitme a piece moves, update a property in the piece that shows what that move maps to for ML
+  - everyitme a piece moves, `piece.move()` function fills `piece.move` attribtue which is datapoint versoin of move
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
