@@ -4,7 +4,8 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- implement `Parser.generate_datapoint(moves)` and `ConvNNet.prediction_to_board(prediction)`
+- remove base_ai.py?
+- implement `moves_to_prediction` and `prediction_to_moves`
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
