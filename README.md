@@ -6,6 +6,7 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - everyitme a piece moves, `piece.move()` function fills `piece.move_code->'P13'` attribtue which is datapoint versoin of move +updates location
 - `piece.get_move(prediction,board,piece)->(source,destination)`
+- fill `MOVES` dictionary
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
