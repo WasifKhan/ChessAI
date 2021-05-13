@@ -4,8 +4,8 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- remove base_ai.py?
 - implement `moves_to_prediction` and `prediction_to_moves`
+  - everyitme a piece moves, update a property in the piece that shows what that move maps to for ML
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
