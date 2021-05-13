@@ -3,7 +3,7 @@ AI Implemented Using A Convolutional Neural Network
 '''
 
 from ai.models.base_ai import AI
-
+from numpy import array
 
 
 class ConvNNet(AI):
@@ -11,7 +11,7 @@ class ConvNNet(AI):
         super().__init__(location)
 
     def _build_model(self):
-        from tensorflow.keras.models import load_model, Sequential
+        from tensorflow.keras.models import Sequential
         from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
         from tensorflow.keras.optimizers import SGD
         model = Sequential()
@@ -57,7 +57,7 @@ class ConvNNet(AI):
 
     def _evaluate_model(self):
         from matplotlib import pyplot
-        from numpy import mean, array, std
+        from numpy import mean, std
         for i in range(len(self.histories)):
             # plot loss
             pyplot.subplot(2, 1, 1)
@@ -75,26 +75,3 @@ class ConvNNet(AI):
         # box and whisker plots of results
         pyplot.boxplot(self.scores)
         pyplot.show()
-
-    def _board_to_dp(self, board, is_white):
-        if is_white:
-            datapoint = [[board[column,row].value \
-                        if board[column,row].is_white == is_white \
-                        else board[column,row].value * -1 \
-                    for column in range(8)] \
-                    for row in range(8)]
-        else:
-            datapoint = [[board[column,row].value \
-                        if board[column,row].is_white == is_white \
-                        else board[column,row].value * -1 \
-                    for column in range(8)] \
-                    for row in range(7, -1, -1)]
-        datapoint = array(datapoint)
-        datapoint = datapoint.reshape(1, 8, 8, 1)
-        return datapoint
-
-    def _prediction_to_board(self, prediction):
-        '''
-        APART OF USING AI
-        '''
-        return prediction

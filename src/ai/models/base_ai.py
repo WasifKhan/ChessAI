@@ -11,16 +11,17 @@ class AI(metaclass=ABCMeta):
         self.location = location
 
     def train(self, game):
+        from ai.data.data_extractor import DataExtractor
+        self.data_extractor = DataExtractor(game)
         from os import listdir
         if 'brain.h5' in listdir(self.location):
-            self.model = load_model(self.location + '/brains.h5')
+            from tensorflow.keras.models import load_model
+            self.model = load_model(self.location + '/brain.h5')
             return
-        from ai.data.data_extractor import DataExtractor
-        datapoints = DataExtractor(game).datapoints()
         self._build_model()
-        self._train_model(datapoints)
+        self._train_model(self.data_extractor.datapoints())
         self._evalulate_model()
 
     def predict(self, board, is_white):
-        prediction = self.model.predict(self._board_to_dp(board, is_white))
-        return self._prediction_to_board(prediction)
+        prediction = self.model.predict(self.data_extractor.move_to_dp(board, is_white))
+        return self.data_extractor.prediction_to_move(prediction)

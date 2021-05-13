@@ -145,6 +145,32 @@ class Parser(metaclass=ABCMeta):
         datapoint = datapoint[0:-2] + ']\n'
         return datapoint
 
+    def move_to_datapoint(self, move):
+        pass
+
+    def _board_to_datapoint(self, board, is_white):
+        if is_white:
+            datapoint = [[board[column,row].value \
+                        if board[column,row].is_white == is_white \
+                        else board[column,row].value * -1 \
+                    for column in range(8)] \
+                    for row in range(8)]
+        else:
+            datapoint = [[board[column,row].value \
+                        if board[column,row].is_white == is_white \
+                        else board[column,row].value * -1 \
+                    for column in range(8)] \
+                    for row in range(7, -1, -1)]
+        datapoint = array(datapoint)
+        datapoint = datapoint.reshape(1, 8, 8, 1)
+        return datapoint
+
+    def _prediction_to_move(self, prediction):
+        '''
+        APART OF USING AI
+        '''
+        return prediction
+
     def _generate_datapoint(self, moves, iter=[0]):
         '''
         APART OF TRAINING
