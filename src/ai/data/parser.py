@@ -172,7 +172,7 @@ class Parser(metaclass=ABCMeta):
             x = self._board_to_datapoint(self.game.board, self.game.white_turn)
             x_vector.append(x)
             self.game.move(source, destination)
-            y = self._move_to_datapoint(self.game.board[destination].move_code)
+            y = self._move_to_datapoint(self.game.board[destination].get_move())
             y_vector.append(y)
         return (x_vector, y_vector)
 
