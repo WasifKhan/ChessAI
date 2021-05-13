@@ -4,8 +4,9 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- everyitme a piece moves, `piece.move()` function fills `piece.move_code->'P13'` attribtue which is datapoint versoin of move +updates location
-- `piece.get_move(prediction,board,piece)->(source,destination)`
+- **don't need MOVES dict**. each piece stores a dict `move_IDs` containing `move_ID:lambda destination`
+- everyitmeca piece moves, `piece.move()` :(updates location) + seaches the moves dict for `destination` and outputs the appropriate `move_ID` - **FINISH GENERATE DATAPOINT**
+- `piece.get_move(prediction,board,piece)->(source,destination)` : simply search `move_ID`(declared in fn) in `piece.moveIDs` and output `(piece.location-int, piece.moveIDs[moveID]` **FINISH PREDICTION TO MOVE**
 - fill `MOVES` dictionary
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
