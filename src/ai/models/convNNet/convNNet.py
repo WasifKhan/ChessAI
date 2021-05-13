@@ -11,10 +11,6 @@ class ConvNNet(AI):
         super().__init__(location)
 
     def _build_model(self):
-        from os import listdir
-        if 'brain.h5' in listdir(self.location):
-            self.model = load_model(self.location + '/brains.h5')
-            return
         from tensorflow.keras.models import load_model, Sequential
         from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
         from tensorflow.keras.optimizers import SGD
@@ -28,19 +24,15 @@ class ConvNNet(AI):
         opt = SGD(lr=0.01, momentum=0.9)
         model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
         self.model = model
-        self._train_model(game)
 
-    def _train_model(self, game):
+    def _train_model(self, datapoints):
         from ai.data.data_extractor import DataExtractor
         from sklearn.model_selection import KFold
-        data_extractor = DataExtractor(game)
-        data_extractor.download_raw_data()
-
         self.scores, self.histories = list(), list()
         splits = 4 #CHANGE TO 5 when done
         kfold = KFold(splits, shuffle=True, random_state=1)
         dataX, dataY = list(), list()
-        for i, data in enumerate(data_extractor.get_datapoint()):
+        for i, data in enumerate(datapoints):
             if i == 2:
                 break
             [dataX.append(board) for board in data[0]]
@@ -62,7 +54,6 @@ class ConvNNet(AI):
             self.scores.append(acc)
             self.histories.append(history)
         self.model.save(f'{self.location}/brain.h5')
-        self._evaluate_model()
 
     def _evaluate_model(self):
         from matplotlib import pyplot

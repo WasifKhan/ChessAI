@@ -13,10 +13,11 @@ from ai.data.parser import Parser
 class DataExtractor(Parser):
     def __init__(self, game):
         super().__init__(game)
+        if len(listdir(DESTINATION)) < 3:
+            self._download_raw_data()
 
-    def download_raw_data(self):
-        if len(listdir(DESTINATION)) > 3:
-            return
+
+    def _download_raw_data(self):
         for ID in range(5):#len(FILES)):
             try:
                 lines = BZ2File(urlopen(FILES[ID]), 'r')
@@ -42,7 +43,7 @@ class DataExtractor(Parser):
                 continue
         print('Done downloading dataset')
 
-    def get_datapoint(self):
+    def datapoints(self):
         dataset_path = './ai/data/dataset/'
         for data in listdir(dataset_path):
             if data[0] == 'd':
