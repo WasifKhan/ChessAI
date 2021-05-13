@@ -4,6 +4,7 @@ Abstract Base Class for Data Extractor
 
 from abc import ABCMeta
 from re import split
+from numpy import array
 from backend.pieces.king import King
 from backend.pieces.queen import Queen
 from backend.pieces.rook import Rook
@@ -60,12 +61,10 @@ class Parser(metaclass=ABCMeta):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
                 raise Exception
-
         destination = (ord(move[-2])-97)*10 + int(move[-1])-1
         destination = destination//10, destination%10
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
         candidates = []
-
         if move[0] == 'K':
             for cur_piece in pieces:
                 if isinstance(cur_piece, King):
@@ -125,28 +124,26 @@ class Parser(metaclass=ABCMeta):
         moves = eval(self._extract_moves(line))
         self.game.__init__()
         from time import sleep
-        for move in moves:
-            white_move, black_move = move
-            white_source, white_destination = self._convert_move(white_move, True)
-            if not self.game.move(white_source, white_destination):
-                print(self.game)
-                print(f'Invalid move: {white_move}')
-                raise Exception
-            black_source, black_destination = self._convert_move(black_move, False)
+        for move_pair in moves:
+            for i in range(len(move_pair)):
+                source, destination = self._convert_move(move_pair[i], not(bool(i)))
+                if not self.game.move(source, destination):
+                    print(self.game)
+                    print(f'Invalid move: {move_pair[i]}')
+                    raise Exception
+                datapoint += f"({source}, {destination}), "
             print(self.game.board)
             sleep(0.3)
-            if not self.game.move(black_source, black_destination):
-                print(self.game)
-                print(f'Invalid move: {black_move}')
-                raise Exception
-            print(self.game.board)
-            sleep(0.3)
-            datapoint += f"(({white_source}, {white_destination}), ({black_source}, {black_destination})), "
         datapoint = datapoint[0:-2] + ']\n'
         return datapoint
 
-    def move_to_datapoint(self, move):
-        pass
+    def _move_to_datapoint(self, move):
+        from ai.data.moves import MOVES
+        datapoint = [0]*124
+        datapoint[MOVES[move]] = 1
+        datapoint = array(datapoint)
+        datapoint = datapoint.reshape(124, 1)
+        return datapoint
 
     def _board_to_datapoint(self, board, is_white):
         if is_white:
@@ -165,63 +162,27 @@ class Parser(metaclass=ABCMeta):
         datapoint = datapoint.reshape(1, 8, 8, 1)
         return datapoint
 
-    def _prediction_to_move(self, prediction):
-        '''
-        APART OF USING AI
-        '''
-        return prediction
-
     def _generate_datapoint(self, moves, iter=[0]):
-        '''
-        APART OF TRAINING
-        THIS FUNCTION SHOULD DO THE load_dataset() in the cNN tutorial
-        Map list of moves into: (np.array(shape=(X,8,8,1), np.array(X, 124,1))
-        '''
+        datapoint = ()
         moves = eval(moves)
-        test_data_x_0 = [[5, 3, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, -1, -1, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_0 = [0] * 124
-        test_data_y_0[9] = 1
-        test_data_x_1 = [[5, 3, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 0, 1, 1, 1],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0],
-                [0, 0, 0, 0, -1, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, -1, 0, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_1 = [0] * 124
-        test_data_y_1[47] = 1
-        test_data_x_2 = [[5, 3, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 0, 1, 1, 1],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0],
-                [0, 0, 0, -1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, -1, 0, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_2 = [0] * 124
-        test_data_y_2[9] = 1
-        test_data_x_3 = [[5, 0, 3, 9, 100, 3, 3, 5],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [0, 0, 3, 0, 0, 0, 0, 0],
-                [0, 0, 0, -1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [-1, -1, 0, -1, -1, -1, -1, -1],
-                [-5, -3, -3, -9, -100, -3, -3, -5]]
-        test_data_y_3 = [0] * 124
-        test_data_y_3[46] = 1
-        ret_val = ([test_data_x_0, test_data_x_1], [test_data_y_0,
-            test_data_y_1])
-        if iter[0] % 2 == 0:
-            ret_val = ([test_data_x_2, test_data_x_3], [test_data_y_2, test_data_y_3])
-        iter[0] += 1
-        return ret_val
+        self.game.__init__()
+        x_vector = []
+        y_vector = []
+        for source, destination in moves:
+            x = self._board_to_datapoint(self.game.board, self.game.white_turn)
+            x_vector.append(x)
+            self.game.move(source, destination)
+            y = self._move_to_datapoint(self.game.board[destination].move_code)
+            y_vector.append(y)
+        return (x_vector, y_vector)
+
+    def _prediction_to_move(self, prediction, board, is_white):
+        from ai.data.moves import MOVES
+        move = MOVES[prediction]
+        my_piece, ID, destination = move[0], move[1], move[2:]
+        pieces = board.white_pieces if is_white else board.black_pieces
+        for piece in pieces:
+            if str(piece) == my_piece and piece.ID == ID:
+                return piece.get_move(destination)
+
 

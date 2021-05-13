@@ -24,4 +24,4 @@ class AI(metaclass=ABCMeta):
 
     def predict(self, board, is_white):
         prediction = self.model.predict(self.data_extractor.move_to_dp(board, is_white))
-        return self.data_extractor.prediction_to_move(prediction)
+        return self.data_extractor.prediction_to_move(prediction, board, is_white)
