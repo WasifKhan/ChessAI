@@ -4,10 +4,8 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- make ai/ai.py more interfacable with base_ai.py
-  - data_extractor + generate_datapoint both need games...
-  - data_extractor should NOT be called independently after changing interface
-  - implement `generate_datapoint(moves)` and `prediction_to_board`
+- implement `Parser.generate_datapoint(moves)` and `ConvNNet.prediction_to_board(prediction)`
+- Help Ali
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
