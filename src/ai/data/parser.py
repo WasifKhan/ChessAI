@@ -179,10 +179,10 @@ class Parser(metaclass=ABCMeta):
     def _prediction_to_move(self, prediction, board, is_white):
         from ai.data.moves import MOVES
         move = MOVES[prediction]
-        my_piece, ID, destination = move[0], move[1], move[2:]
+        my_piece, ID, move_ID = move[0], move[1], move[2:]
         pieces = board.white_pieces if is_white else board.black_pieces
         for piece in pieces:
             if str(piece) == my_piece and piece.ID == ID:
-                return piece.get_move(destination)
+                return piece.get_move(move_ID)
 
 
