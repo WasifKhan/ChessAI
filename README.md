@@ -4,7 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- **don't need MOVES dict**. each piece stores a dict `move_IDs` containing `move_ID:lambda destination`
+- each piece stores a dict `move_IDs` containing `move_ID:lambda destination`
 - everyitmeca piece moves, `piece.move()` :(updates location) + seaches the moves dict for `destination` and outputs the appropriate `move_ID` - **FINISH GENERATE DATAPOINT**
 - `piece.get_move(prediction,board,piece)->(source,destination)` : simply search `move_ID`(declared in fn) in `piece.moveIDs` and output `(piece.location-int, piece.moveIDs[moveID]` **FINISH PREDICTION TO MOVE**
 - fill `MOVES` dictionary
