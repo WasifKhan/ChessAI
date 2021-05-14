@@ -5,9 +5,8 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - each piece stores a dict `move_IDs` containing `move_ID:lambda destination`
-- everyitmeca piece moves, `piece.move()` :(updates location) + seaches the moves dict for `destination` and outputs the appropriate `move_ID` - **FINISH GENERATE DATAPOINT**
-- `piece.get_move(prediction,board,piece)->(source,destination)` : simply search `move_ID`(declared in fn) in `piece.moveIDs` and output `(piece.location-int, piece.moveIDs[moveID]` **FINISH PREDICTION TO MOVE**
 - fill `MOVES` dictionary
+- clean `raw_data_to_datapoint` and `extract_moves`
 - test without the data concertion bug to see if learning is working properly
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
