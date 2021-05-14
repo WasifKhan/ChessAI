@@ -7,7 +7,7 @@ class Knight(Piece):
         super().__init__(is_white, location)
         self.ID = Knight.ID
         self.value = 3
-        Knight.ID += 1
+        Knight.ID = 1 if Knight.ID == 2 else 2
 
     def __str__(self):
         return 'N' if self.is_white else 'n'

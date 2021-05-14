@@ -7,7 +7,7 @@ class Rook(Piece):
         super().__init__(is_white, location)
         self.ID = Rook.ID
         self.value = 5
-        Rook.ID += 1
+        Rook.ID = 1 if Rook.ID == 2 else 2
 
     def __str__(self):
         return 'R' if self.is_white else 'r'

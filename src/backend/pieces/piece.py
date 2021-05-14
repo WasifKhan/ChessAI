@@ -30,18 +30,19 @@ class Piece(Square, metaclass=ABCMeta):
         self.move_IDs = dict()
         self._initialize_moves()
 
-    def move(self, location):
-        self.location = location
+    def move(self, destination):
         for key in self.move_IDs:
-            if self.move_IDs[key](self.location) == location:
+            if self.move_IDs[key](self.location) == \
+                    destination[0]*10 + destination[1]:
                 self.move_ID = key
-                return
+                break
+        self.location = destination
         return
         raise ValueError(f'{str(self)}{str(self.ID)} was not recently moved')
 
     def get_move(self, move_ID=None):
         if not move_ID:
-            return str(self) + str(self.ID - self.black_inc) + str(self.move_ID)
+            return str(self) + str(self.ID) + str(self.move_ID)
         for key in self.move_IDs:
             if key == move_ID:
                 return (self.location[0]*10 + self.location[1],

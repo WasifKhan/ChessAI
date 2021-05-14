@@ -7,7 +7,7 @@ class Bishop(Piece):
         super().__init__(is_white, location)
         self.ID = Bishop.ID
         self.value = 3
-        Bishop.ID += 1
+        Bishop.ID = 1 if Bishop.ID == 2 else 2
 
     def __str__(self):
         return 'B' if self.is_white else 'b'

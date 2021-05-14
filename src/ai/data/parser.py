@@ -128,7 +128,7 @@ class Parser(metaclass=ABCMeta):
         datapoint = '['
         moves = eval(self._extract_moves(line))
         self.game.__init__()
-        # from time import sleep
+        from time import sleep
         for move_pair in moves:
             for i in range(len(move_pair)):
                 source, destination = self._convert_move(move_pair[i], not(bool(i)))
@@ -136,21 +136,21 @@ class Parser(metaclass=ABCMeta):
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
                 if not self.game.move(source, destination):
-                    #print(self.game)
-                    #print(f'Invalid move: {move_pair[i]}')
+                    print(self.game)
+                    print(f'Invalid move: {move_pair[i]}')
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
                     raise Exception
                 datapoint += f"({source}, {destination}), "
-            #print(self.game.board)
-            #sleep(0.3)
+            pint(self.game.board)
+            sleep(0.3)
         datapoint = datapoint[0:-2] + ']\n'
         return datapoint
 
     def _move_to_datapoint(self, move):
         from ai.data.moves import MOVES
         datapoint = [0]*124
-        datapoint[MOVES[move]] = 1
+        datapoint[MOVES[move.upper()]] = 1
         datapoint = array(datapoint)
         datapoint = datapoint.reshape(124, 1)
         return datapoint
@@ -178,15 +178,18 @@ class Parser(metaclass=ABCMeta):
         self.game.__init__()
         x_vector = []
         y_vector = []
+        from time import sleep
         for source, destination in moves:
             x = self._board_to_datapoint(self.game.board, self.game.white_turn)
             x_vector.append(x)
             if self.game.move(source, destination):
                 y = self._move_to_datapoint(self.game.board[destination].get_move())
                 y_vector.append(y)
-            # NO ELSE NEEDED ONCE WORKING PROPERLY
+           # NO ELSE NEEDED ONCE WORKING PROPERLY
             else:
                 return ([], [])
+            print(self.game.board)
+            sleep(0.3)
         return (x_vector, y_vector)
 
     def _prediction_to_move(self, prediction, board, is_white):
