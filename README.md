@@ -6,7 +6,7 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - each piece stores a dict `move_IDs` containing `move_ID:lambda destination`
 - fill `MOVES` dictionary
-- clean `raw_data_to_datapoint` and `extract_moves`
+- clean `raw_data_to_datapoint` and `convert_move`
 - test without the data concertion bug to see if learning is working properly
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
