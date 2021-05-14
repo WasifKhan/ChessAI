@@ -60,7 +60,10 @@ class Parser(metaclass=ABCMeta):
             if piece.is_valid_move(self.game.board, destination):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
+                return 'None', 'None'
                 raise Exception
+        if move == 'None':
+            return 'None', 'None'
         destination = (ord(move[-2])-97)*10 + int(move[-1])-1
         destination = destination//10, destination%10
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
@@ -96,8 +99,9 @@ class Parser(metaclass=ABCMeta):
                         and cur_piece.is_valid_move(self.game.board, destination):
                     candidates.append(cur_piece)
         if len(candidates) == 0:
-            print(self.game)
-            print(move)
+            #print(self.game)
+            #print(move)
+            return 'None', 'None'
             raise Exception
         elif len(candidates) == 1:
             piece = candidates[0]
@@ -115,7 +119,8 @@ class Parser(metaclass=ABCMeta):
                         piece = candidate
                         matches += 1
             if matches == 0 or matches > 1:
-                print(f'move was: {move}')
+                #print(f'move was: {move}')
+                return 'None', 'None'
                 raise Exception
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 
@@ -123,17 +128,22 @@ class Parser(metaclass=ABCMeta):
         datapoint = '['
         moves = eval(self._extract_moves(line))
         self.game.__init__()
-        from time import sleep
+        # from time import sleep
         for move_pair in moves:
             for i in range(len(move_pair)):
                 source, destination = self._convert_move(move_pair[i], not(bool(i)))
+                if source == 'None' or destination == 'None':
+                    datapoint = datapoint[0:-2] + ']\n'
+                    return datapoint
                 if not self.game.move(source, destination):
-                    print(self.game)
-                    print(f'Invalid move: {move_pair[i]}')
+                    #print(self.game)
+                    #print(f'Invalid move: {move_pair[i]}')
+                    datapoint = datapoint[0:-2] + ']\n'
+                    return datapoint
                     raise Exception
                 datapoint += f"({source}, {destination}), "
-            print(self.game.board)
-            sleep(0.3)
+            #print(self.game.board)
+            #sleep(0.3)
         datapoint = datapoint[0:-2] + ']\n'
         return datapoint
 
@@ -171,18 +181,23 @@ class Parser(metaclass=ABCMeta):
         for source, destination in moves:
             x = self._board_to_datapoint(self.game.board, self.game.white_turn)
             x_vector.append(x)
-            self.game.move(source, destination)
-            y = self._move_to_datapoint(self.game.board[destination].get_move())
-            y_vector.append(y)
+            if self.game.move(source, destination):
+                y = self._move_to_datapoint(self.game.board[destination].get_move())
+                y_vector.append(y)
+            # NO ELSE NEEDED ONCE WORKING PROPERLY
+            else:
+                return ([], [])
         return (x_vector, y_vector)
 
     def _prediction_to_move(self, prediction, board, is_white):
         from ai.data.moves import MOVES
+        for key in moves:
+            moves[moves[key]] = key
         move = MOVES[prediction]
-        my_piece, ID, move_ID = move[0], move[1], move[2:]
+        my_piece, ID, move_ID = move[0], move[1], move[2:] # ie. 'P11'
         pieces = board.white_pieces if is_white else board.black_pieces
         for piece in pieces:
             if str(piece) == my_piece and piece.ID == ID:
-                return piece.get_move(move_ID)
+                return piece.get_move(int(move_ID))
 
 

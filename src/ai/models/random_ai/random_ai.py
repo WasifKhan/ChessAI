@@ -15,6 +15,8 @@ class RandomAI(AI):
         return True
 
     def predict(self, board, is_white):
+        if self._resign(board, is_white):
+            return False
         my_pieces = list(board.white_pieces) if is_white else list(board.black_pieces)
         rand_piece = randint(0, max(0, len(my_pieces) - 1))
         while len(my_pieces[rand_piece].moves(board)) == 0:

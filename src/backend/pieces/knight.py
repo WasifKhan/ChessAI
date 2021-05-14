@@ -12,8 +12,8 @@ class Knight(Piece):
     def __str__(self):
         return 'N' if self.is_white else 'n'
 
-    def value(self):
-        return 3
+    def _initialize_moves(self):
+        pass
 
     def is_valid_move(self, board, destination):
         vertical_move = abs(destination[0] - self.location[0])

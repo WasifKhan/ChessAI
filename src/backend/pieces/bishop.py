@@ -12,8 +12,8 @@ class Bishop(Piece):
     def __str__(self):
         return 'B' if self.is_white else 'b'
 
-    def value(self):
-        return 3
+    def _initialize_moves(self):
+        pass
 
     def is_valid_move(self, board, destination):
         x_direction = destination[0] - self.location[0]

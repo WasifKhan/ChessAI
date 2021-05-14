@@ -22,6 +22,17 @@ class AI(metaclass=ABCMeta):
         self._train_model(self.data_extractor.datapoints())
         self._evalulate_model()
 
+    def _resign(self, board, is_white):
+        if len(board.history) >= 5:
+            value = sum([value[3] for value in board.history[-5:]])
+            if (value <= -10 and is_white) or (value >= 10 and not is_white):
+                print(value <= -10 and is_white)
+                print(value >= 10 and not is_white)
+                return True
+        return False
+
     def predict(self, board, is_white):
+        if self._resign(board, is_white):
+            return False
         prediction = self.model.predict(self.data_extractor.move_to_dp(board, is_white))
         return self.data_extractor.prediction_to_move(prediction, board, is_white)

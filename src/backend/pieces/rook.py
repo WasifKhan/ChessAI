@@ -12,6 +12,9 @@ class Rook(Piece):
     def __str__(self):
         return 'R' if self.is_white else 'r'
 
+    def _initialize_moves(self):
+        pass
+
     def is_valid_move(self, board, destination):
         x_direction = destination[0] - self.location[0]
         y_direction = destination[1] - self.location[1]

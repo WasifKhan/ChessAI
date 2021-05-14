@@ -13,7 +13,10 @@ class King(Piece):
 
     def __str__(self):
         return 'K' if self.is_white else 'k'
-    
+
+    def _initialize_moves(self):
+        pass
+
     def _castle(self, board, destination):
         # Left Castle
         if self.location[0] - destination//10 == 3 and self.location[1] == destination%10:

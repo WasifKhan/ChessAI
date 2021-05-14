@@ -53,13 +53,13 @@ class Board:
             if piece.location[0] - destination[0] == 3:
                 rook_location = destination[0]-1, destination[1]
                 rook = self[rook_location]
-                rook.move(piece.location[0]-1, piece.location[1])
+                rook.move((piece.location[0]-1, piece.location[1]))
                 self[piece.location[0]-1, piece.location[1]] = rook
                 self[rook_location] = Square(rook_location)
             elif destination[0] - piece.location[0] == 2:
                 rook_location = destination[0]+1, destination[1]
                 rook = self[rook_location]
-                rook.move(piece.location[0]+1, piece.location[1])
+                rook.move((piece.location[0]+1, piece.location[1]))
                 self[piece.location[0]+1, piece.location[1]] = rook
                 self[rook_location] = Square(rook_location)
         # Update the board to move piece from previous location to destination
