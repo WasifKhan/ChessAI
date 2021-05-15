@@ -9,13 +9,33 @@ class King(Piece):
         super().__init__(is_white, location)
         self.ID = King.ID
         self.value = 100
-        King.ID += 1
+        King.ID = 1
 
     def __str__(self):
         return 'K' if self.is_white else 'k'
 
     def _initialize_moves(self):
-        pass
+        direction = 1 if self.is_white else -1
+        self.move_IDs[0] = lambda location: \
+                (location[0]+1)*10 + location[1]+direction
+        self.move_IDs[1] = lambda location: \
+                (location[0]+1)*10 + location[1]
+        self.move_IDs[2] = lambda location: \
+                (location[0]+1)*10 + location[1]-direction
+        self.move_IDs[3] = lambda location: \
+                (location[0]-1)*10 + location[1]+direction
+        self.move_IDs[4] = lambda location: \
+                (location[0]-1)*10 + location[1]
+        self.move_IDs[5] = lambda location: \
+                (location[0]+1)*10 + location[1]-direction
+        self.move_IDs[6] = lambda location: \
+                location[0]*10 + location[1]+direction
+        self.move_IDs[7] = lambda location: \
+                location[0]*10 + location[1]-direction
+        self.move_IDs[8] = lambda location: \
+                (location[0]-3)*10 + location[1]
+        self.move_IDs[9] = lambda location: \
+                (location[0]+2)*10 + location[1]
 
     def _castle(self, board, destination):
         # Left Castle

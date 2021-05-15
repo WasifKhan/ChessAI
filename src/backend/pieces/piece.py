@@ -38,7 +38,8 @@ class Piece(Square, metaclass=ABCMeta):
                 break
         self.location = destination
         return
-        raise ValueError(f'{str(self)}{str(self.ID)} was not recently moved')
+        if self.move_ID == None:
+            raise ValueError(f'{str(self)}{str(self.ID)} was not recently moved')
 
     def get_move(self, move_ID=None):
         if not move_ID:
@@ -47,8 +48,7 @@ class Piece(Square, metaclass=ABCMeta):
             if key == move_ID:
                 return (self.location[0]*10 + self.location[1],
                         self.move_IDs[key](self.location))
-        return
-        raise ValueError(f'{str(self)}{str(self.ID)} was not recently moved')
+        raise IndexError(f'{str(self)}{str(self.ID)} was not recently moved')
 
     @abstractmethod
     def moves(self, board):

@@ -9,6 +9,10 @@ from abc import ABCMeta
 class AI(metaclass=ABCMeta):
     def __init__(self, location):
         self.location = location
+        from os import listdir
+        if 'brain.h5' in listdir(self.location):
+            from tensorflow.keras.models import load_model
+            self.model = load_model(self.location + '/brain.h5')
 
     def train(self, game):
         from ai.data.data_extractor import DataExtractor
@@ -17,10 +21,10 @@ class AI(metaclass=ABCMeta):
         if 'brain.h5' in listdir(self.location):
             from tensorflow.keras.models import load_model
             self.model = load_model(self.location + '/brain.h5')
-            return
-        self._build_model()
-        self._train_model(self.data_extractor.datapoints())
-        self._evalulate_model()
+        else:
+            self._build_model()
+        self._train_model(self.data_extractor.datapoints(self.location))
+        self._evaluate_model()
 
     def _resign(self, board, is_white):
         if len(board.history) >= 5:
@@ -34,5 +38,8 @@ class AI(metaclass=ABCMeta):
     def predict(self, board, is_white):
         if self._resign(board, is_white):
             return False
-        prediction = self.model.predict(self.data_extractor.move_to_dp(board, is_white))
-        return self.data_extractor.prediction_to_move(prediction, board, is_white)
+        prediction = self.model.predict(self.data_extractor._board_to_datapoint(board, is_white))
+        move = self.data_extractor._prediction_to_move(prediction, board, is_white)
+        print(f'move is {move}')
+        return move
+

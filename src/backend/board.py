@@ -36,7 +36,7 @@ class Board:
             x, y = key[0], key[1]
         elif isinstance(key, int):
             x, y=  key//10, key%10
-        if x >= 0 and y >= 0 and x < len(self.board) and y < len(self.board[x]):
+        if x >= 0 and y >= 0 and x < 8 and y < 8:
             self.board[x][y] = val
         else:
             raise IndexError

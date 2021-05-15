@@ -64,8 +64,11 @@ class Parser(metaclass=ABCMeta):
                 raise Exception
         if move == 'None':
             return 'None', 'None'
-        destination = (ord(move[-2])-97)*10 + int(move[-1])-1
-        destination = destination//10, destination%10
+        try:
+            destination = (ord(move[-2])-97)*10 + int(move[-1])-1
+            destination = destination//10, destination%10
+        except Exception:
+            return 'None', 'None'
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
         candidates = []
         if move[0] == 'K':
@@ -128,7 +131,6 @@ class Parser(metaclass=ABCMeta):
         datapoint = '['
         moves = eval(self._extract_moves(line))
         self.game.__init__()
-        from time import sleep
         for move_pair in moves:
             for i in range(len(move_pair)):
                 source, destination = self._convert_move(move_pair[i], not(bool(i)))
@@ -136,23 +138,20 @@ class Parser(metaclass=ABCMeta):
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
                 if not self.game.move(source, destination):
-                    print(self.game)
-                    print(f'Invalid move: {move_pair[i]}')
+                    #print(self.game)
+                    #print(f'Invalid move: {move_pair[i]}')
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
                     raise Exception
                 datapoint += f"({source}, {destination}), "
-            pint(self.game.board)
-            sleep(0.3)
-        datapoint = datapoint[0:-2] + ']\n'
+        datapoint = datapoint[0:-2] + ']'
         return datapoint
 
     def _move_to_datapoint(self, move):
         from ai.data.moves import MOVES
-        datapoint = [0]*124
+        datapoint = [0]*142
         datapoint[MOVES[move.upper()]] = 1
         datapoint = array(datapoint)
-        datapoint = datapoint.reshape(124, 1)
         return datapoint
 
     def _board_to_datapoint(self, board, is_white):
@@ -172,35 +171,41 @@ class Parser(metaclass=ABCMeta):
         datapoint = datapoint.reshape(1, 8, 8, 1)
         return datapoint
 
-    def _generate_datapoint(self, moves, iter=[0]):
+    def _generate_datapoint(self, moves):
         datapoint = ()
         moves = eval(moves)
         self.game.__init__()
         x_vector = []
         y_vector = []
-        from time import sleep
         for source, destination in moves:
             x = self._board_to_datapoint(self.game.board, self.game.white_turn)
             x_vector.append(x)
             if self.game.move(source, destination):
-                y = self._move_to_datapoint(self.game.board[destination].get_move())
-                y_vector.append(y)
+                try:
+                    y = self._move_to_datapoint(self.game.board[destination].get_move())
+                    y_vector.append(y)
+                except Exception:
+                    x_vector.pop()
+                    return (x_vector, y_vector)
            # NO ELSE NEEDED ONCE WORKING PROPERLY
             else:
                 return ([], [])
-            print(self.game.board)
-            sleep(0.3)
         return (x_vector, y_vector)
 
     def _prediction_to_move(self, prediction, board, is_white):
         from ai.data.moves import MOVES
-        for key in moves:
-            moves[moves[key]] = key
-        move = MOVES[prediction]
-        my_piece, ID, move_ID = move[0], move[1], move[2:] # ie. 'P11'
+        for i, val in enumerate(prediction[0]):
+            if val == max(prediction[0]):
+                prediction = i
+                break
+        for key in MOVES:
+            if MOVES[key] == prediction:
+                move = key
+        my_piece, ID, move_ID = move[0], int(move[1]), move[2:] # ie. 'P11'
+        my_piece = my_piece if is_white else my_piece.lower()
         pieces = board.white_pieces if is_white else board.black_pieces
         for piece in pieces:
-            if str(piece) == my_piece and piece.ID == ID:
+            if str(piece) == str(my_piece) and piece.ID == ID:
                 return piece.get_move(int(move_ID))
 
 

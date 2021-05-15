@@ -28,7 +28,7 @@ class View:
         The following code should be in buttons initiated by the user.
         Currently store here until calls are done
         '''
-        self.interface.versus_AI(0)
+        self.interface.versus_AI(1)
         self.interface.set_player_names('Player 1', 'Black AI')
         scoreboard = self.interface.get_scoreboard()
         score = self.interface.get_score('Player 1', 'Black AI')
@@ -71,7 +71,15 @@ class View:
         play_again_button['command'] = lambda: self.play_again()
         play_again_button.pack(side=tk.LEFT)
 
+        train_ai_button = tk.Button(master=btm_frame, text='Train AI', fg='green')
+        train_ai_button['command'] = lambda: self.train_AI()
+        train_ai_button.pack(side=tk.LEFT)
+
+
         root.mainloop()
+
+    def train_AI(self):
+        self.interface.train_AI()
 
     def simulate_games(self):
         self.interface.simulate_games(100)

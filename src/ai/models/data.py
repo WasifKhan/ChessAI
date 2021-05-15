@@ -3,7 +3,7 @@
 # Model: Q-Learning
 
 '''
-Pieces = 
+Pieces =
 {0: None, 1: Pawn, 2: Bishop, 3: Knight, 4: Rook, 5: Queen, 6: King}
 
 Value = {Pawn: 1, Bishop: 3, Knight: 3, Rook: 5, Queen: 9, King: 100}

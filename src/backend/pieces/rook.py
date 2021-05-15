@@ -13,7 +13,35 @@ class Rook(Piece):
         return 'R' if self.is_white else 'r'
 
     def _initialize_moves(self):
-        pass
+        direction = 1 if self.is_white else -1
+        self.move_IDs[0] = lambda location: \
+                ((location[0]+7)%8)*10 + location[1]
+        self.move_IDs[1] = lambda location: \
+                ((location[0]+6)%8)*10 + location[1]
+        self.move_IDs[2] = lambda location: \
+                ((location[0]+5)%8)*10 + location[1]
+        self.move_IDs[3] = lambda location: \
+                ((location[0]+4)%8)*10 + location[1]
+        self.move_IDs[4] = lambda location: \
+                ((location[0]+3)%8)*10 + location[1]
+        self.move_IDs[5] = lambda location: \
+                ((location[0]+2)%8)*10 + location[1]
+        self.move_IDs[6] = lambda location: \
+                ((location[0]+1)%8)*10 + location[1]
+        self.move_IDs[7] = lambda location: \
+                location[0]*10 + (location[1]+7*direction)%8
+        self.move_IDs[8] = lambda location: \
+                location[0]*10 + (location[1]+6*direction)%8
+        self.move_IDs[9] = lambda location: \
+                location[0]*10 + (location[1]+5*direction)%8
+        self.move_IDs[10] = lambda location: \
+                location[0]*10 + (location[1]+4*direction)%8
+        self.move_IDs[10] = lambda location: \
+                location[0]*10 + (location[1]+3*direction)%8
+        self.move_IDs[12] = lambda location: \
+                location[0]*10 + (location[1]+2*direction)%8
+        self.move_IDs[13] = lambda location: \
+                location[0]*10 + (location[1]+1*direction)%8
 
     def is_valid_move(self, board, destination):
         x_direction = destination[0] - self.location[0]
