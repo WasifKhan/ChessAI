@@ -19,18 +19,18 @@ class DataExtractor(Parser):
         it = iter(lines)
         '''
         Can remove notion of index once ready to use
-        Also change this loop to be len(FILES) and change the
-        inner loop to be 'for _ in range(ten_million)'
         '''
         index = 0
         print(f'Processing File: {ID}')
-        while line := next(it):
-            if index == 1000:
+        while line := str(next(it)):
+            if index % 500 == 0:
+                print(f'Processing... {index//500}% done')
+            if index == 50000:
                 return StopIteration
-            if (move := str(next(it)))[2] == '1':
-                datapoint = self._raw_data_to_datapoint(move)
+            if line[2] == '1':
+                datapoint = self._raw_data_to_datapoint(line)
                 yield datapoint 
-                index += 1
+            index += 1
         print(f'Done processing file: {ID}')
 
     def _generate_datapoint(self, moves):

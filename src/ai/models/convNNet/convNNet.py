@@ -28,33 +28,32 @@ class ConvNNet(AI):
         from ai.data.data_extractor import DataExtractor
         from sklearn.model_selection import KFold
         self.scores, self.histories = list(), list()
-        splits = 5
+        splits = 4
         kfold = KFold(splits, shuffle=True, random_state=1)
         dataX, dataY = list(), list()
-        for i,data in enumerate(datapoints):
-            if i % 1000 == 0:
-                print(f'Processing data.... {i//1000}% done')
+        for data in datapoints:
             [dataX.append(board) for board in data[0]]
             [dataY.append(move) for move in data[1]]
         dataX, dataY = array(dataX), array(dataY)
         dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
-
+        print('Begin learning')
         # enumerate splits
-        for train_ix, test_ix in kfold.split(dataX):
+        for i, train_test in enumerate(kfold.split(dataX)):
+            train_ix, test_ix = train_test
             trainX, trainY, testX, testY = dataX[train_ix], dataY[train_ix], dataX[test_ix], dataY[test_ix]
-            history = self.model.fit(trainX, trainY, epochs=2, batch_size=32, validation_data=(testX, testY), verbose=0)
+            history = self.model.fit(trainX, trainY, epochs=5, batch_size=32, validation_data=(testX, testY), verbose=0)
             _, acc = self.model.evaluate(testX, testY, verbose=0)
-            print('> %.3f' % (acc * 100.0))
+            print(f'Learning {i}/{splits} accuracy: {str(acc*100)[0:5]}')
             self.scores.append(acc)
             self.histories.append(history)
+        print('Done learning')
         self.model.save(f'{self.location}/brain.h5')
 
     def _evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
-        for i in range(len(self.histories)[-2:]):
-            pyplot.title('Classification Accuracy')
-            pyplot.plot(self.histories[i].history['accuracy'], color='blue', label='train')
-            pyplot.plot(self.histories[i].history['val_accuracy'], color='orange', label='test')
-            pyplot.show()
+        pyplot.title('Classification Accuracy')
+        pyplot.plot(self.histories[-1].history['accuracy'], color='blue', label='train')
+        pyplot.plot(self.histories[-1].history['val_accuracy'], color='orange', label='test')
+        pyplot.show()
         print('Accuracy: mean=%.3f std=%.3f, n=%d' % (mean(self.scores)*100, std(self.scores)*100, len(self.scores)))
