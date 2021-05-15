@@ -4,8 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- test without the data concertion bug to see if learning is working properly
-- clean `raw_data_to_datapoint` and `convert_move`
+- clean `parser`
 - Help Ali
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
