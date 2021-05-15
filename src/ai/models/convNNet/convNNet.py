@@ -15,7 +15,7 @@ class ConvNNet(AI):
         from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
         from tensorflow.keras.optimizers import SGD
         model = Sequential()
-        model.add(Conv2D(5, (4, 4), activation='sigmoid', kernel_initializer='he_uniform', input_shape=(8, 8, 1)))
+        model.add(Conv2D(3, (3, 3), activation='sigmoid', kernel_initializer='he_uniform', input_shape=(8, 8, 1)))
         model.add(MaxPooling2D((2, 2)))
         model.add(Flatten())
         model.add(Dense(142, activation='softmax'))
@@ -52,17 +52,9 @@ class ConvNNet(AI):
     def _evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
-        for i in range(len(self.histories)):
-            pyplot.subplot(2, 1, 1)
-            pyplot.title('Cross Entropy Loss')
-            pyplot.plot(self.histories[i].history['loss'], color='blue', label='train')
-            pyplot.plot(self.histories[i].history['val_loss'], color='orange', label='test')
-            pyplot.subplot(2, 1, 2)
+        for i in range(len(self.histories)[-2:]):
             pyplot.title('Classification Accuracy')
             pyplot.plot(self.histories[i].history['accuracy'], color='blue', label='train')
             pyplot.plot(self.histories[i].history['val_accuracy'], color='orange', label='test')
             pyplot.show()
         print('Accuracy: mean=%.3f std=%.3f, n=%d' % (mean(self.scores)*100, std(self.scores)*100, len(self.scores)))
-        # box and whisker plots of results
-        pyplot.boxplot(self.scores)
-        pyplot.show()

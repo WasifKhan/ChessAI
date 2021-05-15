@@ -171,27 +171,6 @@ class Parser(metaclass=ABCMeta):
         datapoint = datapoint.reshape(1, 8, 8, 1)
         return datapoint
 
-    def _generate_datapoint(self, moves):
-        datapoint = ()
-        moves = eval(moves)
-        self.game.__init__()
-        x_vector = []
-        y_vector = []
-        for source, destination in moves:
-            x = self._board_to_datapoint(self.game.board, self.game.white_turn)
-            x_vector.append(x)
-            if self.game.move(source, destination):
-                try:
-                    y = self._move_to_datapoint(self.game.board[destination].get_move())
-                    y_vector.append(y)
-                except Exception:
-                    x_vector.pop()
-                    return (x_vector, y_vector)
-           # NO ELSE NEEDED ONCE WORKING PROPERLY
-            else:
-                return ([], [])
-        return (x_vector, y_vector)
-
     def _prediction_to_move(self, prediction, board, is_white):
         from ai.data.moves import MOVES
         for i, val in enumerate(prediction[0]):
