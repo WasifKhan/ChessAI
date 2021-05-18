@@ -62,5 +62,6 @@ class DataExtractor(Parser):
         for i, moves in enumerate(self._download_raw_data(file_ID)):
             yield self._generate_datapoint(moves)
         with open(train_state, 'w') as fp:
-            fp.write(str(file_ID+1))
+            # CHANGE TO str(file_ID)+1) when done
+            fp.write(str(file_ID))
 
