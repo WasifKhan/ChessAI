@@ -7,12 +7,12 @@ from .pieces.king import King
 from .pieces.pawn import Pawn
 
 class Board:
-    def __init__(self):
+    def __init__(self, pieces=None):
         self.history = []
         self.white_pieces = set()
         self.black_pieces = set()
         self.game_over = False
-        self._initialize_board()
+        self._initialize_board(pieces)
 
     def __str__(self):
         output = ''
@@ -41,10 +41,31 @@ class Board:
         else:
             raise IndexError
 
+    def __deepcopy__(self, memo):
+        return Board(self.white_pieces | self.black_pieces)
+
+    def _add(self, piece):
+        if piece.is_white:
+            if isinstance(piece, King):
+                self.white_king = piece
+            self.white_pieces.add(piece)
+        else:
+            if isinstance(piece, King):
+                self.black_king = piece
+            self.black_pieces.add(piece)
+        self[piece.location] = piece
+
     def board_value(self):
         white_value = sum([piece.value for piece in self.white_pieces])
         black_value = sum([piece.value for piece in self.black_pieces])
         return white_value - black_value
+
+    def check(self, is_white):
+        king = self.white_king if is_white else self.black_king
+        for piece in (pieces := self.black_pieces if is_white else self.white_pieces):
+            if (king.location[0]*10 + king.location[1]) in piece.moves(self):
+                return True
+        return False
 
     def move(self, piece, destination):
         self.history.append((piece, piece.location, destination, self.board_value()))
@@ -85,17 +106,32 @@ class Board:
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
                     self[(destination[0], destination[1] + 1)] = Square((destination[0], destination[1] + 1))
         # Check for promotion
-        #if piece.loc is edge of board, create a new queen, update board location from pawn to queen
-        #Go into board.pieces and remove the pawn and add a new queen
-        #if isinstance(piece, Pawn):
-            
-        # Check if the move resulted in checkmate
-        if (piece.is_white and self.black_king.checkmate(self.board)) \
-            or (not(piece.is_white) and self.white_king.checkmate(self.board)):
-            board.game_over = True
+        if isinstance(piece, Pawn):
+            if piece.location[1] == 7 and piece.is_white:
+                self.white_pieces.remove(piece)
+                new_queen = Queen(is_white=True, location= piece.location)
+                self.white_pieces.add(piece)
+                self[piece.location] = new_queen
+            elif piece.location[1] == 0 and not(piece.is_white):
+                self.black_pieces.remove(piece)
+                new_queen = Queen(is_white=False, location= piece.location)
+                self.black_pieces.add(piece)
+                self[piece.location] = new_queen
 
-    def _initialize_board(self):
+
+        # Check if the move resulted in checkmate
+        if (piece.is_white and self.black_king.checkmate(self)) \
+            or (not(piece.is_white) and self.white_king.checkmate(self)):
+            self.game_over = True
+
+    def _initialize_board(self, pieces):
         board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
+        if pieces:
+            self.board = board
+            from copy import deepcopy
+            for piece in pieces:
+                self._add(deepcopy(piece))
+            return
         white_rook_1 = Rook(is_white=True, location=(0,0))
         white_rook_2 = Rook(is_white=True, location=(7,0))
         white_knight_1 = Knight(is_white=True, location=(1,0))
