@@ -90,7 +90,7 @@ class Board:
         #if isinstance(piece, Pawn):
             
         # Check if the move resulted in checkmate
-        if piece.is_white and self.black_king.checkmate(self.board) \
+        if (piece.is_white and self.black_king.checkmate(self.board)) \
             or (not(piece.is_white) and self.white_king.checkmate(self.board)):
             board.game_over = True
 
