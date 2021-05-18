@@ -1,4 +1,5 @@
 from io import DEFAULT_BUFFER_SIZE
+from re import L
 from .piece import Piece
 from .pawn import Pawn
 from .rook import Rook
@@ -39,7 +40,7 @@ class King(Piece):
 
     def _castle(self, board, destination):
         # Left Castle
-        if self.location[0] - destination//10 == 3 and self.location[1] == destination%10:
+        if self.location[0] - destination//10 == 2 and self.location[1] == destination%10:
             if isinstance(board[0,0], Rook):
                 for square in range(1,4):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
@@ -104,5 +105,17 @@ class King(Piece):
 
 
     def checkmate(self, board):
+        for enemy_piece in (enemy_pieces := board.black_pieces if self.is_white else board.white_pieces):
+            if (self.location[0]*10 + self.location[1]) in enemy_piece.moves(board) \
+                and self.moves(board) == set():
+                captured = False
+                for my_piece in (my_pieces := board.white_pieces if self.is_white else board.black_pieces):
+                    if (enemy_piece.location[0]*10 + enemy_piece.location[1]) in my_piece.moves(board):
+                        captured = True
+                        break
+                if not captured:
+                    return True
         return False
+
+        
 

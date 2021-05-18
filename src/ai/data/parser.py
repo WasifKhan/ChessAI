@@ -133,6 +133,7 @@ class Parser(metaclass=ABCMeta):
         datapoint = '['
         moves = eval(self._extract_moves(line))
         self.game.__init__()
+        from time import sleep
         for move_pair in moves:
             for i in range(len(move_pair)):
                 source, destination = self._convert_move(move_pair[i], not(bool(i)))
@@ -142,10 +143,11 @@ class Parser(metaclass=ABCMeta):
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
                 if not self.game.move(source, destination):
-                    #print(self.game)
-                    #print(f'Invalid move: {move_pair[i]}')
+                    print(moves)
+                    print(f'{source} -> {destination}')
+                    print(self.game)
+                    print(f'Invalid move: {move_pair[i]}')
                     datapoint = datapoint[0:-2] + ']\n'
-                    return datapoint
                     raise Exception
                 datapoint += f"({source}, {destination}), "
         datapoint = datapoint[0:-2] + ']'
