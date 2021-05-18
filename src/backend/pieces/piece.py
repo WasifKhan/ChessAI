@@ -11,6 +11,9 @@ class Square:
         self.value = 0
         Square.ID += 1
 
+    def __deepcopy__(self, memo):
+        return self.__class__(self.is_white, self.location)
+
     '''
     Delete this function when debugging is done
     '''
