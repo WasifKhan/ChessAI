@@ -4,8 +4,9 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
+- clean backend/random AI no errors
+  - Something wrong w/ pawn movement!
 - clean `parser`
-- Help Ali
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
@@ -18,13 +19,9 @@ Repository containing Chess Engine and ML Model
 - Tweak qlearning rewards
 
 ### **Ali**
-- implement promote/check/checkmate
 - unit tests for board and game
 - Write actual integration tests (one for why moves needs to be updated after each move)
   - i think it only needs tobe updated before a king moves
-- Something wrong:
-  - with the square 0,0(UI)
-  - pawn capture pawn 2,5 -> 1,6(backend)
 - write 2 system tests
 - implement scoreboard + visualization
   - db contains `players`=(ID,name) and `scores`=(ID,ID, score)
