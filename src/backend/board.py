@@ -100,10 +100,14 @@ class Board:
             if (isinstance(previous_move[0], Pawn) and
                 previous_move[1][1] - previous_move[2][1] == 2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 5):
+                    captured_piece = self[destination[0], destination[1] - 1]
+                    self.black_pieces.remove(captured_piece)
                     self[destination[0], destination[1] - 1] = Square((destination[0], destination[1] - 1))
             elif (isinstance(previous_move[0], Pawn) and
                 previous_move[1][1] - previous_move[2][1] == -2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
+                    captured_piece = self[destination[0], destination[1] + 1]
+                    self.white_pieces.remove(captured_piece)
                     self[(destination[0], destination[1] + 1)] = Square((destination[0], destination[1] + 1))
         # Check for promotion
         if isinstance(piece, Pawn):

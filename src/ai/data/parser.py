@@ -40,7 +40,6 @@ class Parser(metaclass=ABCMeta):
         if white_move == black_move:
             black_move = 'None'
         elif '*' in black_move or '1-0' in black_move:
-            print(black_move)
             black_move = 'None'
         elif '1/2' in black_move:
             black_move = 'Draw'
@@ -52,30 +51,27 @@ class Parser(metaclass=ABCMeta):
         return datapoint[0:-2] + ']\n'
 
     def _convert_move(self, move, is_white):
+        if move == 'None':
+            return None, None
         if move[0] == 'O':
             piece = self.game.board.white_king if is_white else self.game.board.black_king
             if len(move) == 3:
                 destination = (piece.location[0]+2, piece.location[1])
             else:
-                destination = (piece.location[0]-3, piece.location[1])
+                destination = (piece.location[0]-2, piece.location[1])
             if piece.is_valid_move(self.game.board, destination):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
                 print(move)
                 raise Exception
-        if move == 'None':
-            print(move)
-            raise Exception
-        try:
-            destination = (ord(move[-2])-97)*10 + int(move[-1])-1
-            destination = destination//10, destination%10
-        except Exception:
-            raise Exception
+        destination = (ord(move[-2])-97)*10 + int(move[-1])-1
+        destination = destination//10, destination%10
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
         candidates = []
         if move[0] == 'K':
             for cur_piece in pieces:
-                if isinstance(cur_piece, King):
+                if isinstance(cur_piece, King) \
+                        and cur_piece.is_valid_move(self.game.board, destination):
                     candidates.append(cur_piece)
                     break
         elif move[0] == 'Q':
@@ -104,14 +100,13 @@ class Parser(metaclass=ABCMeta):
                         and cur_piece.is_valid_move(self.game.board, destination):
                     candidates.append(cur_piece)
         if len(candidates) == 0:
-            #print(self.game)
-            #print(move)
-            return 'None', 'None'
+            print(self.game)
+            print(move)
             raise Exception
         elif len(candidates) == 1:
             piece = candidates[0]
         else:
-            identifier = move[1]
+            identifier = move[1] if move[1] != 'x' else move[0]
             matches = 0
             if ord(identifier) >= 97:
                 for candidate in candidates:
@@ -124,8 +119,10 @@ class Parser(metaclass=ABCMeta):
                         piece = candidate
                         matches += 1
             if matches == 0 or matches > 1:
-                #print(f'move was: {move}')
-                return 'None', 'None'
+                for candidate in candidates:
+                    print(f'candidate: {candidate}\nlocation:{candidate.location}')
+                print(f'move was: {move}, destination: {destination}')
+                print(f'matches: {matches}')
                 raise Exception
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 
@@ -133,13 +130,12 @@ class Parser(metaclass=ABCMeta):
         datapoint = '['
         moves = eval(self._extract_moves(line))
         self.game.__init__()
-        from time import sleep
         for move_pair in moves:
             for i in range(len(move_pair)):
-                source, destination = self._convert_move(move_pair[i], not(bool(i)))
+                source, destination = self._convert_move(move_pair[i], not(bool(i%2)))
                 # Start debugging here...source should not be none...
                 # self._extract_moves(line) is wrong somehow
-                if source == 'None' or destination == 'None':
+                if source == None:
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
                 if not self.game.move(source, destination):
@@ -149,6 +145,8 @@ class Parser(metaclass=ABCMeta):
                     print(f'Invalid move: {move_pair[i]}')
                     datapoint = datapoint[0:-2] + ']\n'
                     raise Exception
+                print(f'{source} -> {destination}')
+                print(self.game)
                 datapoint += f"({source}, {destination}), "
         datapoint = datapoint[0:-2] + ']'
         return datapoint

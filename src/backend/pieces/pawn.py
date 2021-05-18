@@ -53,8 +53,8 @@ class Pawn(Piece):
         else:
             # Check for diagonal movement
             if self.location[1] - 1 == destination[1] \
-                and self.location[0] + 1 == destination[0] \
-                or self.location[0] - 1 == destination[0]:
+                and (self.location[0] + 1 == destination[0] \
+                    or self.location[0] - 1 == destination[0]):
                 if board[destination].is_white:
                     return True
                 # Check for en passant movement    
@@ -103,7 +103,7 @@ class Pawn(Piece):
             if (piece:= board[self.location[0] + 1, self.location[1] + y_direction]) is not None \
                 and piece.is_white is not None \
                 and piece.is_white is not self.is_white:
-                    result.add(piece.location[0] * 10 + piece.location[1])
+                result.add(piece.location[0] * 10 + piece.location[1])
             if (piece:= board[self.location[0] - 1, self.location[1] +
                 y_direction]) is not None \
                 and piece.is_white is not None \
