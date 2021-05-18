@@ -39,7 +39,7 @@ class King(Piece):
 
     def _castle(self, board, destination):
         # Left Castle
-        if self.location[0] - destination//10 == 3 and self.location[1] == destination%10:
+        if self.location[0] - destination//10 == 2 and self.location[1] == destination%10:
             if isinstance(board[0,0], Rook):
                 for square in range(1,4):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
