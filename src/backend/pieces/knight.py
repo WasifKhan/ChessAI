@@ -7,13 +7,29 @@ class Knight(Piece):
         super().__init__(is_white, location)
         self.ID = Knight.ID
         self.value = 3
-        Knight.ID += 1
+        Knight.ID = 1 if Knight.ID == 2 else 2
 
     def __str__(self):
         return 'N' if self.is_white else 'n'
 
-    def value(self):
-        return 3
+    def _initialize_moves(self):
+        direction = 1 if self.is_white else -1
+        self.move_IDs[0] = lambda location: \
+                (location[0] + 2)*10 + location[1] + 1*direction
+        self.move_IDs[1] = lambda location: \
+                (location[0] + 2)*10 + location[1] - 1*direction
+        self.move_IDs[2] = lambda location: \
+                (location[0] - 2)*10 + location[1] + 1*direction
+        self.move_IDs[3] = lambda location: \
+                (location[0] - 2)*10 + location[1] - 1*direction
+        self.move_IDs[4] = lambda location: \
+                (location[0] + 1)*10 + location[1] + 2*direction
+        self.move_IDs[5] = lambda location: \
+                (location[0] + 1)*10 + location[1] - 2*direction
+        self.move_IDs[6] = lambda location: \
+                (location[0] - 1)*10 + location[1] + 2*direction
+        self.move_IDs[7] = lambda location: \
+                (location[0] - 1)*10 + location[1] - 2*direction
 
     def is_valid_move(self, board, destination):
         vertical_move = abs(destination[0] - self.location[0])

@@ -7,13 +7,21 @@ class Pawn(Piece):
         super().__init__(is_white, location)
         self.ID = Pawn.ID
         self.value = 1
-        Pawn.ID += 1
+        Pawn.ID = 1 if Pawn.ID == 8 else Pawn.ID + 1
 
     def __str__(self):
         return 'P' if self.is_white else 'p'
 
-    def value(self):
-        return 1
+    def _initialize_moves(self):
+        direction = 1 if self.is_white else -1
+        self.move_IDs[0] = lambda location: \
+                location[0]*10 + location[1] + direction
+        self.move_IDs[1] = lambda location: \
+                location[0]*10 + location[1] + (direction * 2)
+        self.move_IDs[2] = lambda location: \
+                (location[0] - 1)*10 + (location[1] + direction)
+        self.move_IDs[3] = lambda location: \
+                (location[0] + 1)*10 + (location[1] + direction)
 
     def is_valid_move(self, board, destination):
         if self.is_white:
@@ -102,7 +110,6 @@ class Pawn(Piece):
                 and piece.is_white is not self.is_white:
                 result.add(piece.location[0] * 10 + piece.location[1])
         # En passant
-        
         if board.history:
             if self.location[1] == 3 and isinstance(board[self.location[0]-1, self.location[1]], Pawn) and \
                 board[self.location[0]-1, self.location[1]].is_white is not self.is_white:

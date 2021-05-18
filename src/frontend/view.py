@@ -2,8 +2,10 @@
 View to host chess engine
 '''
 
+
 import tkinter as tk
 from PIL import Image, ImageTk
+from interface import Interface
 
 
 
@@ -20,20 +22,20 @@ class Window(tk.Frame):
 
 
 class View:
-    def __init__(self, interface):
+    def __init__(self):
+        self.interface = Interface()
         '''
         The following code should be in buttons initiated by the user.
         Currently store here until calls are done
         '''
-        interface.versus_AI()
-        interface.set_player_names('Player 1', 'Black AI')
-        scoreboard = interface.get_scoreboard()
-        score = interface.get_score('Player 1', 'Black AI')
+        self.interface.versus_AI(0)
+        self.interface.set_player_names('Player 1', 'Black AI')
+        scoreboard = self.interface.get_scoreboard()
+        score = self.interface.get_score('Player 1', 'Black AI')
         '''
         End of code that should be inside buttons.
         The code below belongs in init
         '''
-        self.interface = interface
         self.squares = {}
         self.current_click = None
 
@@ -69,7 +71,15 @@ class View:
         play_again_button['command'] = lambda: self.play_again()
         play_again_button.pack(side=tk.LEFT)
 
+        train_ai_button = tk.Button(master=btm_frame, text='Train AI', fg='green')
+        train_ai_button['command'] = lambda: self.train_AI()
+        train_ai_button.pack(side=tk.LEFT)
+
+
         root.mainloop()
+
+    def train_AI(self):
+        self.interface.train_AI()
 
     def simulate_games(self):
         self.interface.simulate_games(100)
@@ -91,8 +101,8 @@ class View:
         else:
             self.current_click = self.squares[piece]
 
-    def versus_AI(self):
-        self.interface.versus_AI()
+    def versus_AI(self, difficulty):
+        self.interface.versus_AI(difficulty)
 
     def action(self, piece):
         self.interface.add_action(self.squares[piece])

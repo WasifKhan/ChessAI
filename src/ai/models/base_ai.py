@@ -3,42 +3,43 @@ Abstract Base Class for AI Engines
 '''
 
 from abc import ABCMeta
-from os import listdir
+
 
 
 class AI(metaclass=ABCMeta):
     def __init__(self, location):
         self.location = location
-        if not self._trained():
+        from os import listdir
+        if 'brain.h5' in listdir(self.location):
+            from tensorflow.keras.models import load_model
+            self.model = load_model(self.location + '/brain.h5')
+
+    def train(self, game):
+        from ai.data.data_extractor import DataExtractor
+        self.data_extractor = DataExtractor(game)
+        from os import listdir
+        if 'brain.h5' in listdir(self.location):
+            from tensorflow.keras.models import load_model
+            self.model = load_model(self.location + '/brain.h5')
+        else:
             self._build_model()
-            self._train_model()
-            self._evaluate_model()
-
-    def _trained(self):
-        return True if 'brain.h5' in listdir(self.location) else False
-
-    def _get_datapoint(self):
-        dataset_path = './ai/data/dataset/'
-        for data in listdir(dataset_path):
-            if data[0] == 'd':
-                with open(dataset_path + data) as fp:
-                    for moves in fp:
-                        yield self._generate_datapoint(moves)
+        self._train_model(self.data_extractor.datapoints(self.location))
+        self._evaluate_model()
 
     def _resign(self, board, is_white):
-        if len(board.history) < 3:
-            return False
-        prior_turns = [board.history[i][3] for i in range(-3, 0, 1)]
-        if is_white and max(prior_turns) <= -2 \
-            or (not is_white and min(prior_turns) >= 2):
+        if len(board.history) >= 5:
+            value = sum([value[3] for value in board.history[-5:]])
+            if (value <= -10 and is_white) or (value >= 10 and not is_white):
+                print(value <= -10 and is_white)
+                print(value >= 10 and not is_white)
                 return True
         return False
 
-    def _predict_move(self, board, is_white):
-        if not self.model:
-            self._load_model()
-        prediction = self.model.predict(self._board_to_datapoint(board, is_white))
-        return self._prediction_to_board(prediction)
+    def predict(self, board, is_white):
+        if self._resign(board, is_white):
+            return False
+        prediction = self.model.predict(self.data_extractor._board_to_datapoint(board, is_white))
+        move = self.data_extractor._prediction_to_move(prediction, board, is_white)
+        print(f'move is {move}')
+        return move
 
-    def get_move(self, board, is_white):
-        return False if self._resign(board, is_white) else self._predict_move(board, is_white)

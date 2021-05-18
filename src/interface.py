@@ -3,22 +3,26 @@ Interface between backend and frontend
 '''
 
 
+from backend.game import Game
+from ai.ai import AI
+
 
 class Interface:
-    def __init__(self, game, ai):
-        from ai.data.data_extractor import DataExtractor
-        from backend.game import Game
-        self.game = game
-        self.ai = ai
+    def __init__(self):
+        self.game = Game()
         self.versus_ai = False
-        DataExtractor(Game()).raw_data_to_dataset()
-        print(self.game)
 
     def __str__(self):
         return str(self.game)
 
-    def versus_AI(self) -> None:
+    def versus_AI(self, difficulty) -> None:
+        self.ai = AI(difficulty)
         self.versus_ai = True
+        if not hasattr(self.ai.model, 'model'):
+            self.ai.train(self.game)
+
+    def train_AI(self):
+        self.ai.train(self.game)
 
     def set_player_names(self, p1_name: str, p2_name: str) -> None:
         self.game.set_names(p1_name, p2_name)
@@ -35,7 +39,7 @@ class Interface:
 
     def ai_move(self, is_white: bool) -> bool:
         return self.add_move(ai_move[0], ai_move[1]) \
-                if (ai_move := self.ai.get_move(self.game.board, is_white)) \
+                if (ai_move := self.ai.predict(self.game.board, is_white)) \
                 else ai_move
 
     def add_move(self, source: int, destination) -> bool:
@@ -52,7 +56,7 @@ class Interface:
     def simulate_games(self, num_games: int):
         white_wins, black_wins = 0,0
         for i in range(num_games):
-            self.game.__init__('White AI', 'Black AI')
+            self.game = Game('White AI', 'Black AI')
             white_turn = True
             while not self.game.is_game_over():
                 if not(move := self.ai_move(white_turn)):
@@ -64,7 +68,7 @@ class Interface:
             else:
                 black_wins += 1
                 print('Black wins')
-        self.game.__init__('Player 1', 'Black AI')
+        self.game = Game('Player 1', 'Black AI')
         self.game.game_over(white_wins, black_wins)
         print(f'score: {white_wins}-{black_wins}')
 
@@ -72,8 +76,8 @@ class Interface:
         print('*'*30 + '\n')
         print('Reseting game...')
         print('*'*30 + '\n')
-        self.game.__init__(self.game.p1_name, self.game.p2_name)
-        print(self.game)
+        self.game = Game(self.game.p1_name, self.game.p2_name)
+        print(self)
         return True
 
     def get_scoreboard(self):
