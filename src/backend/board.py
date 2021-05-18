@@ -50,8 +50,8 @@ class Board:
         self.history.append((piece, piece.location, destination, self.board_value()))
         # Edge case for castling
         if isinstance(piece, King):
-            if piece.location[0] - destination[0] == 3:
-                rook_location = destination[0]-1, destination[1]
+            if piece.location[0] - destination[0] == 2:
+                rook_location = destination[0]-2, destination[1]
                 rook = self[rook_location]
                 rook.move((piece.location[0]-1, piece.location[1]))
                 self[piece.location[0]-1, piece.location[1]] = rook
@@ -84,6 +84,11 @@ class Board:
                 previous_move[1][1] - previous_move[2][1] == -2 and
                 previous_move[2][0] == destination[0] and piece.location[1] == 2):
                     self[(destination[0], destination[1] + 1)] = Square((destination[0], destination[1] + 1))
+        # Check for promotion
+        #if piece.loc is edge of board, create a new queen, update board location from pawn to queen
+        #Go into board.pieces and remove the pawn and add a new queen
+        #if isinstance(piece, Pawn):
+            
         # Check if the move resulted in checkmate
         if piece.is_white and self.black_king.checkmate(self.board) \
             or (not(piece.is_white) and self.white_king.checkmate(self.board)):
