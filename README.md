@@ -6,6 +6,7 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - clean backend/random AI no errors
   - Something wrong w/ pawn movement!
+  - only-need-`piece.is_white is not self.is_white:`-in-pawn-apture-sine-board-returns-none-on-negatiev-indicies.-also-dont-need-to-divide into 3 separatecases
 - board input is wrong...need to distinguish bishop and knight... simply numbers are no good
 - clean `parser`
 - #### MILESTONE 1.5 base smart AI done
