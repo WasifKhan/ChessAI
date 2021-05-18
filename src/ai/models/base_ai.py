@@ -30,8 +30,6 @@ class AI(metaclass=ABCMeta):
         if len(board.history) >= 5:
             value = sum([value[3] for value in board.history[-5:]])
             if (value <= -10 and is_white) or (value >= 10 and not is_white):
-                print(value <= -10 and is_white)
-                print(value >= 10 and not is_white)
                 return True
         return False
 
@@ -40,6 +38,5 @@ class AI(metaclass=ABCMeta):
             return False
         prediction = self.model.predict(self.data_extractor._board_to_datapoint(board, is_white))
         move = self.data_extractor._prediction_to_move(prediction, board, is_white)
-        print(f'move is {move}')
         return move
 

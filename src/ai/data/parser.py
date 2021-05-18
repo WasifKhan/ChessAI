@@ -40,6 +40,7 @@ class Parser(metaclass=ABCMeta):
         if white_move == black_move:
             black_move = 'None'
         elif '*' in black_move or '1-0' in black_move:
+            print(black_move)
             black_move = 'None'
         elif '1/2' in black_move:
             black_move = 'Draw'
@@ -60,15 +61,16 @@ class Parser(metaclass=ABCMeta):
             if piece.is_valid_move(self.game.board, destination):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
-                return 'None', 'None'
+                print(move)
                 raise Exception
         if move == 'None':
-            return 'None', 'None'
+            print(move)
+            raise Exception
         try:
             destination = (ord(move[-2])-97)*10 + int(move[-1])-1
             destination = destination//10, destination%10
         except Exception:
-            return 'None', 'None'
+            raise Exception
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
         candidates = []
         if move[0] == 'K':
@@ -134,6 +136,8 @@ class Parser(metaclass=ABCMeta):
         for move_pair in moves:
             for i in range(len(move_pair)):
                 source, destination = self._convert_move(move_pair[i], not(bool(i)))
+                # Start debugging here...source should not be none...
+                # self._extract_moves(line) is wrong somehow
                 if source == 'None' or destination == 'None':
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
@@ -155,18 +159,12 @@ class Parser(metaclass=ABCMeta):
         return datapoint
 
     def _board_to_datapoint(self, board, is_white):
-        if is_white:
-            datapoint = [[board[column,row].value \
+        board_direction = range(8) if is_white else range(7, -1, -1)
+        datapoint = [[board[column,row].value \
                         if board[column,row].is_white == is_white \
                         else board[column,row].value * -1 \
                     for column in range(8)] \
-                    for row in range(8)]
-        else:
-            datapoint = [[board[column,row].value \
-                        if board[column,row].is_white == is_white \
-                        else board[column,row].value * -1 \
-                    for column in range(8)] \
-                    for row in range(7, -1, -1)]
+                    for row in board_direction]
         datapoint = array(datapoint)
         datapoint = datapoint.reshape(1, 8, 8, 1)
         return datapoint
@@ -180,7 +178,7 @@ class Parser(metaclass=ABCMeta):
         for key in MOVES:
             if MOVES[key] == prediction:
                 move = key
-        my_piece, ID, move_ID = move[0], int(move[1]), move[2:] # ie. 'P11'
+        my_piece, ID, move_ID = move[0], int(move[1]), move[2:]
         my_piece = my_piece if is_white else my_piece.lower()
         pieces = board.white_pieces if is_white else board.black_pieces
         for piece in pieces:
