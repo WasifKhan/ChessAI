@@ -6,6 +6,7 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - clean backend/random AI no errors
   - Something wrong w/ pawn movement!
+- board input is wrong...need to distinguish bishop and knight... simply numbers are no good
 - clean `parser`
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
