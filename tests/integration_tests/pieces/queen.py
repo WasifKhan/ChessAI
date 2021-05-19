@@ -32,7 +32,7 @@ moves = [
         [Queen(is_white=True, location=(5,4))]),
     ('White queen left diagonal movement',
         ['D2 D4','F7 F6','D1 D3','B7 B5','D3 A6'],
-        [Queen(is_white=True, location=(0,5))]),
+        [Queen(is_white=True, location=(3,2))]),
     ('White queen captures black pawn',
         ['D2 D4','A7 A5','D1 D3','B7 B5','D3 B3','F7 F5','B3 B5'],
         [Queen(is_white=True, location=(1,4))]),

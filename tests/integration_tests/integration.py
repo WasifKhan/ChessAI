@@ -39,7 +39,5 @@ class IntegrationTest:
 
         # Test for valid state or status
         for piece in result:
-            if not(isinstance(piece, Piece)):
-                assert not(isinstance(board[piece.location], Piece)), f'{name} failed'
-            else:
-                assert isinstance(board[piece.location], type(piece)), f'{name} failed'
+            board_piece = board[piece.location]
+            assert isinstance(board_piece, piece.__class__), f'{name} failed'
