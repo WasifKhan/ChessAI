@@ -24,7 +24,9 @@ class DataExtractor(Parser):
         print(f'Processing File: {ID}')
         while line := str(next(it)):
             if index % 1000 == 0:
-                print(f'Processing... index={index}')
+                print(f'Processing... {index//1000}% done')
+            if index == 100000:
+                break
             if line[2] == '1':
                 datapoint = self._raw_data_to_datapoint(line)
                 yield datapoint
