@@ -28,33 +28,40 @@ class King(Piece):
         self.move_IDs[4] = lambda location: \
                 (location[0]-1)*10 + location[1]
         self.move_IDs[5] = lambda location: \
-                (location[0]+1)*10 + location[1]-direction
+                (location[0]-1)*10 + location[1]-direction
         self.move_IDs[6] = lambda location: \
                 location[0]*10 + location[1]+direction
         self.move_IDs[7] = lambda location: \
                 location[0]*10 + location[1]-direction
         self.move_IDs[8] = lambda location: \
-                (location[0]-3)*10 + location[1]
+                (location[0]-2)*10 + location[1]
         self.move_IDs[9] = lambda location: \
                 (location[0]+2)*10 + location[1]
 
     def _castle(self, board, destination):
         # Left Castle
         if self.location[0] - destination//10 == 2 and self.location[1] == destination%10:
-            if isinstance(board[0,0], Rook):
-                for square in range(1,4):
+            rook_location = 0,0 if self.is_white else 0,7
+            print('in here')
+            if isinstance(board[rook_location], Rook):
+                print('in here')
+                for square in range(1,3):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] - square)*10 + self.location[1]) in piece.moves(board):
+                            print('in here')
                             return False
+                print('should return true now')
                 return True
         # Right Castle
         elif destination//10 - self.location[0] == 2 and self.location[1] == destination%10:
-            if isinstance(board[7,0], Rook):
+            rook_location = 7,0 if self.is_white else 7,7
+            if isinstance(board[rook_location], Rook):
                 for square in range(1,3):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] + square)*10 + self.location[1]) in piece.moves(board):
                             return False
                 return True
+        print('returning false cuz getting to end')
 
     def value(self):
         return 100
@@ -81,8 +88,8 @@ class King(Piece):
 
     def moves(self, board):
         result = set()
-        if self._castle(board, (self.location[0]-3)*10 + self.location[1]):
-            result.add((self.location[0]-3)*10 + self.location[1])
+        if self._castle(board, (self.location[0]-2)*10 + self.location[1]):
+            result.add((self.location[0]-2)*10 + self.location[1])
         elif self._castle(board, (self.location[0]+2)*10 + self.location[1]):
             result.add((self.location[0]+2)*10 + self.location[1])
         possible_location = {piece.location[0]*10 + piece.location[1] \
@@ -102,8 +109,6 @@ class King(Piece):
         result = possible_location - opposing_attacks
         return result
 
-
-
     def checkmate(self, board):
         for enemy_piece in (enemy_pieces := board.black_pieces if self.is_white else board.white_pieces):
             if (self.location[0]*10 + self.location[1]) in enemy_piece.moves(board) \
@@ -116,6 +121,4 @@ class King(Piece):
                 if not captured:
                     return True
         return False
-
-        
 

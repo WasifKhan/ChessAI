@@ -100,14 +100,21 @@ class Parser(metaclass=ABCMeta):
                         and cur_piece.is_valid_move(self.game.board, destination):
                     candidates.append(cur_piece)
         if len(candidates) == 0:
-            print(self.game)
             print(move)
+            print(self.game)
             raise Exception
         elif len(candidates) == 1:
             piece = candidates[0]
         else:
-            identifier = move[1] if move[1] != 'x' else move[0]
             matches = 0
+            for candidate in candidates:
+                if not self.game.check_after_move(candidate.location, destination):
+                    matches += 1
+                    piece = candidate
+            if matches == 1:
+                return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
+            matches = 0
+            identifier = move[1] if 'x' not in move else move[0] if move[1] == 'x' else move[1]
             if ord(identifier) >= 97:
                 for candidate in candidates:
                     if candidate.location[0] == ord(identifier)-97:
@@ -119,10 +126,6 @@ class Parser(metaclass=ABCMeta):
                         piece = candidate
                         matches += 1
             if matches == 0 or matches > 1:
-                for candidate in candidates:
-                    print(f'candidate: {candidate}\nlocation:{candidate.location}')
-                print(f'move was: {move}, destination: {destination}')
-                print(f'matches: {matches}')
                 raise Exception
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 
@@ -132,14 +135,17 @@ class Parser(metaclass=ABCMeta):
         self.game.__init__()
         for move_pair in moves:
             for i in range(len(move_pair)):
-                source, destination = self._convert_move(move_pair[i], not(bool(i%2)))
-                # Start debugging here...source should not be none...
-                # self._extract_moves(line) is wrong somehow
+                try:
+                    source, destination = self._convert_move(move_pair[i], not(bool(i%2)))
+                except Exception:
+                    print(line)
+                    print(moves)
                 if source == None:
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
+                print(f'{source} -> {destination}')
+                print(self.game)
                 if not self.game.move(source, destination):
-                    print(moves)
                     print(f'{source} -> {destination}')
                     print(self.game)
                     print(f'Invalid move: {move_pair[i]}')

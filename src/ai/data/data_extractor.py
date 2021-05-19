@@ -41,15 +41,8 @@ class DataExtractor(Parser):
             x = self._board_to_datapoint(self.game.board, self.game.white_turn)
             x_vector.append(x)
             if self.game.move(source, destination):
-                try:
-                    y = self._move_to_datapoint(self.game.board[destination].get_move())
-                    y_vector.append(y)
-                except Exception:
-                    x_vector.pop()
-                    return (x_vector, y_vector)
-           # NO ELSE NEEDED ONCE WORKING PROPERLY
-            else:
-                return ([], [])
+                y = self._move_to_datapoint(self.game.board.move_ID)
+                y_vector.append(y)
         return (x_vector, y_vector)
 
     def datapoints(self, location):

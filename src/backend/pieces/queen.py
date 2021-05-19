@@ -88,6 +88,7 @@ class Queen(Piece):
                     return False
         # Diagonal movement            
         elif abs(x_direction) != abs(y_direction):
+            print('false3')
             return False
         else:
             for i in range(1, abs(x_direction)):
