@@ -47,7 +47,7 @@ class TestBishop:
         assert black_bishop.is_valid_move(board, (2,1)) == True
         assert black_bishop.is_valid_move(board, (6,1)) == True
         assert black_bishop.is_valid_move(board, (6,5)) == True
-        assert black_bishop.is_valid_move(board, (2,5)) == True
+        assert black_bishop.is_valid_move(board, (2,5)) == False
         assert black_bishop.is_valid_move(board, (4,2)) == False
         assert black_bishop.is_valid_move(board, (7,6)) == False
         assert black_bishop.is_valid_move(board, (3,5)) == False
