@@ -51,29 +51,27 @@ class Parser(metaclass=ABCMeta):
         return datapoint[0:-2] + ']\n'
 
     def _convert_move(self, move, is_white):
+        if move == 'None':
+            return None, None
         if move[0] == 'O':
             piece = self.game.board.white_king if is_white else self.game.board.black_king
             if len(move) == 3:
                 destination = (piece.location[0]+2, piece.location[1])
             else:
-                destination = (piece.location[0]-3, piece.location[1])
+                destination = (piece.location[0]-2, piece.location[1])
             if piece.is_valid_move(self.game.board, destination):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
-                return 'None', 'None'
+                print(move)
                 raise Exception
-        if move == 'None':
-            return 'None', 'None'
-        try:
-            destination = (ord(move[-2])-97)*10 + int(move[-1])-1
-            destination = destination//10, destination%10
-        except Exception:
-            return 'None', 'None'
+        destination = (ord(move[-2])-97)*10 + int(move[-1])-1
+        destination = destination//10, destination%10
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
         candidates = []
         if move[0] == 'K':
             for cur_piece in pieces:
-                if isinstance(cur_piece, King):
+                if isinstance(cur_piece, King) \
+                        and cur_piece.is_valid_move(self.game.board, destination):
                     candidates.append(cur_piece)
                     break
         elif move[0] == 'Q':
@@ -102,15 +100,21 @@ class Parser(metaclass=ABCMeta):
                         and cur_piece.is_valid_move(self.game.board, destination):
                     candidates.append(cur_piece)
         if len(candidates) == 0:
-            #print(self.game)
-            #print(move)
-            return 'None', 'None'
+            print(move)
+            print(self.game)
             raise Exception
         elif len(candidates) == 1:
             piece = candidates[0]
         else:
-            identifier = move[1]
             matches = 0
+            for candidate in candidates:
+                if not self.game.check_after_move(candidate.location, destination):
+                    matches += 1
+                    piece = candidate
+            if matches == 1:
+                return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
+            matches = 0
+            identifier = move[1] if 'x' not in move else move[0] if move[1] == 'x' else move[1]
             if ord(identifier) >= 97:
                 for candidate in candidates:
                     if candidate.location[0] == ord(identifier)-97:
@@ -122,8 +126,6 @@ class Parser(metaclass=ABCMeta):
                         piece = candidate
                         matches += 1
             if matches == 0 or matches > 1:
-                #print(f'move was: {move}')
-                return 'None', 'None'
                 raise Exception
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 
@@ -131,20 +133,26 @@ class Parser(metaclass=ABCMeta):
         datapoint = '['
         moves = eval(self._extract_moves(line))
         self.game.__init__()
-        from time import sleep
         for move_pair in moves:
             for i in range(len(move_pair)):
-                source, destination = self._convert_move(move_pair[i], not(bool(i)))
-                if source == 'None' or destination == 'None':
+                try:
+                    source, destination = self._convert_move(move_pair[i], not(bool(i%2)))
+                except Exception:
+                    print(line)
+                    print(moves)
+                if source == None:
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
+                print(f'{source} -> {destination}')
+                print(self.game)
                 if not self.game.move(source, destination):
-                    print(moves)
                     print(f'{source} -> {destination}')
                     print(self.game)
                     print(f'Invalid move: {move_pair[i]}')
                     datapoint = datapoint[0:-2] + ']\n'
                     raise Exception
+                print(f'{source} -> {destination}')
+                print(self.game)
                 datapoint += f"({source}, {destination}), "
         datapoint = datapoint[0:-2] + ']'
         return datapoint
@@ -157,18 +165,12 @@ class Parser(metaclass=ABCMeta):
         return datapoint
 
     def _board_to_datapoint(self, board, is_white):
-        if is_white:
-            datapoint = [[board[column,row].value \
+        board_direction = range(8) if is_white else range(7, -1, -1)
+        datapoint = [[board[column,row].value \
                         if board[column,row].is_white == is_white \
                         else board[column,row].value * -1 \
                     for column in range(8)] \
-                    for row in range(8)]
-        else:
-            datapoint = [[board[column,row].value \
-                        if board[column,row].is_white == is_white \
-                        else board[column,row].value * -1 \
-                    for column in range(8)] \
-                    for row in range(7, -1, -1)]
+                    for row in board_direction]
         datapoint = array(datapoint)
         datapoint = datapoint.reshape(1, 8, 8, 1)
         return datapoint
@@ -182,7 +184,7 @@ class Parser(metaclass=ABCMeta):
         for key in MOVES:
             if MOVES[key] == prediction:
                 move = key
-        my_piece, ID, move_ID = move[0], int(move[1]), move[2:] # ie. 'P11'
+        my_piece, ID, move_ID = move[0], int(move[1]), move[2:]
         my_piece = my_piece if is_white else my_piece.lower()
         pieces = board.white_pieces if is_white else board.black_pieces
         for piece in pieces:

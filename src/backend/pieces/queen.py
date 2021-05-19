@@ -88,9 +88,10 @@ class Queen(Piece):
                     return False
         # Diagonal movement            
         elif abs(x_direction) != abs(y_direction):
+            print('false3')
             return False
         else:
-            for i in range(1, x_direction):
+            for i in range(1, abs(x_direction)):
                 if not(board[self.location[0] + (i * x_plane), self.location[1] + (i*y_plane)].is_white == None):
                     return False
         if not(isinstance(board[destination], Piece)):

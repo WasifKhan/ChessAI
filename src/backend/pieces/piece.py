@@ -12,13 +12,9 @@ class Square:
         Square.ID += 1
 
     def __deepcopy__(self, memo):
-        return self.__class__(self.is_white, self.location)
-
-    '''
-    Delete this function when debugging is done
-    '''
-    def move(self, location):
-        return
+        if isinstance(self, Piece):
+            return self.__class__(self.is_white, self.location)
+        return Square(self.location)
 
     def __str__(self):
         return '.'
@@ -34,24 +30,22 @@ class Piece(Square, metaclass=ABCMeta):
         self._initialize_moves()
 
     def move(self, destination):
+        self.move_ID = None
         for key in self.move_IDs:
             if self.move_IDs[key](self.location) == \
                     destination[0]*10 + destination[1]:
                 self.move_ID = key
                 break
+        else:
+            raise AttributeError(f'Cannot find move for {str(self)}')
         self.location = destination
-        return
-        if self.move_ID == None:
-            raise ValueError(f'{str(self)}{str(self.ID)} was not recently moved')
 
-    def get_move(self, move_ID=None):
-        if not move_ID:
-            return str(self) + str(self.ID) + str(self.move_ID)
+    def get_move(self, move_ID):
         for key in self.move_IDs:
             if key == move_ID:
                 return (self.location[0]*10 + self.location[1],
                         self.move_IDs[key](self.location))
-        raise IndexError(f'{str(self)}{str(self.ID)} was not recently moved')
+        raise AttributeError(f'{str(self)}{str(self.ID)} was not recently moved')
 
     @abstractmethod
     def moves(self, board):

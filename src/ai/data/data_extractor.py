@@ -23,13 +23,11 @@ class DataExtractor(Parser):
         index = 0
         print(f'Processing File: {ID}')
         while line := str(next(it)):
-            if index % 500 == 0:
-                print(f'Processing... {index//500}% done')
-            if index == 50000:
-                return StopIteration
+            if index % 1000 == 0:
+                print(f'Processing... index={index}')
             if line[2] == '1':
                 datapoint = self._raw_data_to_datapoint(line)
-                yield datapoint 
+                yield datapoint
             index += 1
         print(f'Done processing file: {ID}')
 
@@ -43,15 +41,8 @@ class DataExtractor(Parser):
             x = self._board_to_datapoint(self.game.board, self.game.white_turn)
             x_vector.append(x)
             if self.game.move(source, destination):
-                try:
-                    y = self._move_to_datapoint(self.game.board[destination].get_move())
-                    y_vector.append(y)
-                except Exception:
-                    x_vector.pop()
-                    return (x_vector, y_vector)
-           # NO ELSE NEEDED ONCE WORKING PROPERLY
-            else:
-                return ([], [])
+                y = self._move_to_datapoint(self.game.board.move_ID)
+                y_vector.append(y)
         return (x_vector, y_vector)
 
     def datapoints(self, location):

@@ -7,6 +7,7 @@ from backend.game import Game
 from ai.ai import AI
 
 
+
 class Interface:
     def __init__(self):
         self.game = Game()
@@ -42,7 +43,7 @@ class Interface:
                 if (ai_move := self.ai.predict(self.game.board, is_white)) \
                 else ai_move
 
-    def add_move(self, source: int, destination) -> bool:
+    def add_move(self, source: int, destination: int) -> bool:
         if self.game.move(source, destination):
             name = self.game.p2_name if self.game.white_turn else self.game.p1_name
             print(f'{name} move: {source} -> {destination}')
