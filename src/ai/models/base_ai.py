@@ -9,10 +9,6 @@ from abc import ABCMeta
 class AI(metaclass=ABCMeta):
     def __init__(self, location):
         self.location = location
-        from os import listdir
-        if 'brain.h5' in listdir(self.location):
-            from tensorflow.keras.models import load_model
-            self.model = load_model(self.location + '/brain.h5')
 
     def train(self, game):
         from ai.data.data_extractor import DataExtractor
@@ -23,8 +19,8 @@ class AI(metaclass=ABCMeta):
             self.model = load_model(self.location + '/brain.h5')
         else:
             self._build_model()
-        self._train_model(self.data_extractor.datapoints(self.location))
-        self._evaluate_model()
+            self._train_model(self.data_extractor.datapoints(self.location))
+            self._evaluate_model()
 
     def _resign(self, board, is_white):
         if len(board.history) >= 5:
