@@ -7,8 +7,10 @@ from .pieces.king import King
 from .pieces.pawn import Pawn
 
 class Board:
-    def __init__(self, pieces=None):
+    def __init__(self, pieces=None, history=None):
         self.history = []
+        if history:
+            self.history = history
         self.white_pieces = set()
         self.black_pieces = set()
         self.game_over = False
@@ -43,7 +45,7 @@ class Board:
 
     def __deepcopy__(self, memo):
         from copy import deepcopy
-        return Board(deepcopy(self.white_pieces | self.black_pieces))
+        return Board(deepcopy(self.white_pieces | self.black_pieces), deepcopy(self.history))
 
     def _add(self, piece):
         if piece.is_white:
@@ -108,7 +110,8 @@ class Board:
         # Update the board to move piece from previous location to destination
         previous_location = piece.location
         piece.move(destination)
-        self.move_ID = str(piece) + str(piece.ID) + str(piece.move_ID)
+        ID = 1 if isinstance(piece, Queen) else piece.ID
+        self.move_ID = str(piece) + str(ID) + str(piece.move_ID)
         captured_piece = self[destination]
         if (isinstance(captured_piece, Piece)):
             if captured_piece.is_white:

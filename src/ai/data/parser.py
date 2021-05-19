@@ -62,7 +62,6 @@ class Parser(metaclass=ABCMeta):
             if piece.is_valid_move(self.game.board, destination):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
-                print(move)
                 raise Exception
         destination = (ord(move[-2])-97)*10 + int(move[-1])-1
         destination = destination//10, destination%10
@@ -71,48 +70,45 @@ class Parser(metaclass=ABCMeta):
         if move[0] == 'K':
             for cur_piece in pieces:
                 if isinstance(cur_piece, King) \
-                        and cur_piece.is_valid_move(self.game.board, destination):
+                        and cur_piece.is_valid_move(self.game.board, destination) \
+                        and not self.game.check_after_move(cur_piece.location, destination):
                     candidates.append(cur_piece)
                     break
         elif move[0] == 'Q':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Queen) \
-                        and cur_piece.is_valid_move(self.game.board, destination):
+                        and cur_piece.is_valid_move(self.game.board, destination) \
+                        and not self.game.check_after_move(cur_piece.location, destination):
                     candidates.append(cur_piece)
         elif move[0] == 'R':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Rook) \
-                        and cur_piece.is_valid_move(self.game.board, destination):
+                        and cur_piece.is_valid_move(self.game.board, destination) \
+                        and not self.game.check_after_move(cur_piece.location, destination):
                     candidates.append(cur_piece)
         elif move[0] == 'N':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Knight) \
-                        and cur_piece.is_valid_move(self.game.board, destination):
+                        and cur_piece.is_valid_move(self.game.board, destination) \
+                        and not self.game.check_after_move(cur_piece.location, destination):
                     candidates.append(cur_piece)
         elif move[0] == 'B':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Bishop) \
-                        and cur_piece.is_valid_move(self.game.board, destination):
+                        and cur_piece.is_valid_move(self.game.board, destination) \
+                        and not self.game.check_after_move(cur_piece.location, destination):
                     candidates.append(cur_piece)
         else:
             for cur_piece in pieces:
                 if isinstance(cur_piece, Pawn) \
-                        and cur_piece.is_valid_move(self.game.board, destination):
+                        and cur_piece.is_valid_move(self.game.board, destination) \
+                        and not self.game.check_after_move(cur_piece.location, destination):
                     candidates.append(cur_piece)
         if len(candidates) == 0:
-            print(move)
-            print(self.game)
-            raise Exception
+            return None, None
         elif len(candidates) == 1:
             piece = candidates[0]
         else:
-            matches = 0
-            for candidate in candidates:
-                if not self.game.check_after_move(candidate.location, destination):
-                    matches += 1
-                    piece = candidate
-            if matches == 1:
-                return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             matches = 0
             identifier = move[1] if 'x' not in move else move[0] if move[1] == 'x' else move[1]
             if ord(identifier) >= 97:
@@ -135,24 +131,10 @@ class Parser(metaclass=ABCMeta):
         self.game.__init__()
         for move_pair in moves:
             for i in range(len(move_pair)):
-                try:
-                    source, destination = self._convert_move(move_pair[i], not(bool(i%2)))
-                except Exception:
-                    print(line)
-                    print(moves)
-                if source == None:
+                source, destination = self._convert_move(move_pair[i], not(bool(i%2)))
+                if source == None or not self.game.move(source, destination):
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
-                print(f'{source} -> {destination}')
-                print(self.game)
-                if not self.game.move(source, destination):
-                    print(f'{source} -> {destination}')
-                    print(self.game)
-                    print(f'Invalid move: {move_pair[i]}')
-                    datapoint = datapoint[0:-2] + ']\n'
-                    raise Exception
-                print(f'{source} -> {destination}')
-                print(self.game)
                 datapoint += f"({source}, {destination}), "
         datapoint = datapoint[0:-2] + ']'
         return datapoint
