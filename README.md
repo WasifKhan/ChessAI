@@ -4,7 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- board input is wrong...need to distinguish bishop and knight... simply numbers are no good
+- change board input to 1,..,16,-1,..,-16
 - clean backend/parser
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
@@ -28,7 +28,7 @@ Repository containing Chess Engine and ML Model
 - optimizations
   - change coordinate system to 2-digit int
   - remove `if x.is_white: ... else: ...` by inverting board at start/end of code
-
+- write AI - X-d,All-b=2s thinking time
 #### MILESTONE 1: **Done backend**
 - Start frontend
 - Write Controller to interact Model and View
