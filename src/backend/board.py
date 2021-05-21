@@ -87,26 +87,15 @@ class Board:
                 self[piece.location[0]+1, piece.location[1]] = rook
                 self[rook_location] = Square(rook_location)
         # Edge case for en passant pawn capture
-        if len(self.history) > 3:
-            previous_move = self.history[-2]
-            if isinstance(piece, Pawn) \
-                and isinstance(previous_move[0], Pawn) \
-                and previous_move[1][1] - previous_move[2][1] == 2 \
-                and previous_move[2][0] == destination[0] and piece.location[1] == 4 \
-                and destination[0] in {piece.location[0]-1, piece.location[0]+1}:
-                    capture_location = destination[0], destination[1] - 1
-                    capture_piece = self[capture_location]
-                    self.black_pieces.remove(capture_piece)
-                    self[capture_location] = Square(capture_location)
-            elif isinstance(piece, Pawn) \
-                and isinstance(previous_move[0], Pawn) \
-                and previous_move[1][1] - previous_move[2][1] == -2 \
-                and previous_move[2][0] == destination[0] and piece.location[1] == 3 \
-                and destination[0] in {piece.location[0]-1, piece.location[0]+1}:
-                    capture_location = destination[0], destination[1] + 1
-                    capture_piece = self[capture_location]
-                    self.white_pieces.remove(capture_piece)
-                    self[capture_location] = Square(capture_location)
+        if isinstance(piece, Pawn):
+            if destination[0] in {piece.location[0]-1, piece.location[0]+1} \
+                    and self[destination].is_white == None:
+                capture_location = destination[0], destination[1] - 1 if piece.is_white else destination[1] + 1
+                capture_piece = self[capture_location]
+                self.white_pieces.remove(capture_piece) \
+                    if capture_piece.is_white \
+                    else self.black_pieces.remove(capture_piece)
+                self[capture_location] = Square(capture_location)
         # Update the board to move piece from previous location to destination
         previous_location = piece.location
         piece.move(destination)

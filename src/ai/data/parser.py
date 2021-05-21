@@ -147,15 +147,65 @@ class Parser(metaclass=ABCMeta):
         return datapoint
 
     def _board_to_datapoint(self, board, is_white):
+        piece_mapping = {'P': 1, 'p': -1, 'B': 2, 'b': -2, 'N' : 3, 'n': -3,
+                'R': 4, 'r': -4, 'Q': 5, 'q' : -5, 'K': 6, 'k': -6}
         board_direction = range(8) if is_white else range(7, -1, -1)
-        datapoint = [[board[column,row].value \
-                        if board[column,row].is_white == is_white \
-                        else board[column,row].value * -1 \
-                    for column in range(8)] \
-                    for row in board_direction]
+        datapoint = [[None] * 8] * 8
+        for row in board_direction:
+            for column in range(8):
+                if board[column,row].is_white == None:
+                    datapoint[column][row] = 0
+                elif board[column,row].is_white == is_white:
+                    datapoint[column][row] = \
+                            piece_mapping[str(board[column,row])] * 10 + board[column,row].ID
+                else:
+                    datapoint[column][row] = \
+                        piece_mapping[str(board[column,row])] * -10 + board[column,row].ID
         datapoint = array(datapoint)
         datapoint = datapoint.reshape(1, 8, 8, 1)
         return datapoint
+
+    def _datapoint_to_board(self, datapoint):
+        piece_mapping = {'P': 1, 'p': -1, 'B': 2, 'b': -2, 'N' : 3, 'n': -3,
+                'R': 4, 'r': -4, 'Q': 5, 'q' : -5, 'K': 6, 'k': -6}
+        from backend.pieces.pawn import Pawn
+        from backend.pieces.knight import Knight
+        from backend.pieces.queen import Queen
+        from backend.pieces.rook import Rook
+        from backend.pieces.king import King
+        from backend.pieces.bishop import Bishop
+        from backend.board import Board
+        for key in piece_mapping:
+            piece_mapping[piece_mapping[key]] = key
+            white_pieces = {}
+            black_pieces = {}
+            for row in datapoint:
+                for column in datapoint:
+                    if datapoint[row][column][0] == '1':
+                        white_pieces.add(Pawn(True, (row, column)))
+                    if datapoint[row][column][0] == '2':
+                        white_pieces.add(Bishop(True, (row, column)))
+                    if datapoint[row][column][0] == '3':
+                        white_pieces.add(Knight(True, (row, column)))
+                    if datapoint[row][column][0] == '4':
+                        white_pieces.add(Rook(True, (row, column)))
+                    if datapoint[row][column][0] == '5':
+                        white_pieces.add(Queen(True, (row, column)))
+                    if datapoint[row][column][0] == '6':
+                        white_pieces.add(King(True, (row, column)))
+                    if datapoint[row][column][0] == '-1':
+                        white_pieces.add(Pawn(False, (row, column)))
+                    if datapoint[row][column][0] == '-2':
+                        white_pieces.add(Bishop(False, (row, column)))
+                    if datapoint[row][column][0] == '-3':
+                        white_pieces.add(Knight(False, (row, column)))
+                    if datapoint[row][column][0] == '-4':
+                        white_pieces.add(Rook(False, (row, column)))
+                    if datapoint[row][column][0] == '-5':
+                        white_pieces.add(Queen(False, (row, column)))
+                    if datapoint[row][column][0] == '-6':
+                        white_pieces.add(King(False, (row, column)))
+        return Board(white_pieces | black_pieces)
 
     def _prediction_to_move(self, prediction, board, is_white):
         from ai.data.moves import MOVES

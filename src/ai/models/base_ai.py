@@ -18,7 +18,7 @@ class AI(metaclass=ABCMeta):
             from tensorflow.keras.models import load_model
             self.model = load_model(self.location + '/brain.h5')
         else:
-            self._build_model()
+            self._build_model(game)
             self._train_model(self.data_extractor.datapoints(self.location))
             self._evaluate_model()
 
