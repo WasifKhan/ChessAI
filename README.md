@@ -5,7 +5,7 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - **solution to loss problem of passing in board:**
-  - current prediction is 142 array of 0s with 1 non-zero entry. simply change all these values to *some notion* of board value, most simple is just `board.value`. complex could be including positions of pieces into computation of board value...eventually infer board value??....MSE loss is OK.
+  - current prediction is 142 array of 0s with 1 non-zero entry. simply change all these values to *some notion* of board value, most simple is just `board.value`. complex could be including positions of pieces into computation of board value...eventually infer board value??....MSE loss is OK, but then don't softmax last layer, use another activation,look into what this should be for chess.
 - clean backend/parser
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
