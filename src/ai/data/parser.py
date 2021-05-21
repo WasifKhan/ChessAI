@@ -13,7 +13,6 @@ from backend.pieces.bishop import Bishop
 from backend.pieces.pawn import Pawn
 
 
-
 class Parser(metaclass=ABCMeta):
     def __init__(self, game):
         self.game = game
@@ -166,45 +165,37 @@ class Parser(metaclass=ABCMeta):
         return datapoint
 
     def _datapoint_to_board(self, datapoint):
-        piece_mapping = {'P': 1, 'p': -1, 'B': 2, 'b': -2, 'N' : 3, 'n': -3,
-                'R': 4, 'r': -4, 'Q': 5, 'q' : -5, 'K': 6, 'k': -6}
-        from backend.pieces.pawn import Pawn
-        from backend.pieces.knight import Knight
-        from backend.pieces.queen import Queen
-        from backend.pieces.rook import Rook
-        from backend.pieces.king import King
-        from backend.pieces.bishop import Bishop
+        piece_mapping = {1 : 'P', -1: 'p', 2: 'B', -2: 'b', 3: 'N', -3: 'n',
+                4: 'R', -4: 'r', 5: 'Q', -5: 'q', 6: 'K', -6: 'k'}
         from backend.board import Board
-        for key in piece_mapping:
-            piece_mapping[piece_mapping[key]] = key
-            white_pieces = {}
-            black_pieces = {}
-            for row in datapoint:
-                for column in datapoint:
-                    if datapoint[row][column][0] == '1':
-                        white_pieces.add(Pawn(True, (row, column)))
-                    if datapoint[row][column][0] == '2':
-                        white_pieces.add(Bishop(True, (row, column)))
-                    if datapoint[row][column][0] == '3':
-                        white_pieces.add(Knight(True, (row, column)))
-                    if datapoint[row][column][0] == '4':
-                        white_pieces.add(Rook(True, (row, column)))
-                    if datapoint[row][column][0] == '5':
-                        white_pieces.add(Queen(True, (row, column)))
-                    if datapoint[row][column][0] == '6':
-                        white_pieces.add(King(True, (row, column)))
-                    if datapoint[row][column][0] == '-1':
-                        white_pieces.add(Pawn(False, (row, column)))
-                    if datapoint[row][column][0] == '-2':
-                        white_pieces.add(Bishop(False, (row, column)))
-                    if datapoint[row][column][0] == '-3':
-                        white_pieces.add(Knight(False, (row, column)))
-                    if datapoint[row][column][0] == '-4':
-                        white_pieces.add(Rook(False, (row, column)))
-                    if datapoint[row][column][0] == '-5':
-                        white_pieces.add(Queen(False, (row, column)))
-                    if datapoint[row][column][0] == '-6':
-                        white_pieces.add(King(False, (row, column)))
+        white_pieces = set()
+        black_pieces = set()
+        for row in range(len(datapoint)):
+            for column in range(len(datapoint)):
+                if datapoint[row][column][0] == '1':
+                    white_pieces.add(Pawn(True, (row, column)))
+                if datapoint[row][column][0] == '2':
+                    white_pieces.add(Bishop(True, (row, column)))
+                if datapoint[row][column][0] == '3':
+                    white_pieces.add(Knight(True, (row, column)))
+                if datapoint[row][column][0] == '4':
+                    white_pieces.add(Rook(True, (row, column)))
+                if datapoint[row][column][0] == '5':
+                    white_pieces.add(Queen(True, (row, column)))
+                if datapoint[row][column][0] == '6':
+                    white_pieces.add(King(True, (row, column)))
+                if datapoint[row][column][0] == '-1':
+                    white_pieces.add(Pawn(False, (row, column)))
+                if datapoint[row][column][0] == '-2':
+                    white_pieces.add(Bishop(False, (row, column)))
+                if datapoint[row][column][0] == '-3':
+                    white_pieces.add(Knight(False, (row, column)))
+                if datapoint[row][column][0] == '-4':
+                    white_pieces.add(Rook(False, (row, column)))
+                if datapoint[row][column][0] == '-5':
+                    white_pieces.add(Queen(False, (row, column)))
+                if datapoint[row][column][0] == '-6':
+                    white_pieces.add(King(False, (row, column)))
         return Board(white_pieces | black_pieces)
 
     def _prediction_to_move(self, prediction, board, is_white):

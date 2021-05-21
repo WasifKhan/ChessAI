@@ -13,7 +13,7 @@ class ConvNNet(AI):
         # NEED TO CONVERT BOARD FROM KerasTensor->List
         def loss(y_true, y_pred):
             from tensorflow.keras.losses import MeanAbsoluteError
-            uae = MeanAbsoluteError()
+            mae = MeanAbsoluteError()
             true_losses = []
             predicted_losses = []
             for i in range(len(y_true)):
@@ -44,7 +44,7 @@ class ConvNNet(AI):
         opt = SGD(lr=0.01, momentum=0.9)
         model = Model(board, output)
         model.compile(optimizer=opt, loss=self.board_loss(board),
-                metrics=['accuracy'], experimental_run_tf_function=False)
+                metrics=['accuracy'])
         self.model = model
 
     def _train_model(self, datapoints):
