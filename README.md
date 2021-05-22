@@ -4,8 +4,6 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- need to pass in correct board+moves as datapoint...currently both wrong
-   - our board is board[row][column] ....datapoint board should be: board[column][row]
 - clean backend/parser
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
