@@ -21,9 +21,8 @@ class ConvNNet(AI):
         layer_2 = MaxPooling2D((2, 2))(layer_1)
         layer_3 = Flatten()(layer_2)
         output = Dense(142, activation='softmax')(layer_3)
-        opt = SGD(lr=0.01, momentum=0.9)
+        opt = SGD(lr=0.05, momentum=0.75)
         model = Model(board, output)
-        # Try with loss=binarycrossentropy + categoriccalcrossentropy
         model.compile(optimizer=opt, loss='categorical_crossentropy',
                 metrics=['accuracy'])
         self.model = model
@@ -34,28 +33,29 @@ class ConvNNet(AI):
         self.scores, self.histories = list(), list()
         splits = 2
         kfold = KFold(splits, shuffle=True, random_state=1)
-        dataX, dataY = list(), list()
-        for data in datapoints:
-            board, move = data
-            for i in range(len(board)):
-                dataX.append(board[i])
-                dataY.append(move[i])
-        dataX, dataY = array(dataX), array(dataY)
-        dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
-        print(f'Begin learning over {dataX.shape} points')
-        for i, train_test in enumerate(kfold.split(dataX)):
-            train_ix, test_ix = train_test
-            trainX, trainY, testX, testY = dataX[train_ix], dataY[train_ix], dataX[test_ix], dataY[test_ix]
-            history = self.model.fit(trainX, trainY, epochs=10, batch_size=32,
-                    validation_data=(testX, testY), verbose=0)
-            _, acc = self.model.evaluate(testX, testY, verbose=0)
-            print(f'Learning {i}/{splits} accuracy: {str(acc*100)[0:5]}')
+        for i in range(97):
+            dataX, dataY = list(), list()
+            for data in datapoints(self.location):
+                board, move = data
+                for i in range(len(board)):
+                    dataX.append(board[i])
+                    dataY.append(move[i])
+            dataX, dataY = array(dataX), array(dataY)
+            dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
+            print(f'{i}%: Begin learning over {dataX.shape[0]} datapoints')
+            for i, train_test in enumerate(kfold.split(dataX)):
+                train_ix, test_ix = train_test
+                trainX, trainY, testX, testY = dataX[train_ix], dataY[train_ix], dataX[test_ix], dataY[test_ix]
+                history = self.model.fit(trainX, trainY, epochs=10, batch_size=32,
+                        validation_data=(testX, testY), verbose=0)
+                _, acc = self.model.evaluate(testX, testY, verbose=0)
+                print(f'Learning {i}/{splits} accuracy: {str(acc*100)[0:5]}')
+                self.scores.append(acc)
+                self.histories.append(history)
             self.scores.append(acc)
             self.histories.append(history)
-        self.scores.append(acc)
-        self.histories.append(history)
-        print('Done learning')
-        self.model.save(f'{self.location}/brain.h5')
+            print(f'{i}%: Done learning')
+            self.model.save(f'{self.location}/brain.h5')
 
     def _evaluate_model(self):
         from matplotlib import pyplot

@@ -24,7 +24,7 @@ class AI(metaclass=ABCMeta):
             self.model = load_model(self.location + '/brain.h5')
         else:
             self._build_model(game)
-        self._train_model(self.data_extractor.datapoints(self.location))
+        self._train_model(self.data_extractor.datapoints)
         self._evaluate_model()
 
     def _resign(self, board, is_white):

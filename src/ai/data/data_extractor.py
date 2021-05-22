@@ -17,16 +17,13 @@ class DataExtractor(Parser):
     def _download_raw_data(self, ID):
         lines = BZ2File(urlopen(FILES[ID]), 'r')
         it = iter(lines)
-        '''
-        Can remove notion of index once ready to use
-        '''
         index = 0
         print(f'Processing File: {ID}')
         while line := str(next(it)):
-            if index % 100 == 0:
-                print(f'Processing... {index//100}% done')
-            if index == 10000:
-                break
+            if index % 10000 == 0:
+                print(f'{ID}%: Processing... {index//10000}% done')
+            if index == 1000000:
+                return StopIteration
             if line[2] == '1':
                 datapoint = self._raw_data_to_datapoint(line)
                 yield datapoint
@@ -48,7 +45,6 @@ class DataExtractor(Parser):
         return (x_vector, y_vector)
 
     def datapoints(self, location):
-        from os import listdir
         train_state = location + '/train_state.txt'
         file_id = None
         with open(train_state) as fp:
