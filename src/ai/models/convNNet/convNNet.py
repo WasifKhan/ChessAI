@@ -6,15 +6,13 @@ from ai.models.base_ai import AI
 import tensorflow as tf
 
 class ConvNNet(AI):
-    def __init__(self, location):
-        super().__init__(location)
+    def __init__(self, game, location):
+        super().__init__(game, location)
 
-    def _build_model(self, game):
+    def _build_model(self):
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Dense, Flatten
         from tensorflow.keras.optimizers import SGD
-        from ai.data.data_extractor import DataExtractor
-        self.data_extractor = DataExtractor(game)
 
         board = Input(shape=(8, 8, 1))
         layer_1 = Conv2D(16, (3, 3), activation='sigmoid', kernel_initializer='he_uniform')(board)
@@ -27,22 +25,22 @@ class ConvNNet(AI):
                 metrics=['accuracy'])
         self.model = model
 
-    def _train_model(self, datapoints):
+    def _train_model(self):
         from sklearn.model_selection import KFold
         from numpy import array
         self.scores, self.histories = list(), list()
         splits = 2
         kfold = KFold(splits, shuffle=True, random_state=1)
-        for i in range(97):
+        for B in range(50):
             dataX, dataY = list(), list()
-            for data in datapoints(self.location):
+            for data in self.datapoints(self.location):
                 board, move = data
                 for i in range(len(board)):
                     dataX.append(board[i])
                     dataY.append(move[i])
             dataX, dataY = array(dataX), array(dataY)
             dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
-            print(f'{i}%: Begin learning over {dataX.shape[0]} datapoints')
+            print(f'{B*2}%: Begin learning over {dataX.shape[0]} datapoints')
             for i, train_test in enumerate(kfold.split(dataX)):
                 train_ix, test_ix = train_test
                 trainX, trainY, testX, testY = dataX[train_ix], dataY[train_ix], dataX[test_ix], dataY[test_ix]
@@ -54,7 +52,7 @@ class ConvNNet(AI):
                 self.histories.append(history)
             self.scores.append(acc)
             self.histories.append(history)
-            print(f'{i}%: Done learning')
+            print(f'{B*2}%: Done learning')
             self.model.save(f'{self.location}/brain.h5')
 
     def _evaluate_model(self):

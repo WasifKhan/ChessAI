@@ -17,11 +17,11 @@ class Interface:
         return str(self.game)
 
     def versus_AI(self, difficulty) -> None:
-        self.ai = AI(difficulty)
+        self.ai = AI(self.game, difficulty)
         self.versus_ai = True
 
     def train_AI(self):
-        self.ai.train(self.game)
+        self.ai.train()
 
     def set_player_names(self, p1_name: str, p2_name: str) -> None:
         self.game.set_names(p1_name, p2_name)

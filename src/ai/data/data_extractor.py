@@ -18,17 +18,20 @@ class DataExtractor(Parser):
         lines = BZ2File(urlopen(FILES[ID]), 'r')
         it = iter(lines)
         index = 0
-        print(f'Processing File: {ID}')
-        while line := str(next(it)):
-            if index % 10000 == 0:
-                print(f'{ID}%: Processing... {index//10000}% done')
-            if index == 1000000:
-                return StopIteration
-            if line[2] == '1':
-                datapoint = self._raw_data_to_datapoint(line)
-                yield datapoint
-            index += 1
-        print(f'Done processing file: {ID}')
+        print(f'{ID*2}% Processing.')
+        try:
+            while line := str(next(it)):
+                if index % 1000 == 0:
+                    print(f'{ID*2}%: Processing... {index//1000}% done')
+                if index == 100000:
+                    return StopIteration
+                if line[2] == '1':
+                    datapoint = self._raw_data_to_datapoint(line)
+                    yield datapoint
+                index += 1
+        except Exception:
+            return StopIteration
+        print(f'{ID*2}% Done processing.')
 
     def _generate_datapoint(self, moves):
         datapoint = ()

@@ -8,10 +8,10 @@ from random import randint
 
 
 class RandomAI(AI):
-    def __init__(self, location):
-        super().__init__(location)
+    def __init__(self, game, location):
+        super().__init__(game, location)
 
-    def train(self, game):
+    def train(self):
         return True
 
     def predict(self, board, is_white):
