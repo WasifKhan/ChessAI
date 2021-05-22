@@ -4,9 +4,8 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- **solution to loss problem of passing in board:**
-  - pass in board with encoding values..pawn=1.1,1.2,... Can get.more complex by encoding all possible attacks
-  - current prediction is 142 array of 0s with 1 non-zero entry. simply change all these values to *some notion* of board value, most simple is just `board.value`. complex finsih with using #attacks-#attacked?....MSE loss is OK, but then don't softmax last layer..use sigmoid
+- need to pass in correct board+moves as datapoint...currently both wrong
+   - our board is board[row][column] ....datapoint board should be: board[column][row]
 - clean backend/parser
 - #### MILESTONE 1.5 base smart AI done
 - Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
