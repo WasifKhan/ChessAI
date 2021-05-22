@@ -138,118 +138,7 @@ class Parser(metaclass=ABCMeta):
         datapoint = datapoint[0:-2] + ']'
         return datapoint
 
-    def _move_to_datapoint(self, board, is_white, move):
-        from ai.data.moves import MOVES
-        datapoint = [0]*142
-        from copy import deepcopy
-        my_pieces = board.white_pieces if is_white else board.black_pieces
-        their_pieces = board.white_pieces if not is_white else board.black_pieces
-        for piece in my_pieces:
-            piece_name = str(piece).upper()
-            piece_ID = piece.ID if piece_name != 'Q' else 1
-            moves = piece.move_IDs
-            for piece_move in moves:
-                temp_board = deepcopy(board)
-                real_piece = temp_board[piece.location]
-                move_coord = piece.move_IDs[piece_move](piece.location)
-                key = piece_name + str(piece_ID) + str(piece_move)
-                destination = (move_coord//10, move_coord%10)
-                board_value = None
-                if key == move:
-                    continue
-                if destination[0] >= 0 \
-                    and destination[0] <= 7 \
-                    and destination[1] >= 0 \
-                    and destination[1] <= 7 \
-                    and real_piece.is_valid_move(temp_board, destination):
-                        temp_board.move(real_piece, destination)
-                        board_value = temp_board.board_value()
-                else:
-                    board_value = 0
-                board_value *= 1 if is_white else -1
-                datapoint[MOVES[key]] = board_value
-        min_loss = min(datapoint)
-        max_loss = max(datapoint) + 0.05
-        if min_loss < 0:
-            for i in range(len(datapoint)):
-                if datapoint[i] != 0 and i != MOVES[move.upper()]:
-                    datapoint[i] += abs(min_loss)
-        elif min_loss > 0:
-            for i in range(len(datapoint)):
-                if datapoint[i] != 0 and i != MOVES[move.upper()]:
-                    datapoint[i] -= min_loss
-        if max_loss < 0 and min_loss < 0:
-            max_loss = abs(min_loss) - abs(max_loss)
-        elif max_loss > 0 and min_loss > 0:
-            max_loss = max_loss - min_loss
-        else:
-            max_loss += abs(min_loss)
-        for i in range(len(datapoint)):
-            if datapoint[i] != 0 and i != MOVES[move.upper()]:
-                datapoint[i] /= max_loss
-                datapoint[i] = round(datapoint[i], 4)
-        datapoint[MOVES[move.upper()]] = 1.0
-        '''
-        datapoint = array(datapoint)
-        '''
-        return datapoint
-
-    def _board_to_datapoint(self, board, is_white):
-        piece_mapping = {'P': 1.0, 'B': 3.02, 'N' : 3.01, 'R': 5.0, 'Q': 9.0, 'K': 100.0}
-        board_direction = range(8) if is_white else range(7, -1, -1)
-        datapoint = [[None] * 8] * 8
-        for row in board_direction:
-            for column in range(8):
-                if board[row,column].is_white == None:
-                    datapoint[column][row] = 0
-                elif board[row,column].is_white == is_white:
-                    datapoint[column][row] = \
-                            piece_mapping[str(board[row,column]).upper()] + board[row,column].ID/10
-                else:
-                    datapoint[column][row] = \
-                        (piece_mapping[str(board[row,column]).upper()] + board[row,column].ID/10) * -1
-        '''
-        datapoint = array(datapoint)
-        datapoint = datapoint.reshape(1, 8, 8, 1)
-        '''
-        return datapoint
-
-    def _datapoint_to_board(self, datapoint):
-        piece_mapping = {1 : 'P', -1: 'p', 3.2: 'B', -3.2: 'b', 3.1: 'N', -3.1:
-                'n', 5: 'R', -5: 'r', 9: 'Q', -9: 'q', 100: 'K', -100: 'k'}
-        from backend.board import Board
-        white_pieces = set()
-        black_pieces = set()
-        for row in range(len(datapoint)):
-            for column in range(len(datapoint)):
-                if datapoint[column][row][0] == '1':
-                    white_pieces.add(Pawn(True, (row, column)))
-                if datapoint[column][row][0] == '2':
-                    white_pieces.add(Bishop(True, (row, column)))
-                if datapoint[column][row][0] == '3':
-                    white_pieces.add(Knight(True, (row, column)))
-                if datapoint[column][row][0] == '4':
-                    white_pieces.add(Rook(True, (row, column)))
-                if datapoint[column][row][0] == '5':
-                    white_pieces.add(Queen(True, (row, column)))
-                if datapoint[column][row][0] == '6':
-                    white_pieces.add(King(True, (row, column)))
-                if datapoint[column][row][0] == '-1':
-                    white_pieces.add(Pawn(False, (row, column)))
-                if datapoint[column][row][0] == '-2':
-                    white_pieces.add(Bishop(False, (row, column)))
-                if datapoint[column][row][0] == '-3':
-                    white_pieces.add(Knight(False, (row, column)))
-                if datapoint[column][row][0] == '-4':
-                    white_pieces.add(Rook(False, (row, column)))
-                if datapoint[column][row][0] == '-5':
-                    white_pieces.add(Queen(False, (row, column)))
-                if datapoint[column][row][0] == '-6':
-                    white_pieces.add(King(False, (row, column)))
-        return Board(white_pieces | black_pieces)
-
     def _prediction_to_move(self, prediction, board, is_white):
-        print(max(prediction[0]))
         from ai.data.moves import MOVES
         for i, val in enumerate(prediction[0]):
             if val == max(prediction[0]):
@@ -265,4 +154,27 @@ class Parser(metaclass=ABCMeta):
             if str(piece) == str(my_piece) and piece.ID == ID:
                 return piece.get_move(int(move_ID))
 
+    def _move_to_datapoint(self, move):
+        from ai.data.moves import MOVES
+        datapoint = [0]*142
+        datapoint[MOVES[move.upper()]] = 1
+        datapoint = array(datapoint)
+        return datapoint
+
+    def _board_to_datapoint(self, board, is_white):
+        piece_mapping = {'P': 1.0, 'B': 3.2, 'N' : 3.1, 'R': 5.0, 'Q': 9.0, 'K': 100.0}
+        board_direction = range(8) if is_white else range(7, -1, -1)
+        datapoint = [[0 if (piece := board[column,row]).is_white == None \
+                        else piece_mapping[str(piece).upper()] \
+                        if piece.value == 9  and piece.is_white == is_white \
+                        else piece_mapping[str(piece).upper()] * - 1 \
+                        if piece.value == 9 \
+                        else piece_mapping[str(piece).upper()] + piece.ID/100 \
+                        if piece.is_white == is_white \
+                        else (piece_mapping[str(piece).upper()] + piece.ID/100) * -1
+                    for column in range(8)] \
+                    for row in board_direction]
+        datapoint = array(datapoint)
+        datapoint = datapoint.reshape(1, 8, 8, 1)
+        return datapoint
 

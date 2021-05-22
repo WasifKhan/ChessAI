@@ -19,7 +19,6 @@ class Interface:
     def versus_AI(self, difficulty) -> None:
         self.ai = AI(difficulty)
         self.versus_ai = True
-        self.ai.train(self.game)
 
     def train_AI(self):
         self.ai.train(self.game)
