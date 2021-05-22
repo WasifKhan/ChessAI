@@ -50,19 +50,10 @@ class DataExtractor(Parser):
     def datapoints(self, location):
         from os import listdir
         train_state = location + '/train_state.txt'
-        '''
-        data_sample = location + '/sample_data.txt'
-        if 'sample_data.txt' in listdir(location):
-            with open(data_sample, 'r') as fp:
-                for line in fp:
-                    print(line)
-            return
-        '''
         file_id = None
         with open(train_state) as fp:
             file_ID = int(fp.readline()[0])
         for moves in self._download_raw_data(file_ID):
             yield self._generate_datapoint(moves)
         with open(train_state, 'w') as fp:
-            # CHANGE TO str(file_ID)+1) when done
-            fp.write(str(file_ID))
+            fp.write(str(file_ID+1))
