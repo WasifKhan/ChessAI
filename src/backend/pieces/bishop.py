@@ -36,7 +36,7 @@ class Bishop(Piece):
                 ((location[0]+5)%8)*10 + ((location[1]-5*direction)%8)
         self.move_IDs[10] = lambda location: \
                 ((location[0]+4)%8)*10 + ((location[1]-4*direction)%8)
-        self.move_IDs[10] = lambda location: \
+        self.move_IDs[11] = lambda location: \
                 ((location[0]+3)%8)*10 + ((location[1]-3*direction)%8)
         self.move_IDs[12] = lambda location: \
                 ((location[0]+2)%8)*10 + ((location[1]-2*direction)%8)

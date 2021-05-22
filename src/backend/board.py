@@ -87,7 +87,7 @@ class Board:
                 self[piece.location[0]+1, piece.location[1]] = rook
                 self[rook_location] = Square(rook_location)
         # Edge case for en passant pawn capture
-        if isinstance(piece, Pawn):
+        elif isinstance(piece, Pawn):
             if destination[0] in {piece.location[0]-1, piece.location[0]+1} \
                     and self[destination].is_white == None:
                 capture_location = destination[0], destination[1] - 1 if piece.is_white else destination[1] + 1

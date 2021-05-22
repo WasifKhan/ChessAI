@@ -9,10 +9,13 @@ class ConvNNet(AI):
     def __init__(self, location):
         super().__init__(location)
 
+    '''
+    This is impossible due to Eager Execution over Graph Execution
+    Don't really want to do graph execution due to other methods slowing down
+    '''
     def board_loss(self, board):
         # NEED TO CONVERT BOARD FROM KerasTensor->List
         def loss(y_true, y_pred):
-            from tensorflow.keras.losses import MeanAbsoluteError
             mae = MeanAbsoluteError()
             true_losses = []
             predicted_losses = []
@@ -32,6 +35,7 @@ class ConvNNet(AI):
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Dense, Flatten
         from tensorflow.keras.optimizers import SGD
+        from tensorflow.keras.losses import MeanSquaredError
         from ai.data.data_extractor import DataExtractor
         self.data_extractor = DataExtractor(game)
 
@@ -39,11 +43,11 @@ class ConvNNet(AI):
         layer_1 = Conv2D(3, (3, 3), activation='sigmoid', kernel_initializer='he_uniform')(board)
         layer_2 = MaxPooling2D((2, 2))(layer_1)
         layer_3 = Flatten()(layer_2)
-        output = Dense(142, activation='softmax')(layer_3)
-        # compile model
+        output = Dense(142, activation='sigmoid')(layer_3)
         opt = SGD(lr=0.01, momentum=0.9)
         model = Model(board, output)
-        model.compile(optimizer=opt, loss=self.board_loss(board),
+        # Try with loss=binarycrossentropy + categoriccalcrossentropy
+        model.compile(optimizer=opt, loss=MeanSquaredError(),
                 metrics=['accuracy'])
         self.model = model
 
@@ -62,7 +66,6 @@ class ConvNNet(AI):
         dataX, dataY = array(dataX), array(dataY)
         dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
         print('Begin learning')
-        # enumerate splits
         for i, train_test in enumerate(kfold.split(dataX)):
             train_ix, test_ix = train_test
             trainX, trainY, testX, testY = dataX[train_ix], dataY[train_ix], dataX[test_ix], dataY[test_ix]
@@ -81,6 +84,5 @@ class ConvNNet(AI):
         from numpy import mean, std
         pyplot.title('Classification Accuracy')
         pyplot.plot(self.histories[-1].history['accuracy'], color='blue', label='train')
-        pyplot.plot(self.histories[-1].history['val_accuracy'], color='orange', label='test')
         pyplot.show()
         print('Accuracy: mean=%.3f std=%.3f, n=%d' % (mean(self.scores)*100, std(self.scores)*100, len(self.scores)))

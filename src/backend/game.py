@@ -37,6 +37,11 @@ class Game:
         temp_board.move(piece, destination)
         return temp_board.check(piece.is_white)
 
+    def copy_board(self):
+        from copy import deepcopy
+        temp_board = deepcopy(self.board)
+        return temp_board
+
     def move(self, source, destination):
         piece = self.board[source]
         destination = (destination//10, destination%10)

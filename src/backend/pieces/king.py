@@ -41,20 +41,24 @@ class King(Piece):
     def _castle(self, board, destination):
         # Left Castle
         if self.location[0] - destination//10 == 2 and self.location[1] == destination%10:
-            rook_location = (0,0) if self.is_white else (0,7)
+            rook_location = destination//10-2, destination%10
             if isinstance(board[rook_location], Rook):
                 for square in range(1,3):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] - square)*10 + self.location[1]) in piece.moves(board):
                             return False
+                        if board[(self.location[0] - square)*10 + self.location[1]].is_white is not None:
+                            return False
                 return True
         # Right Castle
         elif destination//10 - self.location[0] == 2 and self.location[1] == destination%10:
-            rook_location = (7,0) if self.is_white else (7,7)
+            rook_location = destination//10+1, destination%10
             if isinstance(board[rook_location], Rook):
                 for square in range(1,3):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] + square)*10 + self.location[1]) in piece.moves(board):
+                            return False
+                        if board[(self.location[0] + square)*10 + self.location[1]].is_white is not None:
                             return False
                 return True
 
