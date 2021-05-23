@@ -28,7 +28,7 @@ class View:
         The following code should be in buttons initiated by the user.
         Currently store here until calls are done
         '''
-        self.interface.versus_AI(1)
+        self.interface.versus_AI(0)
         self.interface.set_player_names('Player 1', 'Black AI')
         scoreboard = self.interface.get_scoreboard()
         score = self.interface.get_score('Player 1', 'Black AI')
