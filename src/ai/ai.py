@@ -2,7 +2,7 @@
 Main AI Engine
 '''
 
-from .names import MODELS
+from .models.names import MODELS
 
 
 

@@ -2,10 +2,10 @@
 AI Implemented Using A Convolutional Neural Network
 '''
 
-from ai.models.base_ai import AI
+from ai.models.base_model import BaseModel
 import tensorflow as tf
 
-class ConvNNet(AI):
+class CnnBasic(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 

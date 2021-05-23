@@ -2,11 +2,11 @@
 AI Implemented Using Deep-Q Networks
 '''
 
-from ai.models.base_ai import AI
+from ai.models.base_model import BaseModel
 
 
 
-class DeepQNet(AI):
+class DeepQNet(BaseModel):
     def __init__(self, is_white=False):
         self.is_white = is_white
 

@@ -14,10 +14,10 @@ Piece methods:
     Piece.move(destination)
 '''
 
-from ai.models.base_ai import AI
+from ai.models.base_model import BaseModel
 
 
-class LabeebAI(AI):
+class LabeebAI(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 

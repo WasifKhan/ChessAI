@@ -6,7 +6,7 @@ from abc import ABCMeta
 
 
 
-class AI(metaclass=ABCMeta):
+class BaseModel(metaclass=ABCMeta):
     def __init__(self, game, location):
         self.location = location
         from os import listdir
