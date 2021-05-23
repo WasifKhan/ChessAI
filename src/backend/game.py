@@ -31,8 +31,7 @@ class Game:
         self.p2_name = p2_name
 
     def check_after_move(self, source, destination):
-        from copy import deepcopy
-        temp_board = deepcopy(self.board)
+        temp_board = self.copy_board()
         piece = temp_board[source]
         temp_board.move(piece, destination)
         return temp_board.check(piece.is_white)

@@ -14,6 +14,16 @@ class DataExtractor(Parser):
     def __init__(self, game):
         super().__init__(game)
 
+    def datapoints(self, location):
+        train_state = location + '/train_state.txt'
+        file_id = None
+        with open(train_state) as fp:
+            file_ID = int(fp.readline()[0])
+        for moves in self._download_raw_data(file_ID):
+            yield self._generate_datapoint(moves)
+        with open(train_state, 'w') as fp:
+            fp.write(str(file_ID+1))
+
     def _download_raw_data(self, ID):
         lines = BZ2File(urlopen(FILES[ID]), 'r')
         it = iter(lines)
@@ -39,20 +49,15 @@ class DataExtractor(Parser):
         self.game.__init__()
         x_vector = []
         y_vector = []
+        from copy import deepcopy
         for source, destination in moves:
-            x = self._board_to_datapoint(self.game.board, self.game.white_turn)
-            x_vector.append(x)
+            x = deepcopy(self.game.board)
             if self.game.move(source, destination):
-                y = self._move_to_datapoint(self.game.board.move_ID)
+                y = (source, destination)
+                x_vector.append(x)
                 y_vector.append(y)
+            else:
+                break
         return (x_vector, y_vector)
 
-    def datapoints(self, location):
-        train_state = location + '/train_state.txt'
-        file_id = None
-        with open(train_state) as fp:
-            file_ID = int(fp.readline()[0])
-        for moves in self._download_raw_data(file_ID):
-            yield self._generate_datapoint(moves)
-        with open(train_state, 'w') as fp:
-            fp.write(str(file_ID+1))
+

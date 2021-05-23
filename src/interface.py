@@ -19,6 +19,7 @@ class Interface:
     def versus_AI(self, difficulty) -> None:
         self.ai = AI(self.game, difficulty)
         self.versus_ai = True
+        self.set_player_names(self.game.p1_name, 'Black AI')
 
     def train_AI(self):
         self.ai.train()

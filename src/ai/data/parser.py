@@ -138,43 +138,6 @@ class Parser(metaclass=ABCMeta):
         datapoint = datapoint[0:-2] + ']'
         return datapoint
 
-    def _prediction_to_move(self, prediction, board, is_white):
-        from ai.data.moves import MOVES
-        for i, val in enumerate(prediction[0]):
-            if val == max(prediction[0]):
-                prediction = i
-                break
-        for key in MOVES:
-            if MOVES[key] == prediction:
-                move = key
-        my_piece, ID, move_ID = move[0], int(move[1]), move[2:]
-        my_piece = my_piece if is_white else my_piece.lower()
-        pieces = board.white_pieces if is_white else board.black_pieces
-        for piece in pieces:
-            if str(piece) == str(my_piece) and piece.ID == ID:
-                return piece.get_move(int(move_ID))
 
-    def _move_to_datapoint(self, move):
-        from ai.data.moves import MOVES
-        datapoint = [0]*142
-        datapoint[MOVES[move.upper()]] = 1
-        datapoint = array(datapoint)
-        return datapoint
 
-    def _board_to_datapoint(self, board, is_white):
-        piece_mapping = {'P': 1.0, 'B': 3.2, 'N' : 3.1, 'R': 5.0, 'Q': 9.0, 'K': 100.0}
-        board_direction = range(8) if is_white else range(7, -1, -1)
-        datapoint = [[0 if (piece := board[column,row]).is_white == None \
-                        else piece_mapping[str(piece).upper()] \
-                        if piece.value == 9  and piece.is_white == is_white \
-                        else piece_mapping[str(piece).upper()] * - 1 \
-                        if piece.value == 9 \
-                        else piece_mapping[str(piece).upper()] + piece.ID/100 \
-                        if piece.is_white == is_white \
-                        else (piece_mapping[str(piece).upper()] + piece.ID/100) * -1
-                    for column in range(8)] \
-                    for row in board_direction]
-        datapoint = array(datapoint)
-        datapoint = datapoint.reshape(1, 8, 8, 1)
-        return datapoint
 
