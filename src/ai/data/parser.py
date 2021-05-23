@@ -14,8 +14,10 @@ from backend.pieces.pawn import Pawn
 
 
 class Parser(metaclass=ABCMeta):
-    def __init__(self, game):
+    def __init__(self, game, location):
         self.game = game
+        self.location = location
+
 
     def _extract_moves(self, line):
         game = split('[\d]+\.\s', line)
@@ -48,6 +50,7 @@ class Parser(metaclass=ABCMeta):
         if not white_move == 'None':
             datapoint += f"('{white_move}', '{black_move}'), "
         return datapoint[0:-2] + ']\n'
+
 
     def _convert_move(self, move, is_white):
         if move == 'None':
@@ -124,6 +127,7 @@ class Parser(metaclass=ABCMeta):
                 raise Exception
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 
+
     def _raw_data_to_datapoint(self, line):
         datapoint = '['
         moves = eval(self._extract_moves(line))
@@ -137,7 +141,4 @@ class Parser(metaclass=ABCMeta):
                 datapoint += f"({source}, {destination}), "
         datapoint = datapoint[0:-2] + ']'
         return datapoint
-
-
-
 

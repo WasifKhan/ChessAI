@@ -29,37 +29,36 @@ class CnnBasic(BaseModel):
     def _train_model(self):
         from sklearn.model_selection import KFold
         from numpy import array
+        dataX, dataY = list(), list()
+        for i, data in enumerate(self.datapoints(100)):
+            print(f'{i}% done downloading')
+            board, move = data
+            self.game.__init__()
+            for i in range(len(board)):
+                x = self._board_to_datapoint(board[i], self.game.white_turn)
+                self.game.move(*move[i])
+                y = self._move_to_datapoint(self.game.board.move_ID)
+                dataX.append(x)
+                dataY.append(y)
+        dataX, dataY = array(dataX), array(dataY)
+        dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
+        print(f'Begin learning over {dataX.shape[0]} datapoints')
         self.scores, self.histories = list(), list()
-        splits = 2
+        splits = 5
         kfold = KFold(splits, shuffle=True, random_state=1)
-        for B in range(50):
-            dataX, dataY = list(), list()
-            for data in self.datapoints:
-                board, move = data
-                self.game.__init__()
-                for i in range(len(board)):
-                    x = self._board_to_datapoint(board[i], self.game.white_turn)
-                    self.game.move(*move[i])
-                    y = self._move_to_datapoint(self.game.board.move_ID)
-                    # use self.game.board.move_ID?
-                    dataX.append(board[i])
-                    dataY.append(move[i])
-            dataX, dataY = array(dataX), array(dataY)
-            dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
-            print(f'{B*2}%: Begin learning over {dataX.shape[0]} datapoints')
-            for i, train_test in enumerate(kfold.split(dataX)):
-                train_ix, test_ix = train_test
-                trainX, trainY, testX, testY = dataX[train_ix], dataY[train_ix], dataX[test_ix], dataY[test_ix]
-                history = self.model.fit(trainX, trainY, epochs=10, batch_size=32,
-                        validation_data=(testX, testY), verbose=0)
-                _, acc = self.model.evaluate(testX, testY, verbose=0)
-                print(f'Learning {i}/{splits} accuracy: {str(acc*100)[0:5]}')
-                self.scores.append(acc)
-                self.histories.append(history)
+        for i, train_test in enumerate(kfold.split(dataX)):
+            train_ix, test_ix = train_test
+            trainX, trainY, testX, testY = dataX[train_ix], dataY[train_ix], dataX[test_ix], dataY[test_ix]
+            history = self.model.fit(trainX, trainY, epochs=10, batch_size=32,
+                    validation_data=(testX, testY), verbose=0)
+            _, acc = self.model.evaluate(testX, testY, verbose=0)
+            print(f'Learning {i}/{splits} accuracy: {str(acc*100)[0:5]}')
             self.scores.append(acc)
             self.histories.append(history)
-            print(f'{B*2}%: Done learning')
-            self.model.save(f'{self.location}/brain.h5')
+        self.scores.append(acc)
+        self.histories.append(history)
+        print(f'Done learning')
+        self.model.save(f'{self.location}/brain.h5')
 
     def _evaluate_model(self):
         from matplotlib import pyplot

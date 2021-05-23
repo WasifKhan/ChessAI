@@ -2,7 +2,6 @@
 File to extract chess games data from the web
 '''
 
-from os import listdir
 from bz2 import BZ2File
 from urllib.request import urlopen
 from ai.data.files import files as FILES
@@ -11,40 +10,37 @@ from ai.data.parser import Parser
 
 
 class DataExtractor(Parser):
-    def __init__(self, game):
-        super().__init__(game)
+    def __init__(self, game, location):
+        super().__init__(game, location)
 
-    def datapoints(self, location):
-        train_state = location + '/train_state.txt'
+
+    def datapoints(self, num_games):
+        for moves in self._download_raw_data(num_games):
+            yield self._generate_datapoint(moves)
+
+
+    def _download_raw_data(self, num_games):
+        train_state = self.location + '/train_state.txt'
         file_id = None
         with open(train_state) as fp:
             file_ID = int(fp.readline()[0])
-        for moves in self._download_raw_data(file_ID):
-            yield self._generate_datapoint(moves)
+        while num_games != 0:
+            lines = BZ2File(urlopen(FILES[file_ID]), 'r')
+            it = iter(lines)
+            try:
+                while num_games != 0 and (line := str(next(it))):
+                    if line[2] == '1':
+                        num_games -= 1
+                        yield self._raw_data_to_datapoint(line)
+            except Exception:
+                file_ID += 1
+                continue
         with open(train_state, 'w') as fp:
             fp.write(str(file_ID+1))
+        return StopIteration
 
-    def _download_raw_data(self, ID):
-        lines = BZ2File(urlopen(FILES[ID]), 'r')
-        it = iter(lines)
-        index = 0
-        print(f'{ID*2}% Processing.')
-        try:
-            while line := str(next(it)):
-                if index % 1000 == 0:
-                    print(f'{ID*2}%: Processing... {index//1000}% done')
-                if index == 100000:
-                    return StopIteration
-                if line[2] == '1':
-                    datapoint = self._raw_data_to_datapoint(line)
-                    yield datapoint
-                index += 1
-        except Exception:
-            return StopIteration
-        print(f'{ID*2}% Done processing.')
 
     def _generate_datapoint(self, moves):
-        datapoint = ()
         moves = eval(moves)
         self.game.__init__()
         x_vector = []

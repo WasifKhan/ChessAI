@@ -11,7 +11,7 @@ class BaseModel(metaclass=ABCMeta):
         from os import listdir
         from ai.data.data_extractor import DataExtractor
         self.location = location
-        self.datapoints = DataExtractor(game).datapoints(self.location)
+        self.datapoints = DataExtractor(game, location).datapoints
         self.game = game
         if 'brain.h5' in listdir(self.location):
             from tensorflow.keras.models import load_model
