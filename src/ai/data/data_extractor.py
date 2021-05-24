@@ -12,7 +12,7 @@ from ai.data.parser import Parser
 class DataExtractor(Parser):
     def __init__(self, game, location):
         super().__init__(game, location)
-        # self._download_raw_data()
+        self._download_raw_data()
 
 
     def datapoints(self, num_games):
@@ -42,9 +42,8 @@ class DataExtractor(Parser):
                 yield self._generate_datapoint(moves)
 
     def _download_raw_data(self):
-        DESTINATION = 'ai/data/dataset/'
         num_games = 0
-        # Each file contains 10M games
+        # 10 Files - Each file contains 10M games = 100M games
         for ID in range(10):
             # Save 1M games per file
             for cur_ID in range(10):
@@ -60,14 +59,13 @@ class DataExtractor(Parser):
                                 datapoint = self._raw_data_to_datapoint(move)
                                 fp.write(datapoint)
                         num_games = 0
-                except Exception as e:
+                except Exception:
                     continue
         print('Done downloading dataset')
 
 
     def _stream_raw_data(self, num_games):
         train_state = self.location + '/train_state.txt'
-        file_id = None
         with open(train_state) as fp:
             file_ID = int(fp.readline()[0])
         while num_games != 0:
@@ -87,19 +85,17 @@ class DataExtractor(Parser):
 
 
     def _generate_datapoint(self, moves):
-        moves = eval(moves)
-        self.game.__init__()
-        x_vector = []
-        y_vector = []
         from copy import copy
+        self.game.__init__()
+        x_vector, y_vector = [], []
+        moves = eval(moves)
         for source, destination in moves:
             x = copy(self.game.board)
-            if self.game.move(source, destination):
-                y = (source, destination)
-                x_vector.append(x)
-                y_vector.append(y)
-            else:
+            if not self.game.move(source, destination):
                 break
+            y = (source, destination)
+            x_vector.append(x)
+            y_vector.append(y)
         return (x_vector, y_vector)
 
 
