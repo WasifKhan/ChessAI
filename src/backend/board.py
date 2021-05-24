@@ -57,6 +57,10 @@ class Board:
                 set of Pieces to be added to board
             history: list
                 list of previous moves to get to current board state
+
+        Returns
+        -------
+        None
         '''
 
         from copy import copy

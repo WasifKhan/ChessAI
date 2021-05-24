@@ -1,12 +1,12 @@
 '''
-AI Implemented Using A Basic Convolutional Neural Network
+AI Implemented Using Several Convolutional Neural Network
 '''
 
 from ai.models.base_model import BaseModel
 
 
 
-class CnnBasic(BaseModel):
+class AdvancedCnn(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 
