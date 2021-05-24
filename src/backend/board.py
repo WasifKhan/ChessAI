@@ -1,11 +1,64 @@
+'''
+Stores the logic for Chess board
+
+Classes:
+    Board
+'''
+
 from .pieces.piece import Square, Piece
 from .pieces.rook import Rook
 from .pieces.queen import Queen
 from .pieces.king import King
 from .pieces.pawn import Pawn
 
+
+
 class Board:
+    '''
+    A class to represent a chess board
+
+    ...
+    Attributes
+    ----------
+    history: list
+        list of previous moves to get to board state
+    white_pieces: set(Piece)
+        set of Piece classes for white pieces on board
+    black_pieces: set(Piece)
+        set of Piece classes for black pieces on board
+    board: list(list(Piece))
+        8x8 matrix containing Piece classes
+    game_over: bool
+        bool representing whether the game is over or not
+
+    Methods
+    -------
+    print(Board): None
+        prints the board in chess representation
+    Board[location: int] -> Piece
+        gets the Piece at the specified location
+    Board[location: int] = piece: Piece -> None
+        sets the board at the specified location to Piece
+    is_valid_move(piece: Piece, destination: int) -> bool
+        returns True if piece can move to destination
+    move(piece: Piece, destination: int) -> None
+        moves piece to destination
+    board_value(): int
+        returns the board value
+    '''
+
     def __init__(self, pieces=None, history=None):
+        '''
+        Constructs all the necessary attributes for the board object
+
+        Parameters
+        ----------
+            pieces: set(Piece)
+                set of Pieces to be added to board
+            history: list
+                list of previous moves to get to current board state
+        '''
+
         from copy import copy
         self.history = []
         if history:
@@ -18,7 +71,8 @@ class Board:
         if not pieces:
             from .pieces.initial_pieces import PIECES as pieces
         for piece in pieces:
-            self._add(copy(piece))
+            self._add_piece(copy(piece))
+
 
     def __str__(self):
         output = ''
@@ -28,8 +82,10 @@ class Board:
             output += '\n'
         return output[0:-1]
 
+
     def __copy__(self):
         return Board(self.white_pieces|self.black_pieces, self.history)
+
 
     def __getitem__(self, key):
         if isinstance(key, tuple):
@@ -39,6 +95,7 @@ class Board:
         if x >= 0 and y >= 0 and x < len(self.board) and y < len(self.board[x]):
             return self.board[x][y]
         return None
+
 
     def __setitem__(self, key, val):
         if isinstance(key, tuple):
@@ -50,10 +107,12 @@ class Board:
         else:
             raise IndexError
 
+
     def is_valid_move(self, piece, destination):
         if self._check_after_move(piece, destination):
             return False
         return piece.is_valid_move(self, destination)
+
 
     def move(self, piece, destination):
         self.history.append((piece, piece.location, destination, self.board_value()))
@@ -63,10 +122,12 @@ class Board:
         self._promote(piece, destination)
         self._checkmate(piece, destination)
 
+
     def board_value(self):
         white_value = sum([piece.value for piece in self.white_pieces])
         black_value = sum([piece.value for piece in self.black_pieces])
         return white_value - black_value
+
 
     def _check_after_move(self, piece, destination):
         if (captured_piece := self[destination]).is_white == piece.is_white:
@@ -81,6 +142,7 @@ class Board:
         self[destination] = captured_piece
         return False
 
+
     def _check(self, is_white, excluded=None):
         king = self.white_king if is_white else self.black_king
         for piece in (pieces := self.black_pieces if is_white else self.white_pieces):
@@ -89,6 +151,7 @@ class Board:
                     continue
                 return True
         return False
+
 
     def _castle(self, piece, destination):
         if isinstance(piece, King):
@@ -105,6 +168,7 @@ class Board:
                 self[piece.location[0]+1, piece.location[1]] = rook
                 self[rook_location] = Square(rook_location)
 
+
     def _enpassant(self, piece, destination):
         if isinstance(piece, Pawn):
             if destination[0] in {piece.location[0]-1, piece.location[0]+1} \
@@ -115,6 +179,7 @@ class Board:
                     if capture_piece.is_white \
                     else self.black_pieces.remove(capture_piece)
                 self[capture_location] = Square(capture_location)
+
 
     def _promote(self, piece, destination):
         if isinstance(piece, Pawn):
@@ -129,10 +194,12 @@ class Board:
                 self.black_pieces.add(new_queen)
                 self[piece.location] = new_queen
 
+
     def _checkmate(self, piece, destination):
         if (piece.is_white and self.black_king.checkmate(self)) \
                 or (not(piece.is_white) and self.white_king.checkmate(self)):
             self.game_over = True
+
 
     def _move_piece(self, piece, destination):
         previous_location = piece.location
@@ -148,7 +215,8 @@ class Board:
         self[destination] = piece
         self[previous_location] = Square(previous_location)
 
-    def _add(self, piece):
+
+    def _add_piece(self, piece):
         if piece.is_white:
             if isinstance(piece, King):
                 self.white_king = piece
