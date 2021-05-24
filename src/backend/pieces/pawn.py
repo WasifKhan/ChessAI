@@ -32,7 +32,6 @@ class Pawn(Piece):
                 if board[destination].is_white == False:
                     return True
                 # Check for en passant movement
-                elif board[destination].is_white == None and board.history:
                     previous_move = board.history[-1]
                     if (isinstance(previous_move[0], Pawn) and
                     previous_move[1][1] - previous_move[2][1] == 2 and
@@ -58,7 +57,6 @@ class Pawn(Piece):
                 if board[destination].is_white:
                     return True
                 # Check for en passant movement    
-                elif board[destination].is_white == None and board.history:
                     previous_move = board.history[-1]
                     if (isinstance(previous_move[0], Pawn) and
                     previous_move[1][1] - previous_move[2][1] == -2 and

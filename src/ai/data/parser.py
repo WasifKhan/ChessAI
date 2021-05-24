@@ -61,7 +61,7 @@ class Parser(metaclass=ABCMeta):
                 destination = (piece.location[0]+2, piece.location[1])
             else:
                 destination = (piece.location[0]-2, piece.location[1])
-            if piece.is_valid_move(self.game.board, destination):
+            if self.game.board.is_valid_move(piece, destination):
                 return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
             else:
                 raise Exception
@@ -72,39 +72,33 @@ class Parser(metaclass=ABCMeta):
         if move[0] == 'K':
             for cur_piece in pieces:
                 if isinstance(cur_piece, King) \
-                        and cur_piece.is_valid_move(self.game.board, destination) \
-                        and not self.game.check_after_move(cur_piece.location, destination):
+                        and self.game.board.is_valid_move(cur_piece, destination):
                     candidates.append(cur_piece)
                     break
         elif move[0] == 'Q':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Queen) \
-                        and cur_piece.is_valid_move(self.game.board, destination) \
-                        and not self.game.check_after_move(cur_piece.location, destination):
+                        and self.game.board.is_valid_move(cur_piece, destination):
                     candidates.append(cur_piece)
         elif move[0] == 'R':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Rook) \
-                        and cur_piece.is_valid_move(self.game.board, destination) \
-                        and not self.game.check_after_move(cur_piece.location, destination):
+                        and self.game.board.is_valid_move(cur_piece, destination):
                     candidates.append(cur_piece)
         elif move[0] == 'N':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Knight) \
-                        and cur_piece.is_valid_move(self.game.board, destination) \
-                        and not self.game.check_after_move(cur_piece.location, destination):
+                        and self.game.board.is_valid_move(cur_piece, destination):
                     candidates.append(cur_piece)
         elif move[0] == 'B':
             for cur_piece in pieces:
                 if isinstance(cur_piece, Bishop) \
-                        and cur_piece.is_valid_move(self.game.board, destination) \
-                        and not self.game.check_after_move(cur_piece.location, destination):
+                        and self.game.board.is_valid_move(cur_piece, destination):
                     candidates.append(cur_piece)
         else:
             for cur_piece in pieces:
                 if isinstance(cur_piece, Pawn) \
-                        and cur_piece.is_valid_move(self.game.board, destination) \
-                        and not self.game.check_after_move(cur_piece.location, destination):
+                        and self.game.board.is_valid_move(cur_piece, destination):
                     candidates.append(cur_piece)
         if len(candidates) == 0:
             return None, None

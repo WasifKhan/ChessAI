@@ -34,7 +34,7 @@ class Interface:
             loser = self.game.p1_name if self.game.white_turn else self.game.p2_name
             print('*' * 7 + f'{loser} resigned' + '*' * 6)
         print(('*'*30 + '\n') + ('*'*11 + 'GAME OVER' + '*'*10 + '\n') + ('*'*30))
-        self.game.game_over(1, 0) if loser==self.game.p2_name else self.game.game_over(0, 1)
+        self.game.game_over(1, 0) if winner else self.game.game_over(0, 1)
         self.play_again()
 
     def ai_move(self, is_white: bool) -> bool:

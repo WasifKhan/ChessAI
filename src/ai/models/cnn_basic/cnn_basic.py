@@ -16,7 +16,7 @@ class CnnBasic(BaseModel):
         from tensorflow.keras.optimizers import SGD
 
         board = Input(shape=(8, 8, 1))
-        layer_1 = Conv2D(16, (3, 3), activation='sigmoid', kernel_initializer='he_uniform')(board)
+        layer_1 = Conv2D(16, (4, 4), activation='sigmoid', kernel_initializer='he_uniform')(board)
         layer_2 = MaxPooling2D((2, 2))(layer_1)
         layer_3 = Flatten()(layer_2)
         output = Dense(142, activation='softmax')(layer_3)
@@ -29,9 +29,13 @@ class CnnBasic(BaseModel):
     def _train_model(self):
         from sklearn.model_selection import KFold
         from numpy import array
+        from time import time
+        start = time()
         dataX, dataY = list(), list()
-        for i, data in enumerate(self.datapoints(100)):
-            print(f'{i}% done downloading')
+        print(f'Begin downloading data.')
+        for i, data in enumerate(self.datapoints(5000)):
+            if i % 50 == 0:
+                print(f'{i//50}% downloading')
             board, move = data
             self.game.__init__()
             for i in range(len(board)):
@@ -40,11 +44,13 @@ class CnnBasic(BaseModel):
                 y = self._move_to_datapoint(self.game.board.move_ID)
                 dataX.append(x)
                 dataY.append(y)
+        print(f'Done downloading. Took {time()-start}s')
+        start = time()
         dataX, dataY = array(dataX), array(dataY)
         dataX = dataX.reshape((dataX.shape[0], 8, 8, 1))
         print(f'Begin learning over {dataX.shape[0]} datapoints')
         self.scores, self.histories = list(), list()
-        splits = 5
+        splits = 3
         kfold = KFold(splits, shuffle=True, random_state=1)
         for i, train_test in enumerate(kfold.split(dataX)):
             train_ix, test_ix = train_test
@@ -57,7 +63,7 @@ class CnnBasic(BaseModel):
             self.histories.append(history)
         self.scores.append(acc)
         self.histories.append(history)
-        print(f'Done learning')
+        print(f'Done learning. Took {time()-start}s')
         self.model.save(f'{self.location}/brain.h5')
 
     def _evaluate_model(self):

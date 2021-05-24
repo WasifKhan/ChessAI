@@ -11,7 +11,7 @@ class Square:
         self.value = 0
         Square.ID += 1
 
-    def __deepcopy__(self, memo):
+    def __copy__(self):
         if isinstance(self, Piece):
             return self.__class__(self.is_white, self.location)
         return Square(self.location)

@@ -30,17 +30,6 @@ class Game:
         self.p1_name = p1_name
         self.p2_name = p2_name
 
-    def check_after_move(self, source, destination):
-        temp_board = self.copy_board()
-        piece = temp_board[source]
-        temp_board.move(piece, destination)
-        return temp_board.check(piece.is_white)
-
-    def copy_board(self):
-        from copy import deepcopy
-        temp_board = deepcopy(self.board)
-        return temp_board
-
     def move(self, source, destination):
         piece = self.board[source]
         destination = (destination//10, destination%10)
@@ -48,8 +37,7 @@ class Game:
         if piece.is_white is not None \
                 and ((self.white_turn and piece.is_white) \
                     or (not(self.white_turn) and not(piece.is_white))) \
-                and piece.is_valid_move(self.board, destination) \
-                and not self.check_after_move(source, destination):
+                and self.board.is_valid_move(piece, destination):
             self.board.move(piece, destination)
             self.white_turn = not(self.white_turn)
             return True

@@ -1,20 +1,24 @@
 from .pieces.piece import Square, Piece
 from .pieces.rook import Rook
-from .pieces.knight import Knight
-from .pieces.bishop import Bishop
 from .pieces.queen import Queen
 from .pieces.king import King
 from .pieces.pawn import Pawn
 
 class Board:
     def __init__(self, pieces=None, history=None):
+        from copy import copy
         self.history = []
         if history:
-            self.history = history
+            for hist in history:
+                self.history.append((copy(hist[0]), *hist[1:]))
         self.white_pieces = set()
         self.black_pieces = set()
         self.game_over = False
-        self._initialize_board(pieces)
+        self.board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
+        if not pieces:
+            from .initial_pieces import PIECES as pieces
+        for piece in pieces:
+            self._add(copy(piece))
 
     def __str__(self):
         output = ''
@@ -23,6 +27,9 @@ class Board:
                 output += f' {str(self.board[column][row])} '
             output += '\n'
         return output[0:-1]
+
+    def __copy__(self):
+        return Board(self.white_pieces|self.black_pieces, self.history)
 
     def __getitem__(self, key):
         if isinstance(key, tuple):
@@ -42,10 +49,6 @@ class Board:
             self.board[x][y] = val
         else:
             raise IndexError
-
-    def __deepcopy__(self, memo):
-        from copy import deepcopy
-        return Board(deepcopy(self.white_pieces | self.black_pieces), deepcopy(self.history))
 
     def _add(self, piece):
         if piece.is_white:
@@ -69,6 +72,33 @@ class Board:
             if (king.location[0]*10 + king.location[1]) in piece.moves(self):
                 return True
         return False
+
+    def check_after_move(self, piece, destination):
+        if (captured_piece := self[destination]).is_white == piece.is_white:
+            return False
+        self[destination] = piece
+        self[piece.location] = Square(piece.location)
+        if captured_piece.is_white is not None:
+            self.black_pieces.remove(captured_piece) if piece.is_white \
+                    else self.white_pieces.remove(captured_piece)
+        if self.check(piece.is_white):
+            if captured_piece.is_white is not None:
+                self.black_pieces.add(captured_piece) if piece.is_white \
+                    else self.white_pieces.add(captured_piece)
+            self[piece.location] = piece
+            self[destination] = captured_piece
+            return True
+        if captured_piece.is_white is not None:
+            self.black_pieces.add(captured_piece) if piece.is_white \
+                    else self.white_pieces.add(captured_piece)
+        self[piece.location] = piece
+        self[destination] = captured_piece
+        return False
+
+    def is_valid_move(self, piece, destination):
+        if self.check_after_move(piece, destination):
+            return False
+        return piece.is_valid_move(self, destination)
 
     def move(self, piece, destination):
         self.history.append((piece, piece.location, destination, self.board_value()))
@@ -121,120 +151,8 @@ class Board:
                 new_queen = Queen(is_white=False, location= piece.location)
                 self.black_pieces.add(new_queen)
                 self[piece.location] = new_queen
-
-
         # Check if the move resulted in checkmate
         if (piece.is_white and self.black_king.checkmate(self)) \
                 or (not(piece.is_white) and self.white_king.checkmate(self)):
             self.game_over = True
-
-    def _initialize_board(self, pieces):
-        board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
-        if pieces:
-            from copy import deepcopy
-            self.board = deepcopy(board)
-            for piece in pieces:
-                self._add(piece)
-            return
-        white_rook_1 = Rook(is_white=True, location=(0,0))
-        white_rook_2 = Rook(is_white=True, location=(7,0))
-        white_knight_1 = Knight(is_white=True, location=(1,0))
-        white_knight_2 = Knight(is_white=True, location=(6,0))
-        white_bishop_1 = Bishop(is_white=True, location=(2,0))
-        white_bishop_2 = Bishop(is_white=True, location=(5,0))
-        white_queen = Queen(is_white=True, location=(3,0))
-        white_king = King(is_white=True, location=(4,0))
-        white_pawn_1 = Pawn(is_white=True, location=(0,1))
-        white_pawn_2 = Pawn(is_white=True, location=(1,1))
-        white_pawn_3 = Pawn(is_white=True, location=(2,1))
-        white_pawn_4 = Pawn(is_white=True, location=(3,1))
-        white_pawn_5 = Pawn(is_white=True, location=(4,1))
-        white_pawn_6 = Pawn(is_white=True, location=(5,1))
-        white_pawn_7 = Pawn(is_white=True, location=(6,1))
-        white_pawn_8 = Pawn(is_white=True, location=(7,1))
-        black_rook_1 = Rook(is_white=False, location=(0,7))
-        black_rook_2 = Rook(is_white=False, location=(7,7))
-        black_knight_1 = Knight(is_white=False, location=(1,7))
-        black_knight_2 = Knight(is_white=False, location=(6,7))
-        black_bishop_1 = Bishop(is_white=False, location=(2,7))
-        black_bishop_2 = Bishop(is_white=False, location=(5,7))
-        black_queen = Queen(is_white=False, location=(3,7))
-        black_king = King(is_white=False, location=(4,7))
-        black_pawn_1 = Pawn(is_white=False, location=(0,6))
-        black_pawn_2 = Pawn(is_white=False, location=(1,6))
-        black_pawn_3 = Pawn(is_white=False, location=(2,6))
-        black_pawn_4 = Pawn(is_white=False, location=(3,6))
-        black_pawn_5 = Pawn(is_white=False, location=(4,6))
-        black_pawn_6 = Pawn(is_white=False, location=(5,6))
-        black_pawn_7 = Pawn(is_white=False, location=(6,6))
-        black_pawn_8 = Pawn(is_white=False, location=(7,6))
-
-
-        board[0][0] = white_rook_1
-        self.white_pieces.add(white_rook_1)
-        board[1][0] = white_knight_1
-        self.white_pieces.add(white_knight_1)
-        board[2][0] = white_bishop_1
-        self.white_pieces.add(white_bishop_1)
-        board[3][0] = white_queen
-        self.white_pieces.add(white_queen)
-        board[4][0] = white_king
-        self.white_king = white_king
-        self.white_pieces.add(white_king)
-        board[5][0] = white_bishop_2
-        self.white_pieces.add(white_bishop_2)
-        board[6][0] = white_knight_2
-        self.white_pieces.add(white_knight_2)
-        board[7][0] = white_rook_2
-        self.white_pieces.add(white_rook_2)
-        board[0][1] = white_pawn_1
-        self.white_pieces.add(white_pawn_1)
-        board[1][1] = white_pawn_2
-        self.white_pieces.add(white_pawn_2)
-        board[2][1] = white_pawn_3
-        self.white_pieces.add(white_pawn_3)
-        board[3][1] = white_pawn_4
-        self.white_pieces.add(white_pawn_4)
-        board[4][1] = white_pawn_5
-        self.white_pieces.add(white_pawn_5)
-        board[5][1] = white_pawn_6
-        self.white_pieces.add(white_pawn_6)
-        board[6][1] = white_pawn_7
-        self.white_pieces.add(white_pawn_7)
-        board[7][1] = white_pawn_8
-        self.white_pieces.add(white_pawn_8)
-        board[0][6] = black_pawn_1
-        self.black_pieces.add(black_pawn_1)
-        board[1][6] = black_pawn_2
-        self.black_pieces.add(black_pawn_2)
-        board[2][6] = black_pawn_3
-        self.black_pieces.add(black_pawn_3)
-        board[3][6] = black_pawn_4
-        self.black_pieces.add(black_pawn_4)
-        board[4][6] = black_pawn_5
-        self.black_pieces.add(black_pawn_5)
-        board[5][6] = black_pawn_6
-        self.black_pieces.add(black_pawn_6)
-        board[6][6] = black_pawn_7
-        self.black_pieces.add(black_pawn_7)
-        board[7][6] = black_pawn_8
-        self.black_pieces.add(black_pawn_8)
-        board[0][7] = black_rook_1
-        self.black_pieces.add(black_rook_1)
-        board[1][7] = black_knight_1
-        self.black_pieces.add(black_knight_1)
-        board[2][7] = black_bishop_1
-        self.black_pieces.add(black_bishop_1)
-        board[3][7] = black_queen
-        self.black_pieces.add(black_queen)
-        board[4][7] = black_king
-        self.black_king = black_king
-        self.black_pieces.add(black_king)
-        board[5][7] = black_bishop_2
-        self.black_pieces.add(black_bishop_2)
-        board[6][7] = black_knight_2
-        self.black_pieces.add(black_knight_2)
-        board[7][7] = black_rook_2
-        self.black_pieces.add(black_rook_2)
-        self.board = board
 
