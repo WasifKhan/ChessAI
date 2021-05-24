@@ -41,7 +41,7 @@ class View:
         root = tk.Tk()
         self.root = root
         app = Window(root)
-        root.wm_title('Beth Harmon')
+        root.wm_title('Chess')
         root.geometry('640x470')
 
         for row in range(8):
@@ -66,7 +66,7 @@ class View:
         sim_games_button['command'] = lambda: self.simulate_games()
         sim_games_button.pack(side=tk.LEFT)
 
-        play_again_button = tk.Button(master=btm_frame, text='Play Again', fg='green')
+        play_again_button = tk.Button(master=btm_frame, text='Play Again', fg='orange')
         play_again_button['command'] = lambda: self.play_again()
         play_again_button.pack(side=tk.LEFT)
 

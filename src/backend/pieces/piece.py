@@ -16,6 +16,11 @@ class Square:
             return self.__class__(self.is_white, self.location)
         return Square(self.location)
 
+    def __eq__(self, other):
+        return self.value == other.value \
+                and self.ID == other.ID \
+                and self.location == other.location
+
     def __str__(self):
         return '.'
 

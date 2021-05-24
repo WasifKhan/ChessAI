@@ -2,12 +2,12 @@
 Initialization of pieces on board
 '''
 
-from .pieces.rook import Rook
-from .pieces.bishop import Bishop
-from .pieces.knight import Knight
-from .pieces.pawn import Pawn
-from .pieces.queen import Queen
-from .pieces.king import King
+from .rook import Rook
+from .bishop import Bishop
+from .knight import Knight
+from .pawn import Pawn
+from .queen import Queen
+from .king import King
 
 PIECES = \
 {
