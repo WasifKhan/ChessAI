@@ -11,9 +11,10 @@ Repository containing Chess Engine and ML Model
   - 3= possible threats(sum of attacking enemy)
   - 4= possible moves
   - 5=value of piece
-- try 9 architectures:
+- try 18 architectures:
   - {sparse, avg, dense} neurons per layer
-  - 1,2,3} hidden layers
+  - {1,2,3} hidden layers
+  - {sigmoid, relu} activations
 - graph various architecture performances
 - smart CNN= 3 networks:
   - 1- piece should move -binary

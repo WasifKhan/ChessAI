@@ -13,7 +13,7 @@ class DataExtractor(Parser):
     def __init__(self, game, location, download=False):
         super().__init__(game, location)
         self.download = download
-        # self._download_raw_data()
+        #self._download_raw_data()
 
 
     def datapoints(self, num_games):
