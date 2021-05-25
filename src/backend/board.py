@@ -138,10 +138,14 @@ class Board:
             return False
         self[destination] = piece
         self[piece.location] = Square(piece.location)
+        piece_location = piece.location
+        piece.location = destination
         if self._check(piece.is_white, captured_piece):
+            piece.location = piece_location
             self[piece.location] = piece
             self[destination] = captured_piece
             return True
+        piece.location = piece_location
         self[piece.location] = piece
         self[destination] = captured_piece
         return False

@@ -33,7 +33,7 @@ class CnnBasic(BaseModel):
         start = time()
         dataX, dataY = list(), list()
         print(f'Begin downloading data.')
-        for i, data in enumerate(self.datapoints(5000)):
+        for i, data in enumerate(self.datapoints(100)):
             if i % 50 == 0:
                 print(f'{i//50}% downloading')
             board, move = data

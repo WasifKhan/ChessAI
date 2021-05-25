@@ -58,12 +58,13 @@ class Parser(metaclass=ABCMeta):
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
         candidates = []
         for cur_piece in pieces:
-            if move[0] == 'K' and isinstance(cur_piece, King) \
-                    or move[0] == 'Q' and isinstance(cur_piece, Queen) \
-                    or move[0] == 'R' and isinstance(cur_piece, Rook) \
-                    or move[0] == 'N' and isinstance(cur_piece, Knight) \
-                    or move[0] == 'B' and isinstance(cur_piece, Bishop) \
-                    or move[0] == 'P' and isinstance(cur_piece, Pawn):
+            if self.game.board.is_valid_move(cur_piece, destination) \
+                    and ((move[0] == 'K' and isinstance(cur_piece, King)) \
+                    or (move[0] == 'Q' and isinstance(cur_piece, Queen)) \
+                    or (move[0] == 'R' and isinstance(cur_piece, Rook)) \
+                    or (move[0] == 'N' and isinstance(cur_piece, Knight)) \
+                    or (move[0] == 'B' and isinstance(cur_piece, Bishop)) \
+                    or (move[0] not in {'K', 'Q', 'R', 'N', 'B'} and isinstance(cur_piece, Pawn))):
                 candidates.append(cur_piece)
         if len(candidates) == 0:
             return None, None
@@ -72,8 +73,10 @@ class Parser(metaclass=ABCMeta):
         else:
             identifier = move[1] if 'x' not in move else move[0] if move[1] == 'x' else move[1]
             for candidate in candidates:
-                if candidate.location[0] == ord(identifier) - 97 \
-                        or candidate.location[1] == int(identifier) - 1:
+                if (ord(identifier) >= 97 \
+                        and candidate.location[0] == ord(identifier) - 97) \
+                        or (ord(identifier) < 97 \
+                        and candidate.location[1] == int(identifier) - 1):
                     piece = candidate
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 
@@ -89,6 +92,6 @@ class Parser(metaclass=ABCMeta):
                     datapoint = datapoint[0:-2] + ']\n'
                     return datapoint
                 datapoint += f"({source}, {destination}), "
-        datapoint = datapoint[0:-2] + ']'
+        datapoint = datapoint[0:-2] + ']\n'
         return datapoint
 

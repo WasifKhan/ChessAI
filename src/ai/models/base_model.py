@@ -6,12 +6,15 @@ from abc import ABCMeta
 
 
 
+DOWNLOAD_DATA = True
+
+
 class BaseModel(metaclass=ABCMeta):
     def __init__(self, game, location):
         from os import listdir
         from ai.data.data_extractor import DataExtractor
         self.location = location
-        self.datapoints = DataExtractor(game, location).datapoints
+        self.datapoints = DataExtractor(game, location, DOWNLOAD_DATA).datapoints
         self.game = game
         if 'brain.h5' in listdir(self.location):
             from tensorflow.keras.models import load_model
