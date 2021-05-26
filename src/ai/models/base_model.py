@@ -6,24 +6,25 @@ from abc import ABCMeta
 
 
 
-class AI(metaclass=ABCMeta):
-    def __init__(self, location):
-        self.location = location
+DOWNLOAD_DATA = True
+
+
+class BaseModel(metaclass=ABCMeta):
+    def __init__(self, game, location):
         from os import listdir
+        from ai.data.data_extractor import DataExtractor
+        self.location = location
+        self.datapoints = DataExtractor(game, location, DOWNLOAD_DATA).datapoints
+        self.game = game
         if 'brain.h5' in listdir(self.location):
             from tensorflow.keras.models import load_model
             self.model = load_model(self.location + '/brain.h5')
 
-    def train(self, game):
-        from ai.data.data_extractor import DataExtractor
-        self.data_extractor = DataExtractor(game)
-        from os import listdir
-        if 'brain.h5' in listdir(self.location):
-            from tensorflow.keras.models import load_model
-            self.model = load_model(self.location + '/brain.h5')
-        else:
+
+    def train(self):
+        if not hasattr(self, 'model'):
             self._build_model()
-        self._train_model(self.data_extractor.datapoints(self.location))
+        self._train_model()
         self._evaluate_model()
 
     def _resign(self, board, is_white):
@@ -36,7 +37,7 @@ class AI(metaclass=ABCMeta):
     def predict(self, board, is_white):
         if self._resign(board, is_white):
             return False
-        prediction = self.model.predict(self.data_extractor._board_to_datapoint(board, is_white))
-        move = self.data_extractor._prediction_to_move(prediction, board, is_white)
+        prediction = self.model.predict(self._board_to_datapoint(board, is_white))
+        move = self._prediction_to_move(prediction, board, is_white)
         return move
 

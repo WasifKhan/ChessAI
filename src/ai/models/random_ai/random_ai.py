@@ -2,16 +2,16 @@
 Baseline AI performing random moves
 '''
 
-from ai.models.base_ai import AI
+from ai.models.base_model import BaseModel
 from random import randint
 
 
 
-class RandomAI(AI):
-    def __init__(self, location):
-        super().__init__(location)
+class RandomAI(BaseModel):
+    def __init__(self, game, location):
+        super().__init__(game, location)
 
-    def train(self, game):
+    def train(self):
         return True
 
     def predict(self, board, is_white):

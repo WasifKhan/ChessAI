@@ -17,13 +17,12 @@ class Interface:
         return str(self.game)
 
     def versus_AI(self, difficulty) -> None:
-        self.ai = AI(difficulty)
+        self.ai = AI(self.game, difficulty)
         self.versus_ai = True
-        if not hasattr(self.ai.model, 'model'):
-            self.ai.train(self.game)
+        self.set_player_names(self.game.p1_name, 'Black AI')
 
     def train_AI(self):
-        self.ai.train(self.game)
+        self.ai.train()
 
     def set_player_names(self, p1_name: str, p2_name: str) -> None:
         self.game.set_names(p1_name, p2_name)
@@ -35,13 +34,21 @@ class Interface:
             loser = self.game.p1_name if self.game.white_turn else self.game.p2_name
             print('*' * 7 + f'{loser} resigned' + '*' * 6)
         print(('*'*30 + '\n') + ('*'*11 + 'GAME OVER' + '*'*10 + '\n') + ('*'*30))
-        self.game.game_over(1, 0) if loser==self.game.p2_name else self.game.game_over(0, 1)
+        self.game.game_over(1, 0) if winner else self.game.game_over(0, 1)
         self.play_again()
 
     def ai_move(self, is_white: bool) -> bool:
+        if (ai_move := self.ai.predict(self.game.board, is_white)):
+            print(f'Valid move: {ai_move}')
+            return self.add_move(ai_move[0], ai_move[1])
+        else:
+            print(f'AI move: {ai_move}')
+        return ai_move
+        '''
         return self.add_move(ai_move[0], ai_move[1]) \
                 if (ai_move := self.ai.predict(self.game.board, is_white)) \
                 else ai_move
+        '''
 
     def add_move(self, source: int, destination: int) -> bool:
         if self.game.move(source, destination):

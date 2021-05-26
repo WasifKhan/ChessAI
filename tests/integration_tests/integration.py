@@ -33,7 +33,8 @@ class IntegrationTest:
             destination_x, destination_y= ord(destination[0]) - 65, int(destination[1]) - 1
             # Execute the move
             piece = board.board[origin_x][origin_y]
-            if ((white_turn and piece.is_white) or (not(white_turn) and not(piece.is_white))) and piece.is_valid_move(board, (destination_x, destination_y)):
+            if ((white_turn and piece.is_white) or (not(white_turn) and not(piece.is_white))) \
+                    and board.is_valid_move(piece, (destination_x, destination_y)):
                 board.move(piece, (destination_x, destination_y))
                 white_turn = not(white_turn)
 

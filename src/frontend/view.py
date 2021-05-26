@@ -28,10 +28,9 @@ class View:
         The following code should be in buttons initiated by the user.
         Currently store here until calls are done
         '''
-        self.interface.versus_AI(1)
-        self.interface.set_player_names('Player 1', 'Black AI')
+        self.interface.set_player_names('Player 1', 'Player 2')
         scoreboard = self.interface.get_scoreboard()
-        score = self.interface.get_score('Player 1', 'Black AI')
+        score = self.interface.get_score('Player 1', 'Player 2')
         '''
         End of code that should be inside buttons.
         The code below belongs in init
@@ -42,7 +41,7 @@ class View:
         root = tk.Tk()
         self.root = root
         app = Window(root)
-        root.wm_title('Beth Harmon')
+        root.wm_title('Chess')
         root.geometry('640x470')
 
         for row in range(8):
@@ -67,7 +66,7 @@ class View:
         sim_games_button['command'] = lambda: self.simulate_games()
         sim_games_button.pack(side=tk.LEFT)
 
-        play_again_button = tk.Button(master=btm_frame, text='Play Again', fg='green')
+        play_again_button = tk.Button(master=btm_frame, text='Play Again', fg='orange')
         play_again_button['command'] = lambda: self.play_again()
         play_again_button.pack(side=tk.LEFT)
 
@@ -75,6 +74,13 @@ class View:
         train_ai_button['command'] = lambda: self.train_AI()
         train_ai_button.pack(side=tk.LEFT)
 
+        versus_random_ai_button = tk.Button(master=btm_frame, text='Load Easy AI', fg='green')
+        versus_random_ai_button['command'] = lambda: self.versus_random_AI()
+        versus_random_ai_button.pack(side=tk.LEFT)
+
+        versus_current_ai_button = tk.Button(master=btm_frame, text='Load Hard AI', fg='green')
+        versus_current_ai_button['command'] = lambda: self.versus_current_AI()
+        versus_current_ai_button.pack(side=tk.LEFT)
 
         root.mainloop()
 
@@ -101,8 +107,13 @@ class View:
         else:
             self.current_click = self.squares[piece]
 
-    def versus_AI(self, difficulty):
-        self.interface.versus_AI(difficulty)
+    def versus_random_AI(self):
+        self.interface.versus_AI(0)
+        print('\nDone Loading\nClick Play Again.\n')
+
+    def versus_current_AI(self):
+        self.interface.versus_AI(1)
+        print('\nDone Loading\nClick Play Again.\n')
 
     def action(self, piece):
         self.interface.add_action(self.squares[piece])

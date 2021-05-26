@@ -4,22 +4,29 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- clean backend/random AI no errors
-  - Something wrong w/ pawn movement!
-  - only-need-`piece.is_white is not self.is_white:`-in-pawn-apture-sine-board-returns-none-on-negatiev-indicies.-also-dont-need-to-divide into 3 separatecases
-  - i thnk true error is enpassant...move it above the board update
-- board input is wrong...need to distinguish bishop and knight... simply numbers are no good
-- clean `parser`
+- change input to be:
+  - 5 neurons per piece(5 8x8 layers)
+  - 1= under attack (sum of enemy atks
+  - 2= possible defends(sum of defends)
+  - 3= possible threats(sum of attacking enemy)
+  - 4= possible moves
+  - 5=value of piece
+- try 18 architectures:
+  - {sparse, avg, dense} neurons per layer
+  - {1,2,3} hidden layers
+  - {sigmoid, relu} activations
+- graph various architecture performances
+- smart CNN= 3 networks:
+  - 1- piece should move -binary
+  - 2- piece best move - categorical
+  - 3- pieces vote best move - categorical
 - #### MILESTONE 1.5 base smart AI done
-- Set up cnn/RNN/RNN,CNN/Greedy/Greedy+exploit
+- Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
 - Set up qlearning (links game to models>)
 - Train/Test
 - IReinfLearn to learn reward
 #### MILESTONE 2: **Smart AI done**
-- Write monitoring scripts
-- Try other networks
-- Tweak qlearning rewards
 
 ### **Ali**
 - unit tests for board and game
@@ -28,18 +35,16 @@ Repository containing Chess Engine and ML Model
 - write 2 system tests
 - implement scoreboard + visualization
   - db contains `players`=(ID,name) and `scores`=(ID,ID, score)
-- type documentation
+- type documentation + doc strings
 - optimizations
   - change coordinate system to 2-digit int
   - remove `if x.is_white: ... else: ...` by inverting board at start/end of code
-
+- write AI - X-d,All-b=2s thinking time
 #### MILESTONE 1: **Done backend**
 - Start frontend
 - Write Controller to interact Model and View
 - Write Buttons for View
 #### MILESTONE 2: **Frontend done**
-- Optimize backend
-- User-friendly Frontend
 
 ### **Zuraze**
 - Lose to AI
