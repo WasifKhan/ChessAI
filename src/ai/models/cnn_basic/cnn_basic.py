@@ -12,22 +12,22 @@ class CnnBasic(BaseModel):
 
     def _build_model(self):
         from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
+        from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D
         from tensorflow.keras.optimizers import SGD
 
         inputs = Input(shape=(64, 6))
-        pieces = []
+        x = []
         for row in range(64):
-            piece = Lambda(lambda x: x[row:row+1, 0:6], output_shape=((6,)))(inputs)
-            piece = Dense(1, activation='sigmoid')(piece)
-            pieces.append(piece)
-        pieces = Concatenate()(pieces)
-        pieces = Reshape((8,8,6))(pieces)
-        x = Conv2D(20, (3, 3), activation='relu', input_shape=(8,8,6),
-                kernel_initializer='he_uniform')(pieces)
+            piece = Lambda(lambda x: x[row:row+1, 0:6])(inputs)
+            piece = Conv1D(1, 6, activation='relu')(piece)
+            x.append(piece)
+        x = Concatenate()(x)
+        x = Reshape((8,8,1))(x)
+        x = Conv2D(32, (4, 4), activation='relu')(x)
+        x = MaxPooling2D()(x)
         x = Flatten()(x)
-        x = Dense(300, activation='sigmoid')(x)
+        x = Dense(300, activation='relu')(x)
         outputs = Dense(142, activation='softmax')(x)
         opt = SGD(lr=0.05, momentum=0.9)
         model = Model(inputs, outputs)
@@ -42,7 +42,7 @@ class CnnBasic(BaseModel):
         start = time()
         x_data, y_data = list(), list()
         print(f'Begin downloading data.')
-        for i, data in enumerate(self.datapoints(40)):
+        for i, data in enumerate(self.datapoints(30)):
             if i % 20 == 0:
                 print(f'{i//20}% downloading')
             board, move = data
@@ -59,9 +59,9 @@ class CnnBasic(BaseModel):
         x_data = x_data.reshape((x_data.shape[0], 64, 6))
         x_train, x_test, y_train, y_test = \
                 train_test_split(x_data, y_data, test_size = 0.2)
-        print(f'Begin learning over {x_data.shape[0]} datapoints')
-        self.performance = self.model.fit(x_train, y_train, epochs=10,
-                batch_size=4, validation_data=(x_test, y_test), verbose=0)
+        print(f'Begin learning over {x_train.shape[0]} datapoints')
+        self.performance = self.model.fit(x_train, y_train, epochs=5,
+                batch_size=32, validation_data=(x_test, y_test), verbose=0)
         print(f'Done learning. Took {str(time()-start)[0:5]}s')
         self.model.save(f'{self.location}/brain.h5')
 
