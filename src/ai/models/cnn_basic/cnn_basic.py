@@ -1,4 +1,4 @@
-'''o
+'''
 AI Implemented Using A Basic Convolutional Neural Network
 '''
 
@@ -12,14 +12,23 @@ class CnnBasic(BaseModel):
 
     def _build_model(self):
         from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Dense, Flatten
+        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
+            Concatenate, Lambda, Reshape, MaxPooling2D
         from tensorflow.keras.optimizers import SGD
 
-        inputs = Input(shape=(8, 8, 6))
-        layer_1 = Conv2D(16, (3, 3), activation='relu', input_shape=(8,8,6), kernel_initializer='he_uniform')(inputs)
-        layer_2 = MaxPooling2D((2, 2))(layer_1)
-        layer_3 = Flatten()(layer_2)
-        outputs = Dense(142, activation='softmax')(layer_3)
+        inputs = Input(shape=(64, 6))
+        pieces = []
+        for row in range(64):
+            piece = Lambda(lambda x: x[row:row+1, 0:6], output_shape=((6,)))(inputs)
+            piece = Dense(1, activation='sigmoid')(piece)
+            pieces.append(piece)
+        pieces = Concatenate()(pieces)
+        pieces = Reshape((8,8,6))(pieces)
+        x = Conv2D(20, (3, 3), activation='relu', input_shape=(8,8,6),
+                kernel_initializer='he_uniform')(pieces)
+        x = Flatten()(x)
+        x = Dense(300, activation='sigmoid')(x)
+        outputs = Dense(142, activation='softmax')(x)
         opt = SGD(lr=0.05, momentum=0.9)
         model = Model(inputs, outputs)
         model.compile(optimizer=opt, loss='categorical_crossentropy',
@@ -33,7 +42,7 @@ class CnnBasic(BaseModel):
         start = time()
         x_data, y_data = list(), list()
         print(f'Begin downloading data.')
-        for i, data in enumerate(self.datapoints(2000)):
+        for i, data in enumerate(self.datapoints(40)):
             if i % 20 == 0:
                 print(f'{i//20}% downloading')
             board, move = data
@@ -47,12 +56,12 @@ class CnnBasic(BaseModel):
         print(f'Done downloading. Took {time()-start}s')
         start = time()
         x_data, y_data = array(x_data), array(y_data)
-        x_data = x_data.reshape((x_data.shape[0], 8, 8, 6))
+        x_data = x_data.reshape((x_data.shape[0], 64, 6))
         x_train, x_test, y_train, y_test = \
                 train_test_split(x_data, y_data, test_size = 0.2)
         print(f'Begin learning over {x_data.shape[0]} datapoints')
         self.performance = self.model.fit(x_train, y_train, epochs=10,
-                batch_size=32, validation_data=(x_test, y_test), verbose=0)
+                batch_size=4, validation_data=(x_test, y_test), verbose=0)
         print(f'Done learning. Took {str(time()-start)[0:5]}s')
         self.model.save(f'{self.location}/brain.h5')
 
@@ -83,7 +92,7 @@ class CnnBasic(BaseModel):
                             piece.threatens, piece.num_moves])
             datapoint.append(cur_row)
         datapoint = array(datapoint)
-        datapoint = datapoint.reshape(1, 8, 8, 6)
+        datapoint = datapoint.reshape(1, 64, 6)
         return datapoint
 
     def _move_to_datapoint(self, move):
@@ -96,6 +105,7 @@ class CnnBasic(BaseModel):
 
     def _prediction_to_move(self, prediction, board, is_white):
         from ai.data.moves import MOVES
+        print(prediction)
         for i, val in enumerate(prediction[0]):
             if val == max(prediction[0]):
                 prediction = i
