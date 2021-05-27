@@ -4,13 +4,6 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- change input to be:
-  - 5 neurons per piece(5 8x8 layers)
-  - 1= under attack (sum of enemy atks
-  - 2= possible defends(sum of defends)
-  - 3= possible threats(sum of attacking enemy)
-  - 4= possible moves
-  - 5=value of piece
 - try 18 architectures:
   - {sparse, avg, dense} neurons per layer
   - {1,2,3} hidden layers
