@@ -1,12 +1,17 @@
 '''
-AI Implemented Using A Basic Convolutional Neural Network
+AI Implemented Using Several Convolutional Neural Networks
+
+models['should_move'] = list(queen_should_move, bishop_one_should_move, etc...) : x=board,y=move {0,1}
+models['get_move'] = list(queen_get_move, bishop_one_get_move, etc...) : x=board, y=move ->{0,#moves}
+models['vote_best_move'] = list(queen_vote, bishop_vote, etc...) : { {0,#moves} } -> move
+
 '''
 
 from ai.models.base_model import BaseModel
 
 
 
-class CnnBasic(BaseModel):
+class AdvancedCnn(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 
@@ -16,16 +21,38 @@ class CnnBasic(BaseModel):
             Concatenate, Lambda, Reshape, MaxPooling2D
         from tensorflow.keras.optimizers import SGD
 
-        inputs = Input(shape=(8, 8, 6))
-        x = Conv2D(32, (4, 4), activation='sigmoid')(inputs)
-        x = Conv2D(16, (2, 2), activation='sigmoid')(x)
-        x = Flatten()(x)
-        x = Dense(200, activation='sigmoid')(x)
-        outputs = Dense(142, activation='softmax')(x)
-        opt = SGD(lr=0.05, momentum=0.9)
-        model = Model(inputs, outputs)
-        model.compile(optimizer=opt, loss='categorical_crossentropy',
-                metrics=['categorical_accuracy'])
+
+        self.game.__init__()
+        self.models = dict()
+        self.models['should_move'] = dict()
+        self.models['get_move'] = dict()
+        pieces = self.game.board.white_pieces
+        for piece in pieces:
+            inputs = Input(shape=(8, 8, 1))
+            x = Conv2D(16, (4, 4), activation='relu')(inputs)
+            x = Conv2D(8, (2, 2), activation='relu')(x)
+            x = Flatten()(x)
+            x = Dense(20, activation='sigmoid')(x)
+            outputs = Dense(1, activation='softmax')(x)
+            opt = SGD(lr=0.05, momentum=0.9)
+            model = Model(inputs, outputs)
+            model.compile(optimizer=opt, loss='binary_crossentropy',
+                            metrics=['binary_accuracy'])
+            self.models['should_move'][str(piece) + str(piece.ID)] = model
+
+            inputs = Input(shape=(8, 8, 1))
+            x = Conv2D(32, (4, 4), activation='relu')(inputs)
+            x = Conv2D(16, (2, 2), activation='relu')(x)
+            x = Flatten()(x)
+            x = Dense(20, activation='sigmoid')(x)
+            outputs = Dense(len(piece.move_IDs), activation='softmax')(x)
+            opt = SGD(lr=0.05, momentum=0.9)
+            model = Model(inputs, outputs)
+            model.compile(optimizer=opt, loss='binary_crossentropy',
+                            metrics=['binary_accuracy'])
+            self.models['get_move'][str(piece) + str(piece.ID)] = model
+
+        inputs = Input(shape=(16,))
         self.model = model
 
     def _train_model(self):
