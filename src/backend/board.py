@@ -119,7 +119,7 @@ class Board:
 
 
     def move(self, piece, destination):
-        self.history.append((piece, piece.location, destination, self.board_value()))
+        self.history.append((piece, piece.location, destination, self.value()))
         self._castle(piece, destination)
         self._enpassant(piece, destination)
         self._move_piece(piece, destination)
