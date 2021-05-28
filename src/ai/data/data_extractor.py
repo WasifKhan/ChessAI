@@ -37,7 +37,7 @@ class DataExtractor(Parser):
         from time import time
         num_games = 0
         start = None
-        for ID in range(10):
+        for ID in range(1,3):
             for cur_ID in range(100):
                 try:
                     lines = BZ2File(urlopen(FILES[ID]), 'r')

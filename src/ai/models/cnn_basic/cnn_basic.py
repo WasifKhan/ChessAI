@@ -16,23 +16,16 @@ class CnnBasic(BaseModel):
             Concatenate, Lambda, Reshape, MaxPooling2D
         from tensorflow.keras.optimizers import SGD
 
-        inputs = Input(shape=(64, 6))
-        x = []
-        for row in range(64):
-            piece = Lambda(lambda x: x[row:row+1, 0:6])(inputs)
-            piece = Conv1D(1, 6, activation='relu')(piece)
-            x.append(piece)
-        x = Concatenate()(x)
-        x = Reshape((8,8,1))(x)
-        x = Conv2D(32, (4, 4), activation='relu')(x)
-        x = MaxPooling2D()(x)
+        inputs = Input(shape=(8, 8, 6))
+        x = Conv2D(32, (4, 4), activation='sigmoid')(inputs)
+        x = Conv2D(16, (2, 2), activation='sigmoid')(x)
         x = Flatten()(x)
-        x = Dense(300, activation='relu')(x)
+        x = Dense(200, activation='sigmoid')(x)
         outputs = Dense(142, activation='softmax')(x)
         opt = SGD(lr=0.05, momentum=0.9)
         model = Model(inputs, outputs)
         model.compile(optimizer=opt, loss='categorical_crossentropy',
-                metrics=['accuracy'])
+                metrics=['categorical_accuracy'])
         self.model = model
 
     def _train_model(self):
@@ -40,11 +33,12 @@ class CnnBasic(BaseModel):
         from numpy import array
         from time import time
         start = time()
+        num_datapoints = 100
         x_data, y_data = list(), list()
         print(f'Begin downloading data.')
-        for i, data in enumerate(self.datapoints(30)):
-            if i % 20 == 0:
-                print(f'{i//20}% downloading')
+        for i, data in enumerate(self.datapoints(num_datapoints)):
+            if i % (num_datapoints//100) == 0:
+                print(f'{i//(num_datapoints//100)}% downloading')
             board, move = data
             self.game.__init__()
             for i in range(len(board)):
@@ -56,12 +50,9 @@ class CnnBasic(BaseModel):
         print(f'Done downloading. Took {time()-start}s')
         start = time()
         x_data, y_data = array(x_data), array(y_data)
-        x_data = x_data.reshape((x_data.shape[0], 64, 6))
-        x_train, x_test, y_train, y_test = \
-                train_test_split(x_data, y_data, test_size = 0.2)
+        x_data = x_data.reshape((x_data.shape[0], 8, 8, 6))
         print(f'Begin learning over {x_train.shape[0]} datapoints')
-        self.performance = self.model.fit(x_train, y_train, epochs=5,
-                batch_size=32, validation_data=(x_test, y_test), verbose=0)
+        self.performance = self.model.fit(x_data, y_data, epochs=100, batch_size=32, validation_split=0.2)
         print(f'Done learning. Took {str(time()-start)[0:5]}s')
         self.model.save(f'{self.location}/brain.h5')
 
@@ -70,9 +61,12 @@ class CnnBasic(BaseModel):
         from matplotlib import pyplot
         from numpy import mean, std
         fig, axs = pyplot.subplots()
-        axs.set_title('Cross Entropy Loss')
-        axs.plot(self.performance.history['loss'], color='blue', label='train')
-        axs.plot(self.performance.history['val_loss'], color='orange', label='test')
+        axs.set_title('Prediction Accuracy')
+        axs.xlabel('Epoch')
+        axs.ylabel('Accuracy')
+        axs.plot(self.performance.history['categorical_accuracy'], color='blue', label='train')
+        axs.plot(self.performance.history['val_categorical_accuracy'], color='orange', label='test')
+        pyplot.legend()
         pyplot.show()
 
 
@@ -92,7 +86,7 @@ class CnnBasic(BaseModel):
                             piece.threatens, piece.num_moves])
             datapoint.append(cur_row)
         datapoint = array(datapoint)
-        datapoint = datapoint.reshape(1, 64, 6)
+        datapoint = datapoint.reshape(1, 8, 8, 6)
         return datapoint
 
     def _move_to_datapoint(self, move):
@@ -105,7 +99,6 @@ class CnnBasic(BaseModel):
 
     def _prediction_to_move(self, prediction, board, is_white):
         from ai.data.moves import MOVES
-        print(prediction)
         for i, val in enumerate(prediction[0]):
             if val == max(prediction[0]):
                 prediction = i
