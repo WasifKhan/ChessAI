@@ -127,7 +127,7 @@ class Board:
         self._checkmate(piece, destination)
 
 
-    def board_value(self):
+    def value(self):
         white_value = sum([piece.value for piece in self.white_pieces])
         black_value = sum([piece.value for piece in self.black_pieces])
         return white_value - black_value
