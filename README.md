@@ -13,6 +13,7 @@ Repository containing Chess Engine and ML Model
   - 1- piece should move -binary
   - 2- piece best move - categorical
   - 3- pieces vote best move - categorical
+  - custom loss and activation functions for final layer/network
 - #### MILESTONE 1.5 base smart AI done
 - Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
