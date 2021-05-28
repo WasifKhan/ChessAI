@@ -65,9 +65,13 @@ class Interface:
         white_wins, black_wins = 0,0
         for i in range(num_games):
             self.game = Game('White AI', 'Black AI')
+            white_ai = AI(self.game, 0)
+            black_ai = AI(self.game, 4)
+            AIs = [white_ai, black_ai]
             white_turn = True
             while not self.game.is_game_over():
-                if not(move := self.ai_move(white_turn)):
+                move = AIs[int(not white_turn)].predict(self.game.board, white_turn)
+                if not move or not self.add_move(*move):
                     break
                 white_turn = not(white_turn)
             if not(self.game.white_turn):
