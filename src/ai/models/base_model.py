@@ -39,5 +39,6 @@ class BaseModel(metaclass=ABCMeta):
             return False
         prediction = self.model.predict(self._board_to_datapoint(board, is_white))
         move = self._prediction_to_move(prediction, board, is_white)
+        print(f'move is {move}')
         return move
 
