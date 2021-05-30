@@ -4,6 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
+- change lambda functions into just dense
 - debug training then make predictions
 - try 18 architectures:
   - {sparse, avg, dense} neurons per layer
