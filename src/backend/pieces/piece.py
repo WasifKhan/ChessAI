@@ -4,17 +4,16 @@ from abc import abstractmethod
 
 class Square:
     ID = 1
-    def __init__(self, location):
+    def __init__(self, location, ID=None):
         self.location = location
-        self.ID = Square.ID
+        self.ID = ID if ID else Square.ID
         self.is_white = None
         self.value = 0
-        Square.ID += 1
 
     def __copy__(self):
         if isinstance(self, Piece):
-            return self.__class__(self.is_white, self.location)
-        return Square(self.location)
+            return self.__class__(self.ID, self.is_white, self.location)
+        return Square(self.location, self.ID)
 
     def __eq__(self, other):
         return self.value == other.value \

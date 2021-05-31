@@ -5,12 +5,10 @@ from .pawn import Pawn
 from .rook import Rook
 
 class King(Piece):
-    ID = 1
-    def __init__(self, is_white, location):
+    def __init__(self, ID, is_white, location):
         super().__init__(is_white, location)
-        self.ID = King.ID
+        self.ID = ID
         self.value = 100
-        King.ID = 1
 
     def __str__(self):
         return 'K' if self.is_white else 'k'

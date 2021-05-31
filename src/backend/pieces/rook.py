@@ -2,12 +2,10 @@ from .piece import Piece
 
 
 class Rook(Piece):
-    ID = 1
-    def __init__(self, is_white, location):
+    def __init__(self, ID, is_white, location):
         super().__init__(is_white, location)
-        self.ID = Rook.ID
+        self.ID = ID
         self.value = 5
-        Rook.ID = 1 if Rook.ID == 2 else 2
 
     def __str__(self):
         return 'R' if self.is_white else 'r'

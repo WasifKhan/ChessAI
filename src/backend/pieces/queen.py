@@ -2,12 +2,10 @@ from .piece import Piece
 
 
 class Queen(Piece):
-    ID = 1
-    def __init__(self, is_white, location):
+    def __init__(self, ID, is_white, location):
         super().__init__(is_white, location)
-        self.ID = Queen.ID
+        self.ID = ID
         self.value = 9
-        Queen.ID += 1
 
     def __str__(self):
         return 'Q' if self.is_white else 'q'

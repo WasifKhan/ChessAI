@@ -21,6 +21,8 @@ class AdvancedCnn(BaseModel):
         self.models['get_move'] = dict()
         pieces = self.game.board.white_pieces
         for piece in pieces:
+            location = str(piece).upper() + str(piece.ID) \
+                    if not piece.value == 9 else str(piece).upper() + str(1)
             inputs = Input(shape=(8, 8, 6))
             x = Conv2D(16, (4, 4), activation='relu')(inputs)
             x = Conv2D(8, (2, 2), activation='relu')(x)
@@ -31,8 +33,7 @@ class AdvancedCnn(BaseModel):
             model = Model(inputs, outputs)
             model.compile(optimizer=opt, loss='binary_crossentropy',
                             metrics=['binary_accuracy'])
-            self.models['should_move'][str(piece).upper() + str(piece.ID)] = \
-                    [model, None, None]
+            self.models['should_move'][location] = [model, list(), list()]
 
             inputs = Input(shape=(8, 8, 6))
             x = Conv2D(32, (4, 4), activation='relu')(inputs)
@@ -44,25 +45,19 @@ class AdvancedCnn(BaseModel):
             model = Model(inputs, outputs)
             model.compile(optimizer=opt, loss='categorical_crossentropy',
                             metrics=['categorical_accuracy'])
-            self.models['get_move'][str(piece).upper() + str(piece.ID)] = \
-                    [model, list(), list()]
-        pieces = []
+            self.models['get_move'][location] = [model, list(), list()]
         inputs1 = Input(shape=(16,6))
-        inputs2 = Input(shape(16,1))
-        for i in range(16):
-            x1 = Lambda(lambda x: x[i:i+1, :], output_shape=(6,))(inputs1)
-            x1 = Dense(1, activation='relu')(x1)
-            x2 = Lambda(lambda x: x[i:i+1], output_shape=(1,))(inputs2)
-            x = Concatenate(x1, x2)
-            pieces.append(x)
-        x = Concatenate(pieces)
-        x = Dense(30, activation='sigmoid')(x)
+        inputs2 = Input(shape=(16,1))
+        x = Dense(1, activation='relu')(inputs1)
+        x = Concatenate()([x, inputs2])
+        x = Dense(1, activation='sigmoid')(x)
+        x = Flatten()(x)
+        x = Dense(32, activation='sigmoid')(x)
         outputs = Dense(16, activation='softmax')(x)
         model = Model(inputs=[inputs1, inputs2], outputs=outputs)
         model.compile(optimizer=opt, loss='categorical_crossentropy',
                         metrics=['categorical_accuracy'])
-
-        self.models['vote_best_move'] = [model, list(list(), list()), list()]
+        self.models['vote_best_move'] = [model, list([list(), list()]), list()]
 
 
     def _train_model(self):
@@ -81,16 +76,17 @@ class AdvancedCnn(BaseModel):
                 my_pieces = boards[i].white_pieces if self.game.white_turn \
                         else boards[i].black_pieces
                 piece = boards[i][moves[i][0]]
+                ID = piece.ID if not piece.value == 9 else 1
                 x = self._board_to_datapoint(boards[i], self.game.white_turn)
                 self.game.move(*moves[i])
+                y = self._move_to_datapoint(self.game.board.move_ID, piece)
                 for key in self.models['should_move']:
                     self.models['should_move'][key][1].append(x)
                     self.models['should_move'][key][2].append(1) \
-                        if key == str(piece) + str(piece.ID) \
+                        if key == str(piece).upper() + str(ID) \
                         else self.models['should_move'][key][2].append(0)
-                y = self._move_to_datapoint(self.game.board.move_ID, piece)
-                self.models['get_move'][str(piece).upper() + str(piece.ID)][1].append(x)
-                self.models['get_move'][str(piece).upper() + str(piece.ID)][2].append(y)
+                self.models['get_move'][str(piece).upper() + str(ID)][1].append(x)
+                self.models['get_move'][str(piece).upper() + str(ID)][2].append(y)
         for key in self.models['should_move']:
             x_data = self.models['should_move'][key][1]
             y_data = self.models['should_move'][key][2]
@@ -112,16 +108,16 @@ class AdvancedCnn(BaseModel):
         self.performances = dict()
         self.performances['should_move'] = dict()
         self.performances['get_move'] = dict()
-        print(f'Begin learning over {x_train.shape[0]} datapoints')
+        print(f'Begin learning over {self.models["should_move"][key][1].shape[0]*2} datapoints')
         for key in self.models['should_move']:
             model = self.models['should_move'][key]
             performance = model[0].fit(model[1], model[2],
-                    epochs=100, batch_size=32, validation_split=0.2)
+                    epochs=5, batch_size=32, validation_split=0.2, verbose=0)
             self.performances['should_move'][key] = performance
         for key in self.models['get_move']:
-            model = self.models['get_move']
+            model = self.models['get_move'][key]
             performance = model[0].fit(model[1], model[2],
-                    epochs=100, batch_size=32, validation_split=0.2)
+                    epochs=20, batch_size=32, validation_split=0.2, verbose=0)
             self.performances['get_move'][key] = performance
 
         piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
@@ -143,27 +139,35 @@ class AdvancedCnn(BaseModel):
                 for piece in my_pieces:
                     model = self.models['should_move'][str(piece).upper() + str(piece.ID)][0]
                     prediction = model.predict(x)
-                    if round(prediction) == 1:
+                    if round(prediction[0][0]) == 1:
                         model = self.models['get_move'][str(piece).upper() + str(piece.ID)][0]
                         prediction = model.predict(x)
                         for i, val in enumerate(prediction[0]):
                             if val == max(prediction[0]):
-                                datapoint[piece_map[str(piece).upper()] +
-                                        str(piece.ID) - 1] = i
+                                datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = i
                                 break
                 datapoint = array(datapoint)
-                x = self._pieces_to_datapoint(my_pieces, self.game.white_turn)
-                y = self._pieces_to_datapoint({piece})
+                x, y = self._pieces_to_datapoint(piece,
+                        my_pieces, self.game.white_turn, boards[i])
                 self.models['vote_best_move'][1][0].append(x)
                 self.models['vote_best_move'][1][1].append(datapoint)
                 self.models['vote_best_move'][2].append(y)
+        x_data_1 = self.models['vote_best_move'][1][0]
+        x_data_2 = self.models['vote_best_move'][1][1]
+        y_data = self.models['vote_best_move'][2]
+        x_data_1, x_data_2, y_data = array(x_data_1), array(x_data_2), array(y_data)
+        x_data_1 = x_data_1.reshape((x_data_1.shape[0], 16, 6))
+        self.models['vote_best_move'][1][0] = x_data_1
+        self.models['vote_best_move'][1][1] = x_data_2
+        self.models['vote_best_move'][2] = y_data
 
         print(f'Main Network: Done downloading. Took {time()-start}s')
 
-        print(f'Main Network: Begin learning over {x_train.shape[0]} datapoints')
-        model = self.models['vote_best_move'][0]
+        print(f'Main Network: Begin learning over\
+        {self.models["vote_best_move"][2].shape[0]} datapoints')
+        model = self.models['vote_best_move']
         performance = model[0].fit([model[1][0], model[1][1]], model[2],
-                epochs=100, batch_size=32, validation_split=0.2)
+                epochs=10, batch_size=32, validation_split=0.2, verbose=0)
         self.performances['vote_best_move'] = performance
 
         print(f'Main Network: Done learning. Took {str(time()-start)[0:5]}s')
@@ -186,9 +190,11 @@ class AdvancedCnn(BaseModel):
                 performance = next(it)
                 model = self.performances['should_move'][performance]
                 axs[i, j].set_title(f'{performance}')
-                axs[i, j].plot(model.history['binary_accuracy'], color='blue', label'train')
-                axs[i, j].plot(model.history['val_binary_accuracy'], color='blue', label'train')
-	for ax in axs.flat:
+                axs[i, j].plot(model.history['binary_accuracy'],
+                        color='blue', label='train')
+                axs[i, j].plot(model.history['val_binary_accuracy'],
+                        color='orange', label='test')
+        for ax in axs.flat:
             ax.set(xlabel='Epoch', ylabel='Accuracy')
         for ax in axs.flat:
             ax.label_outer()
@@ -202,9 +208,11 @@ class AdvancedCnn(BaseModel):
                 performance = next(it)
                 model = self.performances['get_move'][performance]
                 axs[i, j].set_title(f'{performance}')
-                axs[i, j].plot(model.history['categorical_accuracy'], color='blue', label'train')
-                axs[i, j].plot(model.history['val_categorical_accuracy'], color='blue', label'train')
-	for ax in axs.flat:
+                axs[i, j].plot(model.history['categorical_accuracy'],
+                        color='blue', label='train')
+                axs[i, j].plot(model.history['val_categorical_accuracy'],
+                        color='orange', label='test')
+        for ax in axs.flat:
             ax.set(xlabel='Epoch', ylabel='Accuracy')
         for ax in axs.flat:
             ax.label_outer()
@@ -212,25 +220,26 @@ class AdvancedCnn(BaseModel):
         pyplot.show()
         fig, axs = pyplot.subplots()
         axs.set_title('Main Network')
-        axs.xlabel('Epoch')
-        axs.ylabel('Accuracy')
-        axs.plot(self.performances['vote_best_move'][0].history['categorical_accuracy'], color='blue', label='train')
-        axs.plot(self.performances['vote_best_move'][0].history['val_categorical_accuracy'], color='orange', label='test')
+        pyplot.xlabel('Epoch')
+        pyplot.ylabel('Accuracy')
+        axs.plot(self.performances['vote_best_move'].history['categorical_accuracy'],
+                color='blue', label='train')
+        axs.plot(self.performances['vote_best_move'].history['val_categorical_accuracy'],
+                color='orange', label='test')
         pyplot.legend()
         pyplot.show()
 
-    def _pieces_to_datapoint(self, pieces):
+    def _pieces_to_datapoint(self, piece, pieces, is_white, board):
         from numpy import array
         piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
-        datapoint = [0]*16
-        if len(pieces) == 1:
-            piece = next(iter(pieces))
-            datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = 1
-            datapoint = array(datapoint)
-            return datapoint
+        piece_datapoint = [0]*16
+        piece_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = 1
+        piece_datapoint = array(piece_datapoint)
+
+        board_datapoint = [0]*16
         for i in range(16):
-            datapoint[i] = [0]*6
-            datapoint[i] = array(datapoint[i])
+            board_datapoint[i] = [0]*6
+            board_datapoint[i] = array(board_datapoint[i])
         for piece in pieces:
             piece.compute_info(board)
             ID = piece.ID if piece.is_white is not None else 0
@@ -238,10 +247,10 @@ class AdvancedCnn(BaseModel):
                     else piece.value * -1
             piece_info = [ID, value, piece.defends, piece.threats, piece.threatens, piece.num_moves]
             piece_info = array(piece_info)
-            datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
-        datapoint = array(datapoint)
-        datapoint.reshape((1, 16, 6))
-        return datapoint
+            board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
+        board_datapoint = array(board_datapoint)
+        board_datapoint.reshape((1, 16, 6))
+        return board_datapoint, piece_datapoint
 
     def _board_to_datapoint(self, board, is_white):
         from numpy import array
