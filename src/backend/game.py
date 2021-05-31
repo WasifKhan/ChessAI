@@ -35,8 +35,7 @@ class Game:
         destination = (destination//10, destination%10)
         # Execute move
         if piece.is_white is not None \
-                and ((self.white_turn and piece.is_white) \
-                    or (not(self.white_turn) and not(piece.is_white))) \
+                and self.white_turn == piece.is_white \
                 and self.board.is_valid_move(piece, destination):
             self.board.move(piece, destination)
             self.white_turn = not(self.white_turn)

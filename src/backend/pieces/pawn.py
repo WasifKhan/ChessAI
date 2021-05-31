@@ -2,12 +2,10 @@ from .piece import Piece
 
 
 class Pawn(Piece):
-    ID = 1
-    def __init__(self, is_white, location):
+    def __init__(self, ID, is_white, location):
         super().__init__(is_white, location)
-        self.ID = Pawn.ID
+        self.ID = ID
         self.value = 1
-        Pawn.ID = 1 if Pawn.ID == 8 else Pawn.ID + 1
 
     def __str__(self):
         return 'P' if self.is_white else 'p'

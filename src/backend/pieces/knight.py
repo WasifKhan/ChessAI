@@ -2,12 +2,10 @@ from .piece import Piece
 
 
 class Knight(Piece):
-    ID = 1
-    def __init__(self, is_white, location):
+    def __init__(self, ID, is_white, location):
         super().__init__(is_white, location)
-        self.ID = Knight.ID
+        self.ID = ID
         self.value = 3
-        Knight.ID = 1 if Knight.ID == 2 else 2
 
     def __str__(self):
         return 'N' if self.is_white else 'n'

@@ -24,7 +24,7 @@ class BaseModel(metaclass=ABCMeta):
     def train(self):
         if not hasattr(self, 'model'):
             self._build_model()
-        self._train_model()
+        #self._train_model()
         self._evaluate_model()
 
     def _resign(self, board, is_white):

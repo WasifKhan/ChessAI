@@ -10,6 +10,8 @@ from .pieces.rook import Rook
 from .pieces.queen import Queen
 from .pieces.king import King
 from .pieces.pawn import Pawn
+from .pieces.bishop import Bishop
+from .pieces.knight import Knight
 
 
 
@@ -190,15 +192,19 @@ class Board:
 
 
     def _promote(self, piece, destination):
+        '''
+        Minor bug - queen id should be incremented, not set to 2.
+        Causes bugs if more than 2 white/black queens on board
+        '''
         if isinstance(piece, Pawn):
             if piece.location[1] == 7 and piece.is_white:
                 self.white_pieces.remove(piece)
-                new_queen = Queen(is_white=True, location= piece.location)
+                new_queen = Queen(2, is_white=True, location= piece.location)
                 self.white_pieces.add(new_queen)
                 self[piece.location] = new_queen
             elif piece.location[1] == 0 and not(piece.is_white):
                 self.black_pieces.remove(piece)
-                new_queen = Queen(is_white=False, location= piece.location)
+                new_queen = Queen(2, is_white=False, location= piece.location)
                 self.black_pieces.add(new_queen)
                 self[piece.location] = new_queen
 
