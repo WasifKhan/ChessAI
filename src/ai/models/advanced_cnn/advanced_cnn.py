@@ -72,20 +72,20 @@ class AdvancedCnn(BaseModel):
                 print(f'{i//(num_datapoints//100)}% downloading')
             boards, moves = data
             self.game.__init__()
+            x_data = self._boards_to_datapoints(boards)
             for i in range(len(boards)):
                 my_pieces = boards[i].white_pieces if self.game.white_turn \
                         else boards[i].black_pieces
                 piece = boards[i][moves[i][0]]
                 ID = piece.ID if not piece.value == 9 else 1
-                x = self._board_to_datapoint(boards[i], self.game.white_turn)
                 self.game.move(*moves[i])
                 y = self._move_to_datapoint(self.game.board.move_ID, piece)
                 for key in self.models['should_move']:
-                    self.models['should_move'][key][1].append(x)
+                    self.models['should_move'][key][1].append(x_data[i])
                     self.models['should_move'][key][2].append(1) \
                         if key == str(piece).upper() + str(ID) \
                         else self.models['should_move'][key][2].append(0)
-                self.models['get_move'][str(piece).upper() + str(ID)][1].append(x)
+                self.models['get_move'][str(piece).upper() + str(ID)][1].append(x_data[i])
                 self.models['get_move'][str(piece).upper() + str(ID)][2].append(y)
         for key in self.models['should_move']:
             x_data = self.models['should_move'][key][1]
@@ -94,7 +94,6 @@ class AdvancedCnn(BaseModel):
             x_data = x_data.reshape((x_data.shape[0], 8, 8, 6))
             self.models['should_move'][key][1] = x_data
             self.models['should_move'][key][2] = y_data
-
         for key in self.models['get_move']:
             x_data = self.models['get_move'][key][1]
             y_data = self.models['get_move'][key][2]
@@ -128,12 +127,8 @@ class AdvancedCnn(BaseModel):
             if i % (num_datapoints//100) == 0:
                 print(f'Main Network: {i//(num_datapoints//100)}% downloading')
             boards, moves = data
-            self.game.__init__()
-
-            '''
             x_data = self._boards_to_datapoints(boards)
-            self.game.__init__()
-            for piece in self.game.board.white_pieces:
+            for piece in boards[0].white_pieces:
                 model = self.models['should_move'][str(piece) + str(piece.ID)][0]
                 should_move = model.predict(x_data)
                 model = self.models['get_move'][str(piece) + str(piece.ID)][0]
@@ -149,34 +144,10 @@ class AdvancedCnn(BaseModel):
                             break
                 datapoint = array(datapoint)
                 x2[i] = datapoint
-            x1, y = self.pieces_to_datapoints(boards)
+            x1, y = self._pieces_to_datapoints(boards, moves)
             self.models['vote_best_move'][1][0].extend(x1)
             self.models['vote_best_move'][1][1].extend(x2)
             self.models['vote_best_move'][2].extend(y)
-            '''
-            for i in range(len(boards)):
-                datapoint = [0] * 16
-                my_pieces = boards[i].white_pieces if self.game.white_turn \
-                        else boards[i].black_pieces
-                piece = boards[i][moves[i][0]]
-                x = self._board_to_datapoint(boards[i], self.game.white_turn)
-                self.game.move(*moves[i])
-                for piece in my_pieces:
-                    model = self.models['should_move'][str(piece).upper() + str(piece.ID)][0]
-                    prediction = model.predict(x)
-                    if round(prediction[0][0]) == 1:
-                        model = self.models['get_move'][str(piece).upper() + str(piece.ID)][0]
-                        prediction = model.predict(x)
-                        for i, val in enumerate(prediction[0]):
-                            if val == max(prediction[0]):
-                                datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = i
-                                break
-                datapoint = array(datapoint)
-                x, y = self._pieces_to_datapoint(piece,
-                        my_pieces, self.game.white_turn, boards[i])
-                self.models['vote_best_move'][1][0].append(x)
-                self.models['vote_best_move'][1][1].append(datapoint)
-                self.models['vote_best_move'][2].append(y)
         x_data_1 = self.models['vote_best_move'][1][0]
         x_data_2 = self.models['vote_best_move'][1][1]
         y_data = self.models['vote_best_move'][2]
@@ -254,47 +225,62 @@ class AdvancedCnn(BaseModel):
         pyplot.legend()
         pyplot.show()
 
-    def _pieces_to_datapoint(self, piece, pieces, is_white, board):
+    def _pieces_to_datapoints(self, boards, moves):
         from numpy import array
         piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
-        piece_datapoint = [0]*16
-        piece_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = 1
-        piece_datapoint = array(piece_datapoint)
+        piece_datapoints = list()
+        board_datapoints = list()
+        is_white = True
+        for i, board in enumerate(boards):
+            piece = boards[i][moves[i][0]]
+            piece_datapoint = [0]*16
+            piece_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = 1
+            piece_datapoint = array(piece_datapoint)
+            piece_datapoints.append(piece_datapoint)
 
-        board_datapoint = [0]*16
-        for i in range(16):
-            board_datapoint[i] = [0]*6
-            board_datapoint[i] = array(board_datapoint[i])
-        for piece in pieces:
-            piece.compute_info(board)
-            ID = piece.ID if piece.is_white is not None else 0
-            value = piece.value if piece.is_white == is_white \
-                    else piece.value * -1
-            piece_info = [ID, value, piece.defends, piece.threats, piece.threatens, piece.num_moves]
-            piece_info = array(piece_info)
-            board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
-        board_datapoint = array(board_datapoint)
-        board_datapoint.reshape((1, 16, 6))
-        return board_datapoint, piece_datapoint
-
-    def _board_to_datapoint(self, board, is_white):
-        from numpy import array
-        board_direction = range(8) if is_white else range(7, -1, -1)
-        datapoint = []
-        for row in board_direction:
-            cur_row = []
-            for column in range(8):
-                piece = board[column,row]
+            board_datapoint = [0]*16
+            pieces = boards[i].white_pieces if is_white else boards[i].black_pieces
+            for i in range(16):
+                board_datapoint[i] = [0]*6
+                board_datapoint[i] = array(board_datapoint[i])
+            for piece in pieces:
                 piece.compute_info(board)
                 ID = piece.ID if piece.is_white is not None else 0
                 value = piece.value if piece.is_white == is_white \
                         else piece.value * -1
-                cur_row.append([ID, value, piece.defends, piece.threats,
-                            piece.threatens, piece.num_moves])
-            datapoint.append(cur_row)
-        datapoint = array(datapoint)
-        datapoint = datapoint.reshape(1, 8, 8, 6)
-        return datapoint
+                piece_info = [ID, value, piece.defends, piece.threats, piece.threatens, piece.num_moves]
+                piece_info = array(piece_info)
+                board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
+            board_datapoint = array(board_datapoint)
+            board_datapoint.reshape((1, 16, 6))
+            board_datapoints.append(board_datapoint)
+        return board_datapoints, piece_datapoints
+
+    def _boards_to_datapoints(self, boards):
+        from numpy import array
+        is_white = True
+        datapoints = []
+        for board in boards:
+            board_direction = range(8) if is_white else range(7, -1, -1)
+            datapoint = []
+            for row in board_direction:
+                cur_row = []
+                for column in range(8):
+                    piece = board[column,row]
+                    piece.compute_info(board)
+                    ID = piece.ID if piece.is_white is not None else 0
+                    value = piece.value if piece.is_white == is_white \
+                            else piece.value * -1
+                    dp = array([ID, value, piece.defends, piece.threats, piece.threatens, piece.num_moves])
+                    cur_row.append(dp)
+                cur_row = array(cur_row)
+                datapoint.append(cur_row)
+            is_white = not(is_white)
+            datapoint = array(datapoint)
+            datapoints.append(datapoint)
+        datapoints = array(datapoints)
+        datapoints = datapoints.reshape((datapoints.shape[0], 8, 8, 6))
+        return datapoints
 
     def _move_to_datapoint(self, move, piece):
         from numpy import array
