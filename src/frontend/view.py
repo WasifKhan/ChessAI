@@ -112,7 +112,7 @@ class View:
         print('\nDone Loading\nClick Play Again.\n')
 
     def versus_current_AI(self):
-        self.interface.versus_AI(4)
+        self.interface.versus_AI(2)
         print('\nDone Loading\nClick Play Again.\n')
 
     def action(self, piece):

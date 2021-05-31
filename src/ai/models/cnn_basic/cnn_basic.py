@@ -10,7 +10,22 @@ class CnnBasic(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 
-    def _build_model(self):
+    def _load_model(self):
+        if 'brain.h5' in listdir(self.location):
+            from tensorflow.keras.models import load_model
+            self.model = load_model(self.location + '/brain.h5')
+
+    def _train(self):
+        self.build_model()
+        self.train_model()
+        self.evaluate_model()
+
+    def _predict(self, board, is_white):
+        prediction = self.model.predict(self._board_to_datapoint(board, is_white))
+        move = self._prediction_to_move(prediction, board, is_white)
+        return move
+
+    def build_model(self):
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D
@@ -28,7 +43,7 @@ class CnnBasic(BaseModel):
                 metrics=['categorical_accuracy'])
         self.model = model
 
-    def _train_model(self):
+    def train_model(self):
         from sklearn.model_selection import train_test_split
         from numpy import array
         from time import time
@@ -57,7 +72,7 @@ class CnnBasic(BaseModel):
         self.model.save(f'{self.location}/brain.h5')
 
 
-    def _evaluate_model(self):
+    def evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
         fig, axs = pyplot.subplots()

@@ -21,6 +21,30 @@ class Pawn(Piece):
         self.move_IDs[3] = lambda location: \
                 (location[0] + 1)*10 + (location[1] + direction)
 
+    def _defends(self, board):
+        direction = 1 if self.is_white else -1
+        pieces = []
+        piece_1 = board[self.location[0]-1, self.location[1]+direction]
+        piece_2 = board[self.location[0]+1, self.location[1]+direction]
+        if piece_1 and piece_1.is_white == self.is_white:
+            pieces.append(piece_1.location[0]*10 + piece_1.location[1])
+        if piece_2 and piece_2.is_white == self.is_white:
+            pieces.append(piece_2.location[0]*10 + piece_2.location[1])
+        return pieces
+
+    def compute_info(self, board):
+        my_pieces, their_pieces = (board.white_pieces, board.black_pieces) \
+                if self.is_white else (board.black_pieces, board.white_pieces)
+        self.defends = sum([piece.value for piece in my_pieces \
+                if piece.location[0]*10 + piece.location[1] in self._defends(board)])
+        self.threats = sum([self.value for piece in their_pieces \
+                if self.location[0]*10 + self.location[1] in piece.moves(board)])
+        self.threatens = sum([piece.value for piece in their_pieces \
+                if piece.location[0]*10 + piece.location[1] in self.moves(board)])
+        self.num_moves = sum([1 for move in self.moves(board) \
+                if not isinstance(board[move], Piece)])
+
+
     def is_valid_move(self, board, destination):
         if self.is_white:
             # Check for diagonal movement

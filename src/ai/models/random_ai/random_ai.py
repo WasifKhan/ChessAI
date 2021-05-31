@@ -11,10 +11,8 @@ class RandomAI(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 
-    def train(self):
-        return True
 
-    def predict(self, board, is_white):
+    def _predict(self, board, is_white):
         if self._resign(board, is_white):
             return False
         my_pieces = list(board.white_pieces) if is_white else list(board.black_pieces)
