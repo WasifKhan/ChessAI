@@ -4,7 +4,6 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- make predictions
 - make data extracyor a subclass of ai
 - clean up ai logic
 - try 18 architectures:
