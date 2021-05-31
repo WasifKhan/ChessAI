@@ -129,6 +129,31 @@ class AdvancedCnn(BaseModel):
                 print(f'Main Network: {i//(num_datapoints//100)}% downloading')
             boards, moves = data
             self.game.__init__()
+
+            '''
+            x_data = self._boards_to_datapoints(boards)
+            self.game.__init__()
+            for piece in self.game.board.white_pieces:
+                model = self.models['should_move'][str(piece) + str(piece.ID)][0]
+                should_move = model.predict(x_data)
+                model = self.models['get_move'][str(piece) + str(piece.ID)][0]
+                get_move = model.predict(x_data)
+            x2 = [0] * len(should_move)
+            for i, prediction in enumerate(should_move):
+                datapoint = [0] * 16
+                if round(prediction[0]) == 1:
+                    move = get_move[i]
+                    for j, val in enumerate(move):
+                        if val == max(move):
+                            datapoint[piece_map[str(piece).upper()] + piece.ID - 1 ] = j
+                            break
+                datapoint = array(datapoint)
+                x2[i] = datapoint
+            x1, y = self.pieces_to_datapoints(boards)
+            self.models['vote_best_move'][1][0].extend(x1)
+            self.models['vote_best_move'][1][1].extend(x2)
+            self.models['vote_best_move'][2].extend(y)
+            '''
             for i in range(len(boards)):
                 datapoint = [0] * 16
                 my_pieces = boards[i].white_pieces if self.game.white_turn \
