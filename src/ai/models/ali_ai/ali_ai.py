@@ -33,12 +33,10 @@ class AliAI(BaseModel):
             return x
         from copy import copy
         my_pieces = board.white_pieces if is_white else board.black_pieces
-        best_move = None
-        board_value = None
-        candidate_piece = None
+        best_moves = []
         for my_piece in my_pieces:
             for move in my_piece.moves(board):
-                print('thinking....')
+                source = my_piece.location[0]*10 + my_piece.location[1]
                 temp_board = copy(board)
                 temp_board.move(temp_board[my_piece.location], ((move//10),(move%10)))
                 their_pieces = temp_board.black_pieces if is_white else temp_board.white_pieces
@@ -49,25 +47,53 @@ class AliAI(BaseModel):
                         second_temp_board.move(second_temp_board[their_piece.location], ((their_move//10),(their_move%10)))
                         my_pieces = second_temp_board.white_pieces if is_white else second_temp_board.black_pieces
                         cur_value = board.value() - second_temp_board.value()
-                        if (cur_value <= 0 and is_white) or (cur_value >= 0 and not is_white):
-                            print('Skipping branch')
-                            (board_value, best_move, candidate_piece) = (cur_value, move, my_piece) \
-                                if board_value is None or ((cur_value > board_value and is_white) or (cur_value < board_value and not is_white)) \
-                                else (board_value, best_move, candidate_piece)
-                            continue
-                        for my_piece_2 in my_pieces:
-                            for move_2 in my_piece_2.moves(second_temp_board):
-                                third_temp_board = copy(second_temp_board)
-                                third_temp_board.move(third_temp_board[my_piece_2.location], ((move_2//10), (move_2%10)))
-                                their_pieces = third_temp_board.black_pieces if is_white else third_temp_board.white_pieces
-                                for their_piece2 in their_pieces:
-                                    for their_move2 in their_piece2.moves(third_temp_board):
-                                        fourth_temp_board = copy(third_temp_board)
-                                        fourth_temp_board.move(fourth_temp_board[their_piece2.location], ((their_move2//10),(their_move2%10)))
-                                        enemy_move_values.append(fourth_temp_board.value())
-                                    cur_value = min(enemy_move_values) if is_white else max(enemy_move_values)
-                                    (board_value, best_move, candidate_piece) = (cur_value, move, my_piece) if board_value is None \
-                                        or ((cur_value > board_value and is_white) or (cur_value < board_value and not is_white)) \
-                                        else (board_value, best_move, candidate_piece)
-                    
-        return (candidate_piece.location[0]*10 + candidate_piece.location[1], best_move)
+                        if enemy_move_values == []:
+                            enemy_move_values = [(cur_value, second_temp_board)]
+                        elif (cur_value == enemy_move_values[0][0] and is_white) or (cur_value == enemy_move_values[0][0] and not is_white):
+                            enemy_move_values.append((cur_value,second_temp_board))
+                        else:
+                            if (cur_value > enemy_move_values[0][0] and is_white) or (cur_value < enemy_move_values[0][0] and not is_white):
+                                enemy_move_values = [(cur_value, second_temp_board)]
+                cur_value = enemy_move_values[0][0]
+                if best_moves == []:
+                    best_moves = [(cur_value, enemy_move_values[0][1], source, move)]
+                elif (best_moves[0][0] == cur_value and is_white) or (best_moves[0][0] == cur_value and not is_white):
+                    best_moves.append((cur_value, enemy_move_values[0][1], source, move))
+                else:
+                    if (best_moves[0][0] > cur_value and is_white) or (best_moves[0][0] < cur_value and not is_white):
+                        best_moves = [(cur_value, enemy_move_values[0][1], source, move)]
+        
+        real_best_move = []
+        
+        for state in best_moves:
+            third_temp_board = state[1]
+            my_pieces = third_temp_board.white_pieces if is_white else third_temp_board.black_pieces
+            for my_piece in my_pieces:
+                for move in my_piece.moves(third_temp_board):
+                    source = my_piece.location[0]*10 + my_piece.location[1]
+                    fourth_temp_board = copy(third_temp_board)
+                    their_pieces = fourth_temp_board.black_pieces if is_white else fourth_temp_board.white_pieces
+                    enemy_move_values = []
+                    for their_piece in their_pieces:
+                        for their_move in their_piece.moves(fourth_temp_board):
+                            fifth_temp_board = copy(fourth_temp_board)
+                            fifth_temp_board.move(fifth_temp_board[their_piece.location], ((their_move//10),(their_move%10)))
+                            my_pieces = fifth_temp_board.white_pieces if is_white else fifth_temp_board.black_pieces
+                            cur_value = third_temp_board.value() - fifth_temp_board.value()
+                            if enemy_move_values == []:
+                                enemy_move_values = [(cur_value, fifth_temp_board)]
+                            elif (cur_value == enemy_move_values[0][0] and is_white) or (cur_value == enemy_move_values[0][0] and not is_white):
+                                enemy_move_values.append((cur_value,fifth_temp_board))
+                            else:
+                                if (cur_value > enemy_move_values[0][0] and is_white) or (cur_value < enemy_move_values[0][0] and not is_white):
+                                    enemy_move_values = [(cur_value, fifth_temp_board)]
+                    cur_value = enemy_move_values[0][0]
+                    if real_best_move == []:
+                        real_best_move = [(cur_value, enemy_move_values[0][1], state[2], state[3])]
+                    elif (real_best_move[0][0] == cur_value and is_white) or (real_best_move[0][0] == cur_value and not is_white):
+                            real_best_move.append((cur_value, enemy_move_values[0][1], state[2], state[3]))
+                    else:
+                        if (real_best_move[0][0] > cur_value and is_white) or (real_best_move[0][0] < cur_value and not is_white):
+                            real_best_move = [(cur_value, enemy_move_values[0][1], state[2], state[3])]
+        
+        return (real_best_move[0][2], real_best_move[0][3])

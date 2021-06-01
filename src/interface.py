@@ -64,7 +64,7 @@ class Interface:
     def simulate_games(self, num_games: int):
         white_wins, black_wins = 0,0
         for i in range(num_games):
-            self.game = Game('White AI', 'Black AI')
+            self.game = Game('Wasif AI', 'Ali AI')
             white_ai = AI(self.game, 0)
             black_ai = AI(self.game, 4)
             AIs = [white_ai, black_ai]

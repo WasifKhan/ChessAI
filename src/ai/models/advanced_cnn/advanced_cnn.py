@@ -142,13 +142,11 @@ class AdvancedCnn(BaseModel):
         from numpy import array
         from time import time
         start = time()
-        num_datapoints = 2
+        num_datapoints = 100
         print(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
-            '''
             if i % (num_datapoints//100) == 0:
                 print(f'{i//(num_datapoints//100)}% downloading')
-            '''
             boards, moves = data
             self.game.__init__()
             x_data = boards_to_datapoints(boards)
@@ -208,10 +206,8 @@ class AdvancedCnn(BaseModel):
 
         print(f'Main Network: Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
-            '''
             if i % (num_datapoints//100) == 0:
                 print(f'Main Network: {i//(num_datapoints//100)}% downloading')
-            '''
             boards, moves = data
             x_data = boards_to_datapoints(boards)
             for piece in boards[0].white_pieces:
