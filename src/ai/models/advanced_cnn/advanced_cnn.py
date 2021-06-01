@@ -65,7 +65,7 @@ class AdvancedCnn(BaseModel):
         from numpy import array
         from time import time
         start = time()
-        num_datapoints = 100
+        num_datapoints = 2000
         print(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
             if i % (num_datapoints//100) == 0:
@@ -111,12 +111,12 @@ class AdvancedCnn(BaseModel):
         for key in self.models['should_move']:
             model = self.models['should_move'][key]
             performance = model[0].fit(model[1], model[2],
-                    epochs=5, batch_size=32, validation_split=0.2, verbose=0)
+                    epochs=100, batch_size=32, validation_split=0.2, verbose=0)
             self.performances['should_move'][key] = performance
         for key in self.models['get_move']:
             model = self.models['get_move'][key]
             performance = model[0].fit(model[1], model[2],
-                    epochs=20, batch_size=32, validation_split=0.2, verbose=0)
+                    epochs=100, batch_size=32, validation_split=0.2, verbose=0)
             self.performances['get_move'][key] = performance
 
         piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
@@ -163,7 +163,7 @@ class AdvancedCnn(BaseModel):
         {self.models["vote_best_move"][2].shape[0]} datapoints')
         model = self.models['vote_best_move']
         performance = model[0].fit([model[1][0], model[1][1]], model[2],
-                epochs=10, batch_size=32, validation_split=0.2, verbose=0)
+                epochs=100, batch_size=32, validation_split=0.2, verbose=0)
         self.performances['vote_best_move'] = performance
 
         print(f'Main Network: Done learning. Took {str(time()-start)[0:5]}s')
