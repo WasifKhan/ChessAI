@@ -135,7 +135,7 @@ class AdvancedCnn(BaseModel):
         from numpy import array
         from time import time
         start = time()
-        num_datapoints = 200
+        num_datapoints = 500
         print(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
             if i % (num_datapoints//100) == 0:
@@ -157,9 +157,7 @@ class AdvancedCnn(BaseModel):
                     if key == str(piece).upper() + str(ID):
                         self.models['should_move'][key][2].append(1)
                     else:
-                        from random import randint
-                        if randint(1,10) == 1:
-                            self.models['should_move'][key][2].append(0)
+                        self.models['should_move'][key][2].append(0)
                 self.models['get_move'][str(piece).upper() + str(ID)][1].append(x_data[i])
                 self.models['get_move'][str(piece).upper() + str(ID)][2].append(y)
         for key in self.models['should_move']:
@@ -184,11 +182,13 @@ class AdvancedCnn(BaseModel):
         self.performances['get_move'] = dict()
         print(f'Begin learning over {self.models["should_move"][key][1].shape[0]*2} datapoints')
         for key in self.models['should_move']:
+            print(f'Learning model for: {key}')
             model = self.models['should_move'][key]
             performance = model[0].fit(model[1], model[2],
                     epochs=10, batch_size=32, validation_split=0.2, verbose=0)
             self.performances['should_move'][key] = performance
         for key in self.models['get_move']:
+            print(f'Learning model for: {key}')
             model = self.models['get_move'][key]
             performance = model[0].fit(model[1], model[2],
                     epochs=20, batch_size=32, validation_split=0.2, verbose=0)
@@ -370,22 +370,6 @@ class AdvancedCnn(BaseModel):
             if piece_move[0] >= 0 and piece_move[0] <= 7 \
                     and piece_move[1] >= 0 and piece_move[1] <= 7 \
                     and board.is_valid_move(piece, piece_move):
-                datapoint[i] = 0.75
+                datapoint[i] = 0.65
         return datapoint
-
-    def _prediction_to_move(self, prediction, board, is_white):
-        from ai.data.moves import MOVES
-        for i, val in enumerate(prediction[0]):
-            if val == max(prediction[0]):
-                prediction = i
-                break
-        for key in MOVES:
-            if MOVES[key] == prediction:
-                move = key
-        my_piece, ID, move_ID = move[0], int(move[1]), move[2:]
-        my_piece = my_piece if is_white else my_piece.lower()
-        pieces = board.white_pieces if is_white else board.black_pieces
-        for piece in pieces:
-            if str(piece) == str(my_piece) and piece.ID == ID:
-                return piece.get_move(int(move_ID))
 

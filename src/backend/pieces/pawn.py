@@ -26,9 +26,9 @@ class Pawn(Piece):
         pieces = []
         piece_1 = board[self.location[0]-1, self.location[1]+direction]
         piece_2 = board[self.location[0]+1, self.location[1]+direction]
-        if piece_1 and piece_1.is_white == self.is_white:
+        if piece_1 and piece_1.is_white == self.is_white and piece_1.value != 100:
             pieces.append(piece_1.location[0]*10 + piece_1.location[1])
-        if piece_2 and piece_2.is_white == self.is_white:
+        if piece_2 and piece_2.is_white == self.is_white and piece_2.value != 100:
             pieces.append(piece_2.location[0]*10 + piece_2.location[1])
         return pieces
 
@@ -37,7 +37,7 @@ class Pawn(Piece):
                 if self.is_white else (board.black_pieces, board.white_pieces)
         self.defends = sum([piece.value for piece in my_pieces \
                 if piece.location[0]*10 + piece.location[1] in self._defends(board)])
-        self.threats = sum([self.value for piece in their_pieces \
+        self.threats = sum([piece.value for piece in their_pieces \
                 if self.location[0]*10 + self.location[1] in piece.moves(board)])
         self.threatens = sum([piece.value for piece in their_pieces \
                 if piece.location[0]*10 + piece.location[1] in self.moves(board)])

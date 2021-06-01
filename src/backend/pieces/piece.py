@@ -51,10 +51,10 @@ class Piece(Square, metaclass=ABCMeta):
         my_pieces, their_pieces = (board.white_pieces, board.black_pieces) \
                 if self.is_white else (board.black_pieces, board.white_pieces)
         self.is_white = not(self.is_white)
-        self.defends = sum([piece.value for piece in my_pieces \
+        self.defends = sum([piece.value if piece.value != 100 else 0 for piece in my_pieces \
                 if piece.location[0]*10 + piece.location[1] in self.moves(board)])
         self.is_white = not(self.is_white)
-        self.threats = sum([self.value for piece in their_pieces \
+        self.threats = sum([piece.value for piece in their_pieces \
                 if self.location[0]*10 + self.location[1] in piece.moves(board)])
         self.threatens = sum([piece.value for piece in their_pieces \
                 if piece.location[0]*10 + piece.location[1] in self.moves(board)])
