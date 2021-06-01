@@ -10,10 +10,80 @@ class AdvancedCnn(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 
-    def _build_model(self):
+    def _load_model(self):
+        from tensorflow.keras.models import load_model
+        from os import listdir
+        self.models = dict()
+        self.models['get_move'] = dict()
+        self.models['should_move'] = dict()
+        self.models['vote_best_move'] = None
+        for brain in listdir(self.location + '/brain/'):
+            if 'brain' not in brain:
+                continue
+            model, _, piece, _ = brain.split('_')
+            if model == 'get':
+                self.models['get_move'][piece] = load_model(self.location + '/brain/' + brain)
+            elif model == 'should':
+                self.models['should_move'][piece] = load_model(self.location + '/brain/' + brain)
+            elif model == 'vote':
+                self.models['vote_best_move'] = load_model(self.location + '/brain/' + brain)
+
+    def _train(self):
+        self.build_model()
+        self.train_model()
+        self.evaluate_model()
+
+    def _predict(self, board, is_white):
+        from numpy import array
+        piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
+        my_pieces = board.white_pieces if is_white else board.black_pieces
+        x_data = self._boards_to_datapoints([board])
+        datapoint = [0] * 16
+        board_datapoint = [0] * 16
+        for i in range(16):
+            board_datapoint[i] = [0]*6
+        for piece in my_pieces:
+            model = self.models['should_move'][str(piece).upper() + str(piece.ID)]
+            should_move = model.predict(x_data)
+            model = self.models['get_move'][str(piece).upper() + str(piece.ID)]
+            get_move = model.predict(x_data)
+            if round(should_move[0][0]) == 1:
+                for i, val in enumerate(get_move[0]):
+                    if val == max(get_move[0]):
+                        datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = i
+                        break
+            piece.compute_info(board)
+            ID = piece.ID if piece.is_white is not None else 0
+            value = piece.value if piece.is_white == is_white \
+                    else piece.value * -1
+            piece_info = [ID/10, value/10, piece.defends/10,
+                    piece.threats/10, piece.threatens/10,
+                    piece.num_moves/10]
+            piece_info = array(piece_info)
+            board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
+        datapoint = array(datapoint)
+        datapoint = datapoint.reshape((1, 16, 1))
+        board_datapoint = array(board_datapoint)
+        board_datapoint = board_datapoint.reshape((1, 16, 6))
+        model = self.models['vote_best_move']
+        prediction = model.predict([board_datapoint, datapoint])
+
+        for i, val in enumerate(prediction[0]):
+            if val == max(prediction[0]):
+                move = datapoint[0][i]
+                print(move)
+                move = int(move)
+                for piece in my_pieces:
+                    if piece_map[str(piece).upper()] + piece.ID - 1 == i:
+                            move = piece.move_IDs[move](piece.location)
+                            return piece.location[0]*10+piece.location[1], move
+        print(f'move not found')
+        return None
+
+    def build_model(self):
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
-            Concatenate, Lambda, Reshape, MaxPooling2D
+            Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
         from tensorflow.keras.optimizers import SGD
         self.game.__init__()
         self.models = dict()
@@ -27,9 +97,9 @@ class AdvancedCnn(BaseModel):
             x = Conv2D(16, (4, 4), activation='relu')(inputs)
             x = Conv2D(8, (2, 2), activation='relu')(x)
             x = Flatten()(x)
-            x = Dense(20, activation='sigmoid')(x)
+            x = Dense(20, activation='relu')(x)
             outputs = Dense(1, activation='sigmoid')(x)
-            opt = SGD(lr=0.05, momentum=0.9)
+            opt = SGD(lr=0.1, momentum=0.9)
             model = Model(inputs, outputs)
             model.compile(optimizer=opt, loss='binary_crossentropy',
                             metrics=['binary_accuracy'])
@@ -39,33 +109,38 @@ class AdvancedCnn(BaseModel):
             x = Conv2D(32, (4, 4), activation='relu')(inputs)
             x = Conv2D(16, (2, 2), activation='relu')(x)
             x = Flatten()(x)
-            x = Dense(20, activation='sigmoid')(x)
-            outputs = Dense(len(piece.move_IDs), activation='softmax')(x)
-            opt = SGD(lr=0.05, momentum=0.9)
+            x = Dense(64, activation='relu')(x)
+            x = Dropout(0.2)(x)
+            x = Dense(32, activation='relu')(x)
+            x = Dropout(0.2)(x)
+            outputs = Dense(len(piece.move_IDs), activation='sigmoid')(x)
+            opt = SGD(lr=0.05, momentum=0.8)
             model = Model(inputs, outputs)
-            model.compile(optimizer=opt, loss='categorical_crossentropy',
-                            metrics=['categorical_accuracy'])
+            model.compile(optimizer=opt, loss='binary_crossentropy',
+                            metrics=['binary_accuracy'])
             self.models['get_move'][location] = [model, list(), list()]
         inputs1 = Input(shape=(16,6))
         inputs2 = Input(shape=(16,1))
         x = Dense(1, activation='relu')(inputs1)
         x = Concatenate()([x, inputs2])
-        x = Dense(1, activation='sigmoid')(x)
+        x = Dense(1, activation='relu')(x)
         x = Flatten()(x)
-        x = Dense(32, activation='sigmoid')(x)
+        x = Dense(64, activation='relu')(x)
+        x = Dropout(0.2)(x)
         outputs = Dense(16, activation='softmax')(x)
+        opt = SGD(lr=0.05, momentum=0.8)
         model = Model(inputs=[inputs1, inputs2], outputs=outputs)
         model.compile(optimizer=opt, loss='categorical_crossentropy',
                         metrics=['categorical_accuracy'])
         self.models['vote_best_move'] = [model, list([list(), list()]), list()]
 
 
-    def _train_model(self):
+    def train_model(self):
         from sklearn.model_selection import train_test_split
         from numpy import array
         from time import time
         start = time()
-        num_datapoints = 2000
+        num_datapoints = 200
         print(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
             if i % (num_datapoints//100) == 0:
@@ -78,13 +153,16 @@ class AdvancedCnn(BaseModel):
                         else boards[i].black_pieces
                 piece = boards[i][moves[i][0]]
                 ID = piece.ID if not piece.value == 9 else 1
+                y = self._move_to_datapoint(boards[i], piece)
                 self.game.move(*moves[i])
-                y = self._move_to_datapoint(self.game.board.move_ID, piece)
+                y[int(self.game.board.move_ID[-1])] = 1
+                y = array(y)
                 for key in self.models['should_move']:
                     self.models['should_move'][key][1].append(x_data[i])
-                    self.models['should_move'][key][2].append(1) \
-                        if key == str(piece).upper() + str(ID) \
-                        else self.models['should_move'][key][2].append(0)
+                    if key == str(piece).upper() + str(ID):
+                        self.models['should_move'][key][2].append(1)
+                    else:
+                        self.models['should_move'][key][2].append(0)
                 self.models['get_move'][str(piece).upper() + str(ID)][1].append(x_data[i])
                 self.models['get_move'][str(piece).upper() + str(ID)][2].append(y)
         for key in self.models['should_move']:
@@ -109,11 +187,13 @@ class AdvancedCnn(BaseModel):
         self.performances['get_move'] = dict()
         print(f'Begin learning over {self.models["should_move"][key][1].shape[0]*2} datapoints')
         for key in self.models['should_move']:
+            print(f'Learning model for: {key}')
             model = self.models['should_move'][key]
             performance = model[0].fit(model[1], model[2],
-                    epochs=100, batch_size=32, validation_split=0.2, verbose=0)
+                    epochs=10, batch_size=32, validation_split=0.2, verbose=0)
             self.performances['should_move'][key] = performance
         for key in self.models['get_move']:
+            print(f'Learning model for: {key}')
             model = self.models['get_move'][key]
             performance = model[0].fit(model[1], model[2],
                     epochs=100, batch_size=32, validation_split=0.2, verbose=0)
@@ -163,19 +243,19 @@ class AdvancedCnn(BaseModel):
         {self.models["vote_best_move"][2].shape[0]} datapoints')
         model = self.models['vote_best_move']
         performance = model[0].fit([model[1][0], model[1][1]], model[2],
-                epochs=100, batch_size=32, validation_split=0.2, verbose=0)
+                epochs=50, batch_size=32, validation_split=0.2, verbose=0)
         self.performances['vote_best_move'] = performance
 
         print(f'Main Network: Done learning. Took {str(time()-start)[0:5]}s')
 
         for key in self.models['should_move']:
-            self.models['should_move'][key][0].save(f'{self.location}/should_move_{key}_brain.h5')
+            self.models['should_move'][key][0].save(f'{self.location}/brain/should_move_{key}_brain.h5')
         for key in self.models['get_move']:
-            self.models['get_move'][key][0].save(f'{self.location}/get_move_{key}_brain.h5')
-        self.models['vote_best_move'][0].save(f'{self.location}/vote_best_move_brain.h5')
+            self.models['get_move'][key][0].save(f'{self.location}/brain/get_move_{key}_brain.h5')
+        self.models['vote_best_move'][0].save(f'{self.location}/brain/vote_best_move_brain.h5')
 
 
-    def _evaluate_model(self):
+    def evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
         fig, axs = pyplot.subplots(4, 4)
@@ -204,9 +284,9 @@ class AdvancedCnn(BaseModel):
                 performance = next(it)
                 model = self.performances['get_move'][performance]
                 axs[i, j].set_title(f'{performance}')
-                axs[i, j].plot(model.history['categorical_accuracy'],
+                axs[i, j].plot(model.history['binary_accuracy'],
                         color='blue', label='train')
-                axs[i, j].plot(model.history['val_categorical_accuracy'],
+                axs[i, j].plot(model.history['val_binary_accuracy'],
                         color='orange', label='test')
         for ax in axs.flat:
             ax.set(xlabel='Epoch', ylabel='Accuracy')
@@ -248,7 +328,9 @@ class AdvancedCnn(BaseModel):
                 ID = piece.ID if piece.is_white is not None else 0
                 value = piece.value if piece.is_white == is_white \
                         else piece.value * -1
-                piece_info = [ID, value, piece.defends, piece.threats, piece.threatens, piece.num_moves]
+                piece_info = [ID/10, value/10, piece.defends/10,
+                        piece.threats/10, piece.threatens/10,
+                        piece.num_moves/10]
                 piece_info = array(piece_info)
                 board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
             board_datapoint = array(board_datapoint)
@@ -271,7 +353,9 @@ class AdvancedCnn(BaseModel):
                     ID = piece.ID if piece.is_white is not None else 0
                     value = piece.value if piece.is_white == is_white \
                             else piece.value * -1
-                    dp = array([ID, value, piece.defends, piece.threats, piece.threatens, piece.num_moves])
+                    dp = array([ID/10, value/10, piece.defends/10,
+                        piece.threats/10, piece.threatens/10,
+                        piece.num_moves/10])
                     cur_row.append(dp)
                 cur_row = array(cur_row)
                 datapoint.append(cur_row)
@@ -282,26 +366,15 @@ class AdvancedCnn(BaseModel):
         datapoints = datapoints.reshape((datapoints.shape[0], 8, 8, 6))
         return datapoints
 
-    def _move_to_datapoint(self, move, piece):
+    def _move_to_datapoint(self, board, piece):
         from numpy import array
         datapoint = [0]*len(piece.move_IDs)
-        datapoint[int(move[-1])] = 1
-        datapoint = array(datapoint)
+        for i, ID in enumerate(piece.move_IDs):
+            piece_move = piece.move_IDs[ID](piece.location)
+            piece_move = (piece_move//10, piece_move%10)
+            if piece_move[0] >= 0 and piece_move[0] <= 7 \
+                    and piece_move[1] >= 0 and piece_move[1] <= 7 \
+                    and board.is_valid_move(piece, piece_move):
+                datapoint[i] = 0.65
         return datapoint
-
-    def _prediction_to_move(self, prediction, board, is_white):
-        from ai.data.moves import MOVES
-        for i, val in enumerate(prediction[0]):
-            if val == max(prediction[0]):
-                prediction = i
-                break
-        for key in MOVES:
-            if MOVES[key] == prediction:
-                move = key
-        my_piece, ID, move_ID = move[0], int(move[1]), move[2:]
-        my_piece = my_piece if is_white else my_piece.lower()
-        pieces = board.white_pieces if is_white else board.black_pieces
-        for piece in pieces:
-            if str(piece) == str(my_piece) and piece.ID == ID:
-                return piece.get_move(int(move_ID))
 

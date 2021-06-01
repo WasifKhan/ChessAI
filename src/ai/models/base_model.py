@@ -16,16 +16,12 @@ class BaseModel(metaclass=ABCMeta):
         self.location = location
         self.datapoints = DataExtractor(game, location, DOWNLOAD_DATA).datapoints
         self.game = game
-        if 'brain.h5' in listdir(self.location):
-            from tensorflow.keras.models import load_model
-            self.model = load_model(self.location + '/brain.h5')
-
+        if hasattr(self, '_load_model'):
+            self._load_model()
 
     def train(self):
-        if not hasattr(self, 'model'):
-            self._build_model()
-        self._train_model()
-        self._evaluate_model()
+        if hasattr(self, '_train'):
+            self._train()
 
     def _resign(self, board, is_white):
         if len(board.history) >= 5:
@@ -37,8 +33,4 @@ class BaseModel(metaclass=ABCMeta):
     def predict(self, board, is_white):
         if self._resign(board, is_white):
             return False
-        prediction = self.model.predict(self._board_to_datapoint(board, is_white))
-        move = self._prediction_to_move(prediction, board, is_white)
-        print(f'move is {move}')
-        return move
-
+        return self._predict(board, is_white)
