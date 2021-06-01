@@ -1,5 +1,14 @@
 '''
 AI Implemented Using A Basic Convolutional Neural Network
+
+self._predict(board, is_white)
+self._load_model()
+self._build_model()
+self._train_model()
+self._evaluate_model()
+self._move_to_datapoint(move)
+self._board_to_datapoint(board, is_white)
+self._prediction_to_move(prediction, board, is_white):
 '''
 
 from ai.models.base_model import BaseModel
@@ -16,17 +25,14 @@ class CnnBasic(BaseModel):
             from tensorflow.keras.models import load_model
             self.model = load_model(self.location + '/brain.h5')
 
-    def _train(self):
-        self.build_model()
-        self.train_model()
-        self.evaluate_model()
-
     def _predict(self, board, is_white):
         prediction = self.model.predict(self._board_to_datapoint(board, is_white))
         move = self._prediction_to_move(prediction, board, is_white)
         return move
 
-    def build_model(self):
+    def _build_model(self):
+        if hasattr(self, 'model'):
+            return
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D
@@ -44,7 +50,7 @@ class CnnBasic(BaseModel):
                 metrics=['categorical_accuracy'])
         self.model = model
 
-    def train_model(self):
+    def _train_model(self):
         from sklearn.model_selection import train_test_split
         from numpy import array
         from time import time
@@ -73,13 +79,13 @@ class CnnBasic(BaseModel):
         self.model.save(f'{self.location}/brain.h5')
 
 
-    def evaluate_model(self):
+    def _evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
         fig, axs = pyplot.subplots()
         axs.set_title('Prediction Accuracy')
-        axs.xlabel('Epoch')
-        axs.ylabel('Accuracy')
+        pyplot.xlabel('Epoch')
+        pyplot.ylabel('Accuracy')
         axs.plot(self.performance.history['categorical_accuracy'], color='blue', label='train')
         axs.plot(self.performance.history['val_categorical_accuracy'], color='orange', label='test')
         pyplot.legend()
@@ -106,7 +112,7 @@ class CnnBasic(BaseModel):
         return datapoint
 
     def _move_to_datapoint(self, move):
-        from ai.data.moves import MOVES
+        from ai.models.cnn_basic.moves import MOVES
         from numpy import array
         datapoint = [0]*142
         datapoint[MOVES[move.upper()]] = 1

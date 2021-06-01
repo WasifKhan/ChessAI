@@ -13,10 +13,10 @@ class AI:
         exec(f'from .models.{ai_file}.{ai_file} import {ai_cls} as ai')
         model = eval('ai')
         self.name = name
-        self.model = model(game, location)
+        self.ai = model(game, location)
 
     def train(self):
-        return self.model.train()
+        return self.ai.train()
 
     def predict(self, board, is_white=False):
-        return self.model.predict(board, is_white)
+        return self.ai.predict(board, is_white)

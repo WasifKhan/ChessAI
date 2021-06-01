@@ -20,13 +20,14 @@ class BaseModel(metaclass=ABCMeta):
             self._load_model()
 
     def train(self):
-        if hasattr(self, '_train'):
-            self._train()
+        self._build_model()
+        self._train_model()
+        self._evaluate_model()
 
     def _resign(self, board, is_white):
         if len(board.history) >= 5:
             value = sum([value[3] for value in board.history[-5:]])
-            if (value <= -10 and is_white) or (value >= 10 and not is_white):
+            if (value <= -15 and is_white) or (value >= 15 and not is_white):
                 return True
         return False
 

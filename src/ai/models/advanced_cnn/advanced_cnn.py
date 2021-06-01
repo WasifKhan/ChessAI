@@ -1,8 +1,15 @@
 '''
 AI Implemented Using Several Convolutional Neural Networks
+
+self._predict(board, is_white)
+self._load_model()
+self._build_model()
+self._train_model()
+self._evaluate_model()
 '''
 
 from ai.models.base_model import BaseModel
+from ai.models.advanced_cnn.auxiliary_functions.functions import move_to_datapoint, boards_to_datapoints, moves_to_datapoints
 
 
 
@@ -28,16 +35,11 @@ class AdvancedCnn(BaseModel):
             elif model == 'vote':
                 self.models['vote_best_move'] = load_model(self.location + '/brain/' + brain)
 
-    def _train(self):
-        self.build_model()
-        self.train_model()
-        self.evaluate_model()
-
     def _predict(self, board, is_white):
         from numpy import array
         piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
         my_pieces = board.white_pieces if is_white else board.black_pieces
-        x_data = self._boards_to_datapoints([board])
+        x_data = boards_to_datapoints([board])
         datapoint = [0] * 16
         board_datapoint = [0] * 16
         for i in range(16):
@@ -67,7 +69,6 @@ class AdvancedCnn(BaseModel):
         board_datapoint = board_datapoint.reshape((1, 16, 6))
         model = self.models['vote_best_move']
         prediction = model.predict([board_datapoint, datapoint])
-
         for i, val in enumerate(prediction[0]):
             if val == max(prediction[0]):
                 move = datapoint[0][i]
@@ -77,10 +78,11 @@ class AdvancedCnn(BaseModel):
                     if piece_map[str(piece).upper()] + piece.ID - 1 == i:
                             move = piece.move_IDs[move](piece.location)
                             return piece.location[0]*10+piece.location[1], move
-        print(f'move not found')
         return None
 
-    def build_model(self):
+    def _build_model(self):
+        if self.models['vote_best_move']:
+            return
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
@@ -135,25 +137,27 @@ class AdvancedCnn(BaseModel):
         self.models['vote_best_move'] = [model, list([list(), list()]), list()]
 
 
-    def train_model(self):
+    def _train_model(self):
         from sklearn.model_selection import train_test_split
         from numpy import array
         from time import time
         start = time()
-        num_datapoints = 200
+        num_datapoints = 2
         print(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
+            '''
             if i % (num_datapoints//100) == 0:
                 print(f'{i//(num_datapoints//100)}% downloading')
+            '''
             boards, moves = data
             self.game.__init__()
-            x_data = self._boards_to_datapoints(boards)
+            x_data = boards_to_datapoints(boards)
             for i in range(len(boards)):
                 my_pieces = boards[i].white_pieces if self.game.white_turn \
                         else boards[i].black_pieces
                 piece = boards[i][moves[i][0]]
                 ID = piece.ID if not piece.value == 9 else 1
-                y = self._move_to_datapoint(boards[i], piece)
+                y = move_to_datapoint(boards[i], piece)
                 self.game.move(*moves[i])
                 y[int(self.game.board.move_ID[-1])] = 1
                 y = array(y)
@@ -204,10 +208,12 @@ class AdvancedCnn(BaseModel):
 
         print(f'Main Network: Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
+            '''
             if i % (num_datapoints//100) == 0:
                 print(f'Main Network: {i//(num_datapoints//100)}% downloading')
+            '''
             boards, moves = data
-            x_data = self._boards_to_datapoints(boards)
+            x_data = boards_to_datapoints(boards)
             for piece in boards[0].white_pieces:
                 model = self.models['should_move'][str(piece) + str(piece.ID)][0]
                 should_move = model.predict(x_data)
@@ -224,7 +230,7 @@ class AdvancedCnn(BaseModel):
                             break
                 datapoint = array(datapoint)
                 x2[i] = datapoint
-            x1, y = self._pieces_to_datapoints(boards, moves)
+            x1, y = moves_to_datapoints(boards, moves)
             self.models['vote_best_move'][1][0].extend(x1)
             self.models['vote_best_move'][1][1].extend(x2)
             self.models['vote_best_move'][2].extend(y)
@@ -255,7 +261,7 @@ class AdvancedCnn(BaseModel):
         self.models['vote_best_move'][0].save(f'{self.location}/brain/vote_best_move_brain.h5')
 
 
-    def evaluate_model(self):
+    def _evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
         fig, axs = pyplot.subplots(4, 4)
@@ -305,76 +311,4 @@ class AdvancedCnn(BaseModel):
         pyplot.legend()
         pyplot.show()
 
-    def _pieces_to_datapoints(self, boards, moves):
-        from numpy import array
-        piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
-        piece_datapoints = list()
-        board_datapoints = list()
-        is_white = True
-        for i, board in enumerate(boards):
-            piece = boards[i][moves[i][0]]
-            piece_datapoint = [0]*16
-            piece_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = 1
-            piece_datapoint = array(piece_datapoint)
-            piece_datapoints.append(piece_datapoint)
-
-            board_datapoint = [0]*16
-            pieces = boards[i].white_pieces if is_white else boards[i].black_pieces
-            for i in range(16):
-                board_datapoint[i] = [0]*6
-                board_datapoint[i] = array(board_datapoint[i])
-            for piece in pieces:
-                piece.compute_info(board)
-                ID = piece.ID if piece.is_white is not None else 0
-                value = piece.value if piece.is_white == is_white \
-                        else piece.value * -1
-                piece_info = [ID/10, value/10, piece.defends/10,
-                        piece.threats/10, piece.threatens/10,
-                        piece.num_moves/10]
-                piece_info = array(piece_info)
-                board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
-            board_datapoint = array(board_datapoint)
-            board_datapoint.reshape((1, 16, 6))
-            board_datapoints.append(board_datapoint)
-        return board_datapoints, piece_datapoints
-
-    def _boards_to_datapoints(self, boards):
-        from numpy import array
-        is_white = True
-        datapoints = []
-        for board in boards:
-            board_direction = range(8) if is_white else range(7, -1, -1)
-            datapoint = []
-            for row in board_direction:
-                cur_row = []
-                for column in range(8):
-                    piece = board[column,row]
-                    piece.compute_info(board)
-                    ID = piece.ID if piece.is_white is not None else 0
-                    value = piece.value if piece.is_white == is_white \
-                            else piece.value * -1
-                    dp = array([ID/10, value/10, piece.defends/10,
-                        piece.threats/10, piece.threatens/10,
-                        piece.num_moves/10])
-                    cur_row.append(dp)
-                cur_row = array(cur_row)
-                datapoint.append(cur_row)
-            is_white = not(is_white)
-            datapoint = array(datapoint)
-            datapoints.append(datapoint)
-        datapoints = array(datapoints)
-        datapoints = datapoints.reshape((datapoints.shape[0], 8, 8, 6))
-        return datapoints
-
-    def _move_to_datapoint(self, board, piece):
-        from numpy import array
-        datapoint = [0]*len(piece.move_IDs)
-        for i, ID in enumerate(piece.move_IDs):
-            piece_move = piece.move_IDs[ID](piece.location)
-            piece_move = (piece_move//10, piece_move%10)
-            if piece_move[0] >= 0 and piece_move[0] <= 7 \
-                    and piece_move[1] >= 0 and piece_move[1] <= 7 \
-                    and board.is_valid_move(piece, piece_move):
-                datapoint[i] = 0.65
-        return datapoint
 
