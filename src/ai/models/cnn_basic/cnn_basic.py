@@ -11,6 +11,7 @@ class CnnBasic(BaseModel):
         super().__init__(game, location)
 
     def _load_model(self):
+        from os import listdir
         if 'brain.h5' in listdir(self.location):
             from tensorflow.keras.models import load_model
             self.model = load_model(self.location + '/brain.h5')
@@ -66,7 +67,7 @@ class CnnBasic(BaseModel):
         start = time()
         x_data, y_data = array(x_data), array(y_data)
         x_data = x_data.reshape((x_data.shape[0], 8, 8, 6))
-        print(f'Begin learning over {x_train.shape[0]} datapoints')
+        print(f'Begin learning over {x_data.shape[0]} datapoints')
         self.performance = self.model.fit(x_data, y_data, epochs=100, batch_size=32, validation_split=0.2)
         print(f'Done learning. Took {str(time()-start)[0:5]}s')
         self.model.save(f'{self.location}/brain.h5')

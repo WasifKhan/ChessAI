@@ -7,6 +7,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from interface import Interface
 
+CURRENT_AI = 1
 
 
 class Window(tk.Frame):
@@ -112,7 +113,7 @@ class View:
         print('\nDone Loading\nClick Play Again.\n')
 
     def versus_current_AI(self):
-        self.interface.versus_AI(2)
+        self.interface.versus_AI(CURRENT_AI)
         print('\nDone Loading\nClick Play Again.\n')
 
     def action(self, piece):

@@ -67,6 +67,7 @@ class AdvancedCnn(BaseModel):
         board_datapoint = board_datapoint.reshape((1, 16, 6))
         model = self.models['vote_best_move']
         prediction = model.predict([board_datapoint, datapoint])
+
         for i, val in enumerate(prediction[0]):
             if val == max(prediction[0]):
                 move = datapoint[0][i]
@@ -82,7 +83,7 @@ class AdvancedCnn(BaseModel):
     def build_model(self):
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
-            Concatenate, Lambda, Reshape, MaxPooling2D
+            Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
         from tensorflow.keras.optimizers import SGD
         self.game.__init__()
         self.models = dict()
@@ -98,7 +99,7 @@ class AdvancedCnn(BaseModel):
             x = Flatten()(x)
             x = Dense(20, activation='relu')(x)
             outputs = Dense(1, activation='sigmoid')(x)
-            opt = SGD(lr=0.05, momentum=0.7)
+            opt = SGD(lr=0.1, momentum=0.9)
             model = Model(inputs, outputs)
             model.compile(optimizer=opt, loss='binary_crossentropy',
                             metrics=['binary_accuracy'])
@@ -108,9 +109,12 @@ class AdvancedCnn(BaseModel):
             x = Conv2D(32, (4, 4), activation='relu')(inputs)
             x = Conv2D(16, (2, 2), activation='relu')(x)
             x = Flatten()(x)
-            x = Dense(20, activation='relu')(x)
+            x = Dense(64, activation='relu')(x)
+            x = Dropout(0.2)(x)
+            x = Dense(32, activation='relu')(x)
+            x = Dropout(0.2)(x)
             outputs = Dense(len(piece.move_IDs), activation='sigmoid')(x)
-            opt = SGD(lr=0.1, momentum=0.8)
+            opt = SGD(lr=0.05, momentum=0.8)
             model = Model(inputs, outputs)
             model.compile(optimizer=opt, loss='binary_crossentropy',
                             metrics=['binary_accuracy'])
@@ -122,11 +126,12 @@ class AdvancedCnn(BaseModel):
         x = Dense(1, activation='relu')(x)
         x = Flatten()(x)
         x = Dense(64, activation='relu')(x)
-        outputs = Dense(16, activation='sigmoid')(x)
-        opt = SGD(lr=0.1, momentum=0.9)
+        x = Dropout(0.2)(x)
+        outputs = Dense(16, activation='softmax')(x)
+        opt = SGD(lr=0.05, momentum=0.8)
         model = Model(inputs=[inputs1, inputs2], outputs=outputs)
-        model.compile(optimizer=opt, loss='binary_crossentropy',
-                        metrics=['binary_accuracy'])
+        model.compile(optimizer=opt, loss='categorical_crossentropy',
+                        metrics=['categorical_accuracy'])
         self.models['vote_best_move'] = [model, list([list(), list()]), list()]
 
 
@@ -293,9 +298,9 @@ class AdvancedCnn(BaseModel):
         axs.set_title('Main Network')
         pyplot.xlabel('Epoch')
         pyplot.ylabel('Accuracy')
-        axs.plot(self.performances['vote_best_move'].history['binary_accuracy'],
+        axs.plot(self.performances['vote_best_move'].history['categorical_accuracy'],
                 color='blue', label='train')
-        axs.plot(self.performances['vote_best_move'].history['val_binary_accuracy'],
+        axs.plot(self.performances['vote_best_move'].history['val_categorical_accuracy'],
                 color='orange', label='test')
         pyplot.legend()
         pyplot.show()
