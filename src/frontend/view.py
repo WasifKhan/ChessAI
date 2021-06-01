@@ -7,7 +7,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from interface import Interface
 
-CURRENT_AI = 1
+CURRENT_AI = 4
 
 
 class Window(tk.Frame):
