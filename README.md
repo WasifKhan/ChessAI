@@ -4,13 +4,13 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
+- finish cnn
+  - prediction=max(nn=softmax activation of final layer)
+  - tweak rewards to see best one-prioritize defense
+  - try 18 architectures {space,avg,dense}layer x {1,2,3}layers x {sigmoid, relu}activations
+  - custom loss functions
 - make data extracyor a subclass of ai
 - clean up ai logic
-- try 18 architectures:
-  - {sparse, avg, dense} neurons per layer
-  - {1,2,3} hidden layers
-  - {sigmoid, relu} activations
-- custom loss and activation functions for final layer/network
 - #### MILESTONE 1.5 base smart AI done
 - Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
