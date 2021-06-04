@@ -4,6 +4,10 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
+- only process games rank 1.8k and above
+- weight each datapoint based on how many other datapoints we have in this state (if many, weight is less)
+- ake board from 1x1->3x3
+- loggers
 - finish cnn
   - prediction=max(nn=softmax activation of final layer)
   - tweak rewards to see best one-prioritize defense
