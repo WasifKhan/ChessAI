@@ -8,129 +8,179 @@ self._train_model()
 self._evaluate_model()
 self._move_to_datapoint(move)
 self._board_to_datapoint(board, is_white)
-self._prediction_to_move(prediction, board, is_white):
 '''
 
 from ai.models.base_model import BaseModel
+from ai.models.cnn_basic.auxiliary_functions.functions import boards_to_datapoints, moves_to_datapoints
+from ai.models.cnn_basic.moves import MOVES as MOVES
 
-
+LOSS = 'binary_crossentropy'
+ACTIVATION = 'sigmoid'
 
 class CnnBasic(BaseModel):
     def __init__(self, game, location):
-        super().__init__(game, location)
-
-    def _load_model(self):
+        from tensorflow.keras.models import load_model
         from os import listdir
-        if 'brain.h5' in listdir(self.location):
-            from tensorflow.keras.models import load_model
-            self.model = load_model(self.location + '/brain.h5')
+        super().__init__(game, location)
+        location = self.location + '/brain/'
+        self.models = list()
+        self.names = list()
+        for brain in listdir(location):
+            if 'brain' in brain:
+                self.models.append(load_model(location + brain))
 
     def _predict(self, board, is_white):
-        prediction = self.model.predict(self._board_to_datapoint(board, is_white))
-        move = self._prediction_to_move(prediction, board, is_white)
+        from numpy import array
+        dp = boards_to_datapoints([board], False)
+        predictions = dict()
+        for model in self.models:
+            prediction = model.predict(array(dp))[0]
+            for i, val in enumerate(prediction):
+                if val == max(prediction):
+                    move = i
+            for key in MOVES:
+                if MOVES[key] == move:
+                    move_ID = key
+            piece_ID, move_index = move_ID[0:2], int(move_ID[2])
+            my_pieces = board.white_pieces if is_white else board.black_pieces
+            source = None
+            for piece in my_pieces:
+                ID = piece.ID if piece.value != 9 else 1
+                if str(piece).upper() + str(ID) == piece_ID:
+                    source = piece.location[0]*10 + piece.location[1]
+                    destination = piece.move_IDs[move_index](piece.location)
+                if source and board.is_valid_move(board[source],
+                        (destination//10, destination%10)):
+                    if (source, destination) not in  predictions:
+                        predictions[(source, destination)] = 1
+                    else:
+                        predictions[(source, destination)] += 1
+        max_vote = None
+        move = None
+        for key in predictions:
+            if not max_vote:
+                max_vote = predictions[key]
+                move = key
+            elif predictions[key] > max_vote:
+                max_vote = predictions[key]
+                move = key
         return move
 
+
     def _build_model(self):
-        if hasattr(self, 'model'):
+        if self.models:
             return
         from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
-            Concatenate, Lambda, Reshape, MaxPooling2D
+        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
+            Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
         from tensorflow.keras.optimizers import SGD
-
-        inputs = Input(shape=(8, 8, 6))
-        x = Conv2D(32, (4, 4), activation='sigmoid')(inputs)
-        x = Conv2D(16, (2, 2), activation='sigmoid')(x)
+        self.names = list()
+        inputs = Input(shape=(8, 8, 5))
+        x = Conv2D(32, (4, 4), activation='relu')(inputs)
+        x = MaxPooling2D()(x)
+        x = Conv2D(64, (2, 2), activation='relu')(x)
         x = Flatten()(x)
-        x = Dense(200, activation='sigmoid')(x)
-        outputs = Dense(142, activation='softmax')(x)
-        opt = SGD(lr=0.05, momentum=0.9)
-        model = Model(inputs, outputs)
-        model.compile(optimizer=opt, loss='categorical_crossentropy',
-                metrics=['categorical_accuracy'])
-        self.model = model
+        x = Dense(300, activation='relu')(x)
+        outputs = Dense(142, activation=ACTIVATION)(x)
+        opt = SGD(lr=0.01, momentum=0.8)
+        model = Model(inputs=inputs, outputs=outputs)
+        model.compile(optimizer=opt, loss=LOSS, metrics=[LOSS])
+        self.names.append('Conv2d w/ pool+300dense')
+        self.models.append(model)
+
+        inputs = Input(shape=(8, 8, 5))
+        x = Conv2D(16, (4, 4), activation='relu')(inputs)
+        x = MaxPooling2D()(x)
+        x = Conv2D(32, (2, 2), activation='relu')(x)
+        x = Flatten()(x)
+        outputs = Dense(142, activation=ACTIVATION)(x)
+        opt = SGD(lr=0.01, momentum=0.8)
+        model = Model(inputs=inputs, outputs=outputs)
+        model.compile(optimizer=opt, loss=LOSS, metrics=[LOSS])
+        self.names.append('shallow Conv2d w/ pool')
+        self.models.append(model)
+
+        inputs = Input(shape=(8, 8, 5))
+        x = Dense(64, activation='relu')(inputs)
+        x = Flatten()(x)
+        x = Dense(300, activation='relu')(x)
+        outputs = Dense(142, activation=ACTIVATION)(x)
+        opt = SGD(lr=0.01, momentum=0.8)
+        model = Model(inputs=inputs, outputs=outputs)
+        model.compile(optimizer=opt, loss=LOSS, metrics=[LOSS])
+        self.names.append('ffnn multi-layer')
+        self.models.append(model)
+
+        inputs = Input(shape=(8, 8, 5))
+        x = Dense(64, activation='relu')(inputs)
+        x = Flatten()(x)
+        x = Dense(300, activation='relu')(x)
+        outputs = Dense(142, activation=ACTIVATION)(x)
+        opt = SGD(lr=0.001, momentum=0.6)
+        model = Model(inputs=inputs, outputs=outputs)
+        model.compile(optimizer=opt, loss=LOSS, metrics=[LOSS])
+        self.names.append('ffnn multilayer, low learning rate/momentum')
+        self.models.append(model)
+
 
     def _train_model(self):
-        from sklearn.model_selection import train_test_split
         from numpy import array
         from time import time
         start = time()
-        num_datapoints = 100
-        x_data, y_data = list(), list()
-        print(f'Begin downloading data.')
+        num_datapoints = 10000
+        x = list()
+        y = list()
+        self.logger.error('test error')
+        my_data = self.get_data()
+        self.logger.info(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
-            if i % (num_datapoints//100) == 0:
-                print(f'{i//(num_datapoints//100)}% downloading')
-            board, move = data
-            self.game.__init__()
-            for i in range(len(board)):
-                x = self._board_to_datapoint(board[i], self.game.white_turn)
-                self.game.move(*move[i])
-                y = self._move_to_datapoint(self.game.board.move_ID)
-                x_data.append(x)
-                y_data.append(y)
-        print(f'Done downloading. Took {time()-start}s')
+            if i >= 100 and i % (num_datapoints//100) == 0:
+                self.logger.log(f'{i//(num_datapoints//100)}% downloading')
+            boards, moves = data
+            x_data = boards_to_datapoints(boards)
+            y_data, bad_indicies = moves_to_datapoints(boards, my_data)
+            for index in bad_indicies[::-1]:
+                del x_data[index]
+                del y_data[index]
+            x.extend(x_data)
+            y.extend(y_data)
+        x, y = array(x), array(y)
+        x = x.reshape((x.shape[0], 8, 8, 5))
+        y = y.reshape((y.shape[0], 142))
+        for i in range(5):
+            x_val = max(max(x[:,:,:,i:i+1].reshape(-1,)), 1)
+            x[:,:,:,i:i+1] = x[:,:,:,i:i+1] / x_val
+        x = x.reshape((x.shape[0], 8, 8, 5))
+        self.logger.info(f'Done downloading. Took {str(time()-start)[0:5]}s')
+        self.logger.info(f'Begin learning over {x.shape[0]} datapoints')
         start = time()
-        x_data, y_data = array(x_data), array(y_data)
-        x_data = x_data.reshape((x_data.shape[0], 8, 8, 6))
-        print(f'Begin learning over {x_data.shape[0]} datapoints')
-        self.performance = self.model.fit(x_data, y_data, epochs=100, batch_size=32, validation_split=0.2)
-        print(f'Done learning. Took {str(time()-start)[0:5]}s')
-        self.model.save(f'{self.location}/brain.h5')
+        self.performances = list()
+        for i, model in enumerate(self.models):
+            self.performances.append(model.fit(x, y,
+                epochs=10, batch_size=32, validation_split=0.2, verbose=0))
+            model.save(f'{self.location}/brain/brain_{i}.h5')
+        self.logger.info(f'Done learning. Took {str(time()-start)[0:5]}s')
 
 
     def _evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
-        fig, axs = pyplot.subplots()
-        axs.set_title('Prediction Accuracy')
-        pyplot.xlabel('Epoch')
-        pyplot.ylabel('Accuracy')
-        axs.plot(self.performance.history['categorical_accuracy'], color='blue', label='train')
-        axs.plot(self.performance.history['val_categorical_accuracy'], color='orange', label='test')
+        fig, axs = pyplot.subplots(4)
+        fig.suptitle('Network Performances')
+        colors = ['blue', 'orange', 'red', 'green']
+        for i, performance in enumerate(self.performances):
+            axs[i].set_title(f'{self.names[i]}')
+            axs[i].plot(performance.history[LOSS],
+                    color=colors[0], label=f'train accuracy')
+            axs[i].plot(performance.history['val_' + LOSS],
+                    color=colors[1], label='test accuracy')
+            axs[i].plot(performance.history['loss'],
+                    color=colors[2], label=f'train_loss')
+            axs[i].plot(performance.history['val_loss'],
+                    color=colors[3], label=f'test loss')
+        for ax in axs.flat:
+            ax.set(xlabel='Epoch', ylabel='Accuracy')
+        for ax in axs.flat:
+            ax.label_outer()
         pyplot.legend()
         pyplot.show()
-
-
-    def _board_to_datapoint(self, board, is_white):
-        from numpy import array
-        board_direction = range(8) if is_white else range(7, -1, -1)
-        datapoint = []
-        for row in board_direction:
-            cur_row = []
-            for column in range(8):
-                piece = board[column,row]
-                piece.compute_info(board)
-                ID = piece.ID if piece.is_white is not None else 0
-                value = piece.value if piece.is_white == is_white \
-                        else piece.value * -1
-                cur_row.append([ID, value, piece.defends, piece.threats,
-                            piece.threatens, piece.num_moves])
-            datapoint.append(cur_row)
-        datapoint = array(datapoint)
-        datapoint = datapoint.reshape(1, 8, 8, 6)
-        return datapoint
-
-    def _move_to_datapoint(self, move):
-        from ai.models.cnn_basic.moves import MOVES
-        from numpy import array
-        datapoint = [0]*142
-        datapoint[MOVES[move.upper()]] = 1
-        datapoint = array(datapoint)
-        return datapoint
-
-    def _prediction_to_move(self, prediction, board, is_white):
-        from ai.data.moves import MOVES
-        for i, val in enumerate(prediction[0]):
-            if val == max(prediction[0]):
-                prediction = i
-                break
-        for key in MOVES:
-            if MOVES[key] == prediction:
-                move = key
-        my_piece, ID, move_ID = move[0], int(move[1]), move[2:]
-        my_piece = my_piece if is_white else my_piece.lower()
-        pieces = board.white_pieces if is_white else board.black_pieces
-        for piece in pieces:
-            if str(piece) == str(my_piece) and piece.ID == ID:
-                return piece.get_move(int(move_ID))

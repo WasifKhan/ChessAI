@@ -3,10 +3,9 @@ from abc import abstractmethod
 
 
 class Square:
-    ID = 1
-    def __init__(self, location, ID=None):
+    def __init__(self, location, ID):
         self.location = location
-        self.ID = ID if ID else Square.ID
+        self.ID = ID
         self.is_white = None
         self.value = 0
 
@@ -28,10 +27,11 @@ class Square:
 
     def compute_info(self, board):
         self.defends, self.threats, self.threatens, self.num_moves = [0]*4
+        return 0
 
 class Piece(Square, metaclass=ABCMeta):
     def __init__(self, is_white, location):
-        super().__init__(location)
+        super().__init__(location, location[0]*10 + location[1])
         self.is_white = is_white
         self.move_IDs = dict()
         self._initialize_moves()
@@ -50,16 +50,25 @@ class Piece(Square, metaclass=ABCMeta):
     def compute_info(self, board):
         my_pieces, their_pieces = (board.white_pieces, board.black_pieces) \
                 if self.is_white else (board.black_pieces, board.white_pieces)
-        self.is_white = not(self.is_white)
-        self.defends = sum([piece.value if piece.value != 100 else 0 for piece in my_pieces \
-                if piece.location[0]*10 + piece.location[1] in self.moves(board)])
-        self.is_white = not(self.is_white)
-        self.threats = sum([piece.value for piece in their_pieces \
+        defends = []
+        if self.value == 1:
+            defends = self._defends(board)
+        else:
+            self.is_white = not(self.is_white)
+            for piece in my_pieces:
+                if piece.location[0]*10 + piece.location[1] in self.moves(board):
+                    for their_piece in their_pieces:
+                        if piece.location[0]*10 + piece.location[1] in their_piece.moves(board):
+                            defends.append(piece.value if piece.value != 2 else 0)
+            self.is_white = not(self.is_white)
+        self.defends = sum(defends)
+        self.threats = sum([piece.value if piece.value != 2 else 1 for piece in their_pieces \
                 if self.location[0]*10 + self.location[1] in piece.moves(board)])
-        self.threatens = sum([piece.value for piece in their_pieces \
+        self.threatens = sum([piece.value if piece.value != 2 else 1 for piece in their_pieces \
                 if piece.location[0]*10 + piece.location[1] in self.moves(board)])
         self.num_moves = sum([1 for move in self.moves(board) \
                 if not isinstance(board[move], Piece)])
+        return self.defends + self.threats + self.threatens + self.num_moves
 
 
     def get_move(self, move_ID):

@@ -5,6 +5,7 @@ Abstract Base Class for Data Extractor
 from abc import ABCMeta
 from re import split
 from numpy import array
+from ai.data.info import Info
 from backend.pieces.king import King
 from backend.pieces.queen import Queen
 from backend.pieces.rook import Rook
@@ -14,10 +15,9 @@ from backend.pieces.pawn import Pawn
 
 
 
-class Parser(metaclass=ABCMeta):
+class Parser(Info):
     def __init__(self, game, location):
-        self.game = game
-        self.location = location
+        super().__init__(game, location)
 
 
     def _extract_moves(self, line):

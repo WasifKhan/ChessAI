@@ -19,7 +19,7 @@ class Interface:
     def versus_AI(self, difficulty) -> None:
         self.ai = AI(self.game, difficulty)
         self.versus_ai = True
-        self.set_player_names(self.game.p1_name, 'Black AI')
+        self.set_player_names(self.game.p1_name, self.ai.name)
 
     def train_AI(self):
         self.ai.train()
@@ -38,17 +38,9 @@ class Interface:
         self.play_again()
 
     def ai_move(self, is_white: bool) -> bool:
-        if (ai_move := self.ai.predict(self.game.board, is_white)):
-            print(f'Valid move: {ai_move}')
-            return self.add_move(ai_move[0], ai_move[1])
-        else:
-            print(f'AI move: {ai_move}')
-        return ai_move
-        '''
         return self.add_move(ai_move[0], ai_move[1]) \
                 if (ai_move := self.ai.predict(self.game.board, is_white)) \
                 else ai_move
-        '''
 
     def add_move(self, source: int, destination: int) -> bool:
         if self.game.move(source, destination):

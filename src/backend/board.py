@@ -73,7 +73,7 @@ class Board:
         self.white_pieces = set()
         self.black_pieces = set()
         self.game_over = False
-        self.board = [[Square(location=(x, y)) for y in range(8)] for x in range(8)]
+        self.board = [[Square(location=(x, y), ID=x*10+y) for y in range(8)] for x in range(8)]
         if not pieces:
             from .pieces.initial_pieces import PIECES as pieces
         for piece in pieces:
@@ -87,6 +87,13 @@ class Board:
                 output += f' {str(self.board[column][row])} '
             output += '\n'
         return output[0:-1]
+
+    def pprint(self):
+        output = ''
+        for row in range(8):
+            for column in range(8):
+                output += str(self.board[column][row])
+        return output
 
 
     def __copy__(self):
@@ -139,7 +146,8 @@ class Board:
         if (captured_piece := self[destination]).is_white == piece.is_white:
             return False
         self[destination] = piece
-        self[piece.location] = Square(piece.location)
+        self[piece.location] = Square(piece.location,
+                piece.location[0]*10+piece.location[1])
         piece_location = piece.location
         piece.location = destination
         if self._check(piece.is_white, captured_piece):
@@ -170,13 +178,13 @@ class Board:
                 rook = self[rook_location]
                 rook.move((piece.location[0]-1, piece.location[1]))
                 self[piece.location[0]-1, piece.location[1]] = rook
-                self[rook_location] = Square(rook_location)
+                self[rook_location] = Square(rook_location, rook_location[0]*10+rook_location[1])
             elif destination[0] - piece.location[0] == 2:
                 rook_location = destination[0]+1, destination[1]
                 rook = self[rook_location]
                 rook.move((piece.location[0]+1, piece.location[1]))
                 self[piece.location[0]+1, piece.location[1]] = rook
-                self[rook_location] = Square(rook_location)
+                self[rook_location] = Square(rook_location, rook_location[0]*10 + rook_location[1])
 
 
     def _enpassant(self, piece, destination):
@@ -188,7 +196,7 @@ class Board:
                 self.white_pieces.remove(capture_piece) \
                     if capture_piece.is_white \
                     else self.black_pieces.remove(capture_piece)
-                self[capture_location] = Square(capture_location)
+                self[capture_location] = Square(capture_location, capture_location[0]*10 + capture_location[1])
 
 
     def _promote(self, piece, destination):
@@ -219,7 +227,7 @@ class Board:
         previous_location = piece.location
         piece.move(destination)
         ID = 1 if isinstance(piece, Queen) else piece.ID
-        self.move_ID = str(piece) + str(ID) + str(piece.move_ID)
+        self.move_ID = str(piece).upper() + str(ID) + str(piece.move_ID)
         captured_piece = self[destination]
         if (isinstance(captured_piece, Piece)):
             if captured_piece.is_white:
@@ -227,7 +235,7 @@ class Board:
             else:
                 self.black_pieces.remove(captured_piece)
         self[destination] = piece
-        self[previous_location] = Square(previous_location)
+        self[previous_location] = Square(previous_location, previous_location[0]*10 + previous_location[1])
 
 
     def _add_piece(self, piece):
@@ -240,5 +248,4 @@ class Board:
                 self.black_king = piece
             self.black_pieces.add(piece)
         self[piece.location] = piece
-
 

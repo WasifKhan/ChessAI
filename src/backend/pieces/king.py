@@ -8,7 +8,7 @@ class King(Piece):
     def __init__(self, ID, is_white, location):
         super().__init__(is_white, location)
         self.ID = ID
-        self.value = 100
+        self.value = 2
 
     def __str__(self):
         return 'K' if self.is_white else 'k'

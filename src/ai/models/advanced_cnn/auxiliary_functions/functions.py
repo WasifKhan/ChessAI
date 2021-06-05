@@ -1,9 +1,9 @@
 '''
-Auxiliary functions for Advanced CNN
+Auxiliary Functions for Basic CNN
 '''
 
 from numpy import array
-
+from copy import copy
 
 
 def move_to_datapoint(board, piece):
@@ -14,8 +14,12 @@ def move_to_datapoint(board, piece):
         if piece_move[0] >= 0 and piece_move[0] <= 7 \
                 and piece_move[1] >= 0 and piece_move[1] <= 7 \
                 and board.is_valid_move(piece, piece_move):
-            datapoint[i] = 0.65
+            temp_board = copy(board)
+            temp_board.move(temp_board[piece.location], piece_move)
+            datapoint[i] = piece.compute_info(board)
+    datapoint = array(datapoint)
     return datapoint
+
 
 def boards_to_datapoints(boards):
     is_white = True
@@ -31,9 +35,9 @@ def boards_to_datapoints(boards):
                 ID = piece.ID if piece.is_white is not None else 0
                 value = piece.value if piece.is_white == is_white \
                         else piece.value * -1
-                dp = array([ID/10, value/10, piece.defends/10,
-                    piece.threats/10, piece.threatens/10,
-                    piece.num_moves/10])
+                dp = array([value, piece.defends,
+                    piece.threats, piece.threatens,
+                    piece.num_moves])
                 cur_row.append(dp)
             cur_row = array(cur_row)
             datapoint.append(cur_row)
@@ -41,38 +45,37 @@ def boards_to_datapoints(boards):
         datapoint = array(datapoint)
         datapoints.append(datapoint)
     datapoints = array(datapoints)
-    datapoints = datapoints.reshape((datapoints.shape[0], 8, 8, 6))
+    datapoints = datapoints.reshape((datapoints.shape[0], 8, 8, 5))
     return datapoints
 
-def moves_to_datapoints(boards, moves):
+def moves_to_datapoints(boards, moves, info):
+    from copy import copy
     piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
-    piece_datapoints = list()
-    board_datapoints = list()
-    is_white = True
+    datapoints = [0] * len(boards)
+    white_turn = True
+    bad_indicies = []
     for i, board in enumerate(boards):
-        piece = boards[i][moves[i][0]]
-        piece_datapoint = [0]*16
-        piece_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = 1
-        piece_datapoint = array(piece_datapoint)
-        piece_datapoints.append(piece_datapoint)
-        
-        board_datapoint = [0]*16
-        pieces = boards[i].white_pieces if is_white else boards[i].black_pieces
-        for i in range(16):
-            board_datapoint[i] = [0]*6
-            board_datapoint[i] = array(board_datapoint[i])
-        for piece in pieces:
-            piece.compute_info(board)
-            ID = piece.ID if piece.is_white is not None else 0
-            value = piece.value if piece.is_white == is_white \
-                    else piece.value * -1
-            piece_info = [ID/10, value/10, piece.defends/10,
-                    piece.threats/10, piece.threatens/10,
-                    piece.num_moves/10]
-            piece_info = array(piece_info)
-            board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
-        board_datapoint = array(board_datapoint)
-        board_datapoint.reshape((1, 16, 6))
-        board_datapoints.append(board_datapoint)
-    return board_datapoints, piece_datapoints
+        datapoints[i] = array([0]*16)
+        real_piece = boards[i][moves[i][0]]
+        ID = real_piece.ID if real_piece.value != 9 else 1
+        real_piece_ID = str(real_piece) + str(ID)
+        real_move = moves[i][1]
+        my_pieces = board.white_pieces if white_turn else board.black_pieces
+        found = False
+        for piece in my_pieces:
+            ID = piece.ID if piece.value != 9 else 1
+            move_ID = info[i][piece_map[str(piece).upper()] + ID - 1]
+            if str(piece) + str(ID) == real_piece_ID:
+                our_move = piece.move_IDs[move_ID](piece.location)
+                if our_move == real_move:
+                    datapoints[i][piece_map[str(piece).upper()] + ID - 1] = 1
+                    found = True
+                break
+        if not found:
+            bad_indicies.append(i)
+        white_turn = not(white_turn)
+    for index in bad_indicies[::-1]:
+        del datapoints[index]
+    datapoints = array(datapoints)
+    return datapoints, bad_indicies
 

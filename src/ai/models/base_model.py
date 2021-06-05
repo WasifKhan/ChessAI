@@ -1,28 +1,21 @@
 '''
-Abstract Base Class for AI Engines
+Base Class for AI Engines
 '''
 
-from abc import ABCMeta
+from ai.data.data_extractor import DataExtractor
 
 
 
-DOWNLOAD_DATA = True
-
-
-class BaseModel(metaclass=ABCMeta):
+class BaseModel(DataExtractor):
     def __init__(self, game, location):
-        from os import listdir
-        from ai.data.data_extractor import DataExtractor
-        self.location = location
-        self.datapoints = DataExtractor(game, location, DOWNLOAD_DATA).datapoints
-        self.game = game
-        if hasattr(self, '_load_model'):
-            self._load_model()
+        super().__init__(game, location)
+
 
     def train(self):
         self._build_model()
         self._train_model()
         self._evaluate_model()
+
 
     def _resign(self, board, is_white):
         if len(board.history) >= 5:
@@ -30,6 +23,7 @@ class BaseModel(metaclass=ABCMeta):
             if (value <= -15 and is_white) or (value >= 15 and not is_white):
                 return True
         return False
+
 
     def predict(self, board, is_white):
         if self._resign(board, is_white):

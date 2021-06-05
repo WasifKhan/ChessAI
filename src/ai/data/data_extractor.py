@@ -10,28 +10,61 @@ from ai.data.parser import Parser
 
 
 class DataExtractor(Parser):
-    def __init__(self, game, location, download=False):
+    def __init__(self, game, location):
         super().__init__(game, location)
-        self.download = download
         #self._download_raw_data()
 
 
     def datapoints(self, num_games):
-        if self.download:
-            from os import listdir
-            for data in listdir(DESTINATION):
-                if data[0] == 'd':
-                    with open(DESTINATION + data) as fp:
-                        for moves in fp:
-                            if num_games == 0:
-                                return StopIteration
-                            num_games -= 1
-                            yield self._generate_datapoint(moves)
-        else:
-            for moves in self._stream_raw_data(num_games):
-                yield self._generate_datapoint(moves)
+        from os import listdir
+        for data in listdir(DESTINATION):
+            if data[0] == 'd':
+                with open(DESTINATION + data) as fp:
+                    for moves in fp:
+                        if num_games == 0:
+                            return StopIteration
+                        num_games -= 1
+                        yield self._generate_datapoint(moves)
         return StopIteration
 
+    def populate_data(self, num_games):
+        from time import time
+        data = self.get_data()
+        self.logger.info('Populating data...')
+        for i, moves in enumerate(self._stream_raw_data(num_games)):
+            if i % 1000 == 0:
+                if i != 0:
+                    self.logger.debug(f'took {str(time()-start)[0:5]}s to process')
+                start = time()
+                self.logger.debug(f'{i/10000}% done')
+            if i % 10000 == 0 and i != 0:
+                self.set_data(data)
+                self.logger.debug('Saving state...')
+            datapoints = self._generate_datapoint(moves)
+            for i, board in enumerate(datapoints[0]):
+                if board.pself.logger.log() not in data[i]:
+                    data[i][board.pprint()] = 1
+                else:
+                    data[i][board.pprint()] += 1
+        self.set_data(data)
+        self.logger.info('Done populating...')
+
+    def get_data(self):
+        self.logger.info(f'Begin extacting intelligence.')
+        location = f'./ai/data/dataset/intelligence.py'
+        self.logger.info('Extracting Intelligence...')
+        data = []
+        with open(location, 'r') as fp:
+            for line in fp:
+                data.append(eval(line[0:-1]))
+        self.logger.info(f'Done extacting intelligence.')
+        return data
+
+    def set_data(self, data):
+        location = f'./ai/data/intelligence.py'
+        with open(location, 'w') as fp:
+            for moves in data:
+                fp.write(str(moves) + '\n')
 
     def _download_raw_data(self):
         from time import time
@@ -49,7 +82,7 @@ class DataExtractor(Parser):
                         minutes, seconds = int((end-start)//60), int((end-start)%60)
                         output += f'Previous 100,000 games took {minutes}m{seconds}s to process\n'
                     start = time()
-                    print(output)
+                    self.logger.info(output)
                     with open(filename, 'w') as fp:
                         while (line := next(it)) and num_games < 100000:
                             if (move := str(line))[2] == '1':
@@ -59,7 +92,7 @@ class DataExtractor(Parser):
                         num_games = 0
                 except Exception:
                     continue
-        print('Done downloading dataset')
+        self.logger.info('Done downloading dataset')
 
 
     def _stream_raw_data(self, num_games):

@@ -1,140 +1,118 @@
 '''
-AI Implemented Using Several Convolutional Neural Networks
+AI Implemented Using A Basic Convolutional Neural Network
 
 self._predict(board, is_white)
 self._load_model()
 self._build_model()
 self._train_model()
 self._evaluate_model()
+self._move_to_datapoint(move)
+self._board_to_datapoint(board, is_white)
 '''
 
 from ai.models.base_model import BaseModel
-from ai.models.advanced_cnn.auxiliary_functions.functions import move_to_datapoint, boards_to_datapoints, moves_to_datapoints
 
+from ai.models.cnn_basic.auxiliary_functions.functions import move_to_datapoint, boards_to_datapoints, moves_to_datapoints
 
+LOSS = 'mean_squared_error'
+LOSS_2 = 'categorical_crossentropy'
 
-class AdvancedCnn(BaseModel):
+class CnnBasic(BaseModel):
     def __init__(self, game, location):
         super().__init__(game, location)
 
     def _load_model(self):
-        from tensorflow.keras.models import load_model
         from os import listdir
+        from tensorflow.keras.models import load_model
+        location = self.location + '/brain/'
         self.models = dict()
-        self.models['get_move'] = dict()
-        self.models['should_move'] = dict()
-        self.models['vote_best_move'] = None
-        for brain in listdir(self.location + '/brain/'):
-            if 'brain' not in brain:
-                continue
-            model, _, piece, _ = brain.split('_')
-            if model == 'get':
-                self.models['get_move'][piece] = load_model(self.location + '/brain/' + brain)
-            elif model == 'should':
-                self.models['should_move'][piece] = load_model(self.location + '/brain/' + brain)
-            elif model == 'vote':
-                self.models['vote_best_move'] = load_model(self.location + '/brain/' + brain)
+        for brain in listdir(location):
+            if 'brain' in brain:
+                model_ID = brain.split('_')[0]
+                if model_ID == 'main':
+                    self.model = load_model(location + brain)
+                else:
+                    self.models[model_ID] = load_model(location + brain)
 
     def _predict(self, board, is_white):
         from numpy import array
         piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
+        reverse_map = {0: 'P1', 1:'P2', 2:'P3', 3:'P4', 4:'P5', 5:'P6', 6:'P7',
+                7:'P8', 8:'B1', 9:'B2', 10:'N1', 11:'N2', 12:'R1', 13:'R2',
+                14:'Q1', 15:'K1'}
+        dp = boards_to_datapoints([board])
+        piece_moves = [0]*16
+        piece_index = [0]*16
+        for key in self.models:
+            prediction = (self.models[key].predict(dp))[0]
+            for i, val in enumerate(prediction):
+                if val == max(prediction):
+                    piece_moves[piece_map[key[0]] + int(key[1]) - 1] = val
+                    piece_index[piece_map[key[0]] + int(key[1]) - 1] = i
+                    break
+        piece_moves = array(piece_moves)
+        piece_moves = piece_moves.reshape((1, 16))
+        prediction = (self.model.predict([dp, piece_moves]))[0]
+        for i, val in enumerate(prediction):
+            if val == max(prediction):
+                piece = i
+                break
+        move_index = piece_index[piece]
+        piece_ID = reverse_map[piece]
         my_pieces = board.white_pieces if is_white else board.black_pieces
-        x_data = boards_to_datapoints([board])
-        datapoint = [0] * 16
-        board_datapoint = [0] * 16
-        for i in range(16):
-            board_datapoint[i] = [0]*6
         for piece in my_pieces:
-            model = self.models['should_move'][str(piece).upper() + str(piece.ID)]
-            should_move = model.predict(x_data)
-            model = self.models['get_move'][str(piece).upper() + str(piece.ID)]
-            get_move = model.predict(x_data)
-            if round(should_move[0][0]) == 1:
-                for i, val in enumerate(get_move[0]):
-                    if val == max(get_move[0]):
-                        datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = i
-                        break
-            piece.compute_info(board)
-            ID = piece.ID if piece.is_white is not None else 0
-            value = piece.value if piece.is_white == is_white \
-                    else piece.value * -1
-            piece_info = [ID/10, value/10, piece.defends/10,
-                    piece.threats/10, piece.threatens/10,
-                    piece.num_moves/10]
-            piece_info = array(piece_info)
-            board_datapoint[piece_map[str(piece).upper()] + piece.ID - 1] = piece_info
-        datapoint = array(datapoint)
-        datapoint = datapoint.reshape((1, 16, 1))
-        board_datapoint = array(board_datapoint)
-        board_datapoint = board_datapoint.reshape((1, 16, 6))
-        model = self.models['vote_best_move']
-        prediction = model.predict([board_datapoint, datapoint])
-        for i, val in enumerate(prediction[0]):
-            if val == max(prediction[0]):
-                move = datapoint[0][i]
-                print(move)
-                move = int(move)
-                for piece in my_pieces:
-                    if piece_map[str(piece).upper()] + piece.ID - 1 == i:
-                            move = piece.move_IDs[move](piece.location)
-                            return piece.location[0]*10+piece.location[1], move
-        return None
+            ID = piece.ID if piece.value != 9 else 1
+            if str(piece).upper() + str(ID) == piece_ID:
+                source = piece.location[0]*10 + piece.location[1]
+                destination = piece.move_IDs[move_index](piece.location)
+        return source, destination
+
 
     def _build_model(self):
-        if self.models['vote_best_move']:
+        if hasattr(self, 'model'):
             return
         from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv1D, Conv2D, Dense, Flatten, \
+        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
         from tensorflow.keras.optimizers import SGD
+
         self.game.__init__()
         self.models = dict()
-        self.models['should_move'] = dict()
-        self.models['get_move'] = dict()
-        pieces = self.game.board.white_pieces
-        for piece in pieces:
+        for piece in self.game.board.white_pieces:
             location = str(piece).upper() + str(piece.ID) \
                     if not piece.value == 9 else str(piece).upper() + str(1)
-            inputs = Input(shape=(8, 8, 6))
-            x = Conv2D(16, (4, 4), activation='relu')(inputs)
-            x = Conv2D(8, (2, 2), activation='relu')(x)
-            x = Flatten()(x)
-            x = Dense(20, activation='relu')(x)
-            outputs = Dense(1, activation='sigmoid')(x)
-            opt = SGD(lr=0.1, momentum=0.9)
-            model = Model(inputs, outputs)
-            model.compile(optimizer=opt, loss='binary_crossentropy',
-                            metrics=['binary_accuracy'])
-            self.models['should_move'][location] = [model, list(), list()]
-
-            inputs = Input(shape=(8, 8, 6))
+            inputs = Input(shape=(8, 8, 5))
             x = Conv2D(32, (4, 4), activation='relu')(inputs)
+            x = MaxPooling2D()(x)
             x = Conv2D(16, (2, 2), activation='relu')(x)
             x = Flatten()(x)
-            x = Dense(64, activation='relu')(x)
-            x = Dropout(0.2)(x)
-            x = Dense(32, activation='relu')(x)
-            x = Dropout(0.2)(x)
+            x = Dense(40, activation='relu')(x)
             outputs = Dense(len(piece.move_IDs), activation='sigmoid')(x)
-            opt = SGD(lr=0.05, momentum=0.8)
+            opt = SGD(lr=0.05, momentum=0.9)
             model = Model(inputs, outputs)
-            model.compile(optimizer=opt, loss='binary_crossentropy',
-                            metrics=['binary_accuracy'])
-            self.models['get_move'][location] = [model, list(), list()]
-        inputs1 = Input(shape=(16,6))
-        inputs2 = Input(shape=(16,1))
-        x = Dense(1, activation='relu')(inputs1)
-        x = Concatenate()([x, inputs2])
-        x = Dense(1, activation='relu')(x)
+            model.compile(optimizer=opt, loss=LOSS,
+                    metrics=[LOSS])
+            self.models[location] = [model, list(), list()]
+        inputs_1 = Input(shape=(8, 8, 5))
+        x = Conv2D(32, (4, 4), activation='relu')(inputs_1)
+        x = MaxPooling2D()(x)
+        x = Conv2D(16, (2, 2), activation='relu')(x)
         x = Flatten()(x)
-        x = Dense(64, activation='relu')(x)
+        x = Dense(16, activation='relu')(x)
+
+        inputs_2 = Input(shape=(16,))
+        x = Concatenate()([x, inputs_2])
+        x = Dense(16, activation='relu')(x)
+        x = Flatten()(x)
+        x = Dense(32, activation='relu')(x)
         x = Dropout(0.2)(x)
+        x = Dense(16, activation='relu')(x)
         outputs = Dense(16, activation='softmax')(x)
-        opt = SGD(lr=0.05, momentum=0.8)
-        model = Model(inputs=[inputs1, inputs2], outputs=outputs)
-        model.compile(optimizer=opt, loss='categorical_crossentropy',
-                        metrics=['categorical_accuracy'])
-        self.models['vote_best_move'] = [model, list([list(), list()]), list()]
+        opt = SGD(lr=0.05, momentum=0.9)
+        model = Model(inputs=[inputs_1, inputs_2], outputs=outputs)
+        model.compile(optimizer=opt, loss=LOSS_2,
+                metrics=[LOSS_2])
+        self.model = [model, list([list(), list()]), list()]
 
 
     def _train_model(self):
@@ -145,150 +123,134 @@ class AdvancedCnn(BaseModel):
         num_datapoints = 100
         print(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
+            '''
             if i % (num_datapoints//100) == 0:
                 print(f'{i//(num_datapoints//100)}% downloading')
+            '''
             boards, moves = data
-            self.game.__init__()
             x_data = boards_to_datapoints(boards)
+            white_turn = True
             for i in range(len(boards)):
-                my_pieces = boards[i].white_pieces if self.game.white_turn \
+                my_pieces = boards[i].white_pieces if white_turn \
                         else boards[i].black_pieces
-                piece = boards[i][moves[i][0]]
-                ID = piece.ID if not piece.value == 9 else 1
-                y = move_to_datapoint(boards[i], piece)
-                self.game.move(*moves[i])
-                y[int(self.game.board.move_ID[-1])] = 1
-                y = array(y)
-                for key in self.models['should_move']:
-                    self.models['should_move'][key][1].append(x_data[i])
-                    if key == str(piece).upper() + str(ID):
-                        self.models['should_move'][key][2].append(1)
-                    else:
-                        self.models['should_move'][key][2].append(0)
-                self.models['get_move'][str(piece).upper() + str(ID)][1].append(x_data[i])
-                self.models['get_move'][str(piece).upper() + str(ID)][2].append(y)
-        for key in self.models['should_move']:
-            x_data = self.models['should_move'][key][1]
-            y_data = self.models['should_move'][key][2]
+                for piece in my_pieces:
+                    ID = piece.ID if piece.value != 9 else 1
+                    key = str(piece).upper() + str(ID)
+                    model = self.models[key]
+                    y = move_to_datapoint(boards[i], piece)
+                    model[1].append(x_data[i])
+                    model[2].append(y)
+                white_turn = not(white_turn)
+        for key in self.models:
+            x_data, y_data = self.models[key][1], self.models[key][2]
             x_data, y_data = array(x_data), array(y_data)
-            x_data = x_data.reshape((x_data.shape[0], 8, 8, 6))
-            self.models['should_move'][key][1] = x_data
-            self.models['should_move'][key][2] = y_data
-        for key in self.models['get_move']:
-            x_data = self.models['get_move'][key][1]
-            y_data = self.models['get_move'][key][2]
-            x_data, y_data = array(x_data), array(y_data)
-            x_data = x_data.reshape((x_data.shape[0], 8, 8, 6))
-            self.models['get_move'][key][1] = x_data
-            self.models['get_move'][key][2] = y_data
+            x_data = x_data.reshape((x_data.shape[0], 8, 8, 5))
+            y_data = y_data.reshape((y_data.shape[0], y_data.shape[1]))
+            for i in range(5):
+                x_val = max(max(x_data[:,:,:,i:i+1].reshape(-1,)), 1)
+                x_data[:,:,:,i:i+1] = x_data[:,:,:,i:i+1] / x_val
+            for i in range(y_data.shape[1]):
+                y_val = max(max(y_data[:,i:i+1].reshape(-1,)), 1)
+                y_data[:,i:i+1] = y_data[:,i:i+1] / y_val
+            self.models[key][1] = x_data
+            self.models[key][2] = y_data
+        # Make final models numpy arrays
         print(f'Done downloading. Took {time()-start}s')
-
         start = time()
+        x_data, y_data = array(x_data), array(y_data)
+        x_data = x_data.reshape((x_data.shape[0], 8, 8, 5))
+        print(f'Begin learning over {x_data.shape[0]} datapoints')
         self.performances = dict()
-        self.performances['should_move'] = dict()
-        self.performances['get_move'] = dict()
-        print(f'Begin learning over {self.models["should_move"][key][1].shape[0]*2} datapoints')
-        for key in self.models['should_move']:
+        for key in self.models:
+            model = self.models[key]
             print(f'Learning model for: {key}')
-            model = self.models['should_move'][key]
             performance = model[0].fit(model[1], model[2],
-                    epochs=10, batch_size=32, validation_split=0.2, verbose=0)
-            self.performances['should_move'][key] = performance
-        for key in self.models['get_move']:
-            print(f'Learning model for: {key}')
-            model = self.models['get_move'][key]
-            performance = model[0].fit(model[1], model[2],
-                    epochs=100, batch_size=32, validation_split=0.2, verbose=0)
-            self.performances['get_move'][key] = performance
-
-        piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
+                    epochs=30, batch_size=32, validation_split=0.2, verbose=0)
+            self.performances[key] = performance
         print(f'Done learning. Took {str(time()-start)[0:5]}s')
-
         print(f'Main Network: Begin downloading data.')
+        piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
         for i, data in enumerate(self.datapoints(num_datapoints)):
+            '''
             if i % (num_datapoints//100) == 0:
                 print(f'Main Network: {i//(num_datapoints//100)}% downloading')
+            '''
             boards, moves = data
             x_data = boards_to_datapoints(boards)
-            for piece in boards[0].white_pieces:
-                model = self.models['should_move'][str(piece) + str(piece.ID)][0]
-                should_move = model.predict(x_data)
-                model = self.models['get_move'][str(piece) + str(piece.ID)][0]
+            x = [0] * len(boards)
+            y_info = [0] * len(boards)
+            for i in range(len(boards)):
+                x[i] = array([0] * 16)
+                y_info[i] = array([0]*16)
+            for piece in boards[i].white_pieces:
+                ID = piece.ID if piece.value != 9 else 1
+                model = self.models[str(piece) + str(ID)][0]
                 get_move = model.predict(x_data)
-            x2 = [0] * len(should_move)
-            for i, prediction in enumerate(should_move):
-                datapoint = [0] * 16
-                if round(prediction[0]) == 1:
-                    move = get_move[i]
-                    for j, val in enumerate(move):
-                        if val == max(move):
-                            datapoint[piece_map[str(piece).upper()] + piece.ID - 1 ] = j
+                for i, prediction in enumerate(get_move):
+                    for j, val in enumerate(prediction):
+                        if val == max(prediction):
+                            x[i][piece_map[str(piece)] + ID - 1] = val
+                            y_info[i][piece_map[str(piece)] + ID - 1] = j
                             break
-                datapoint = array(datapoint)
-                x2[i] = datapoint
-            x1, y = moves_to_datapoints(boards, moves)
-            self.models['vote_best_move'][1][0].extend(x1)
-            self.models['vote_best_move'][1][1].extend(x2)
-            self.models['vote_best_move'][2].extend(y)
-        x_data_1 = self.models['vote_best_move'][1][0]
-        x_data_2 = self.models['vote_best_move'][1][1]
-        y_data = self.models['vote_best_move'][2]
-        x_data_1, x_data_2, y_data = array(x_data_1), array(x_data_2), array(y_data)
-        x_data_1 = x_data_1.reshape((x_data_1.shape[0], 16, 6))
-        self.models['vote_best_move'][1][0] = x_data_1
-        self.models['vote_best_move'][1][1] = x_data_2
-        self.models['vote_best_move'][2] = y_data
+            x_data = list(x_data)
+            y, bad_indicies = moves_to_datapoints(boards, moves, y_info)
+            for index in bad_indicies[::-1]:
+                del x[index]
+                del x_data[index]
+            self.model[1][0].extend(x_data)
+            self.model[1][1].extend(x)
+            self.model[2].extend(y)
+        x_1 = self.model[1][0]
+        x_1 = array(x_1)
+        x_1 = x_1.reshape((x_1.shape[0], 8, 8, 5))
+        for i in range(5):
+            x_val = max(max(x_1[:,:,:,i:i+1].reshape(-1,)), 1)
+            x_1[:,:,:,i:i+1] = x_1[:,:,:,i:i+1] / x_val
+
+        x_data = self.model[1][1]
+        y_data = self.model[2]
+        x_data, y_data = array(x_data), array(y_data)
+        x_data = x_data.reshape((x_data.shape[0], 16))
+        y_data = y_data.reshape((y_data.shape[0], 16))
+        for i in range(x_data.shape[0]):
+            val = max(max(x_data[i:i+1,:].reshape((-1,))), 1)
+            x_data[i:i+1,:] = x_data[i:i+1,:] / val
+        self.model[1][0] = x_1
+        self.model[1][1] = x_data
+        self.model[2] = y_data
 
         print(f'Main Network: Done downloading. Took {time()-start}s')
 
-        print(f'Main Network: Begin learning over\
-        {self.models["vote_best_move"][2].shape[0]} datapoints')
-        model = self.models['vote_best_move']
+        print(f'Main Network: Begin learning over {self.model[2].shape[0]} datapoints')
+        model = self.model
         performance = model[0].fit([model[1][0], model[1][1]], model[2],
-                epochs=50, batch_size=32, validation_split=0.2, verbose=0)
-        self.performances['vote_best_move'] = performance
+                epochs=100, batch_size=32, validation_split=0.2, verbose=1)
+        self.performances['main'] = performance
 
         print(f'Main Network: Done learning. Took {str(time()-start)[0:5]}s')
 
-        for key in self.models['should_move']:
-            self.models['should_move'][key][0].save(f'{self.location}/brain/should_move_{key}_brain.h5')
-        for key in self.models['get_move']:
-            self.models['get_move'][key][0].save(f'{self.location}/brain/get_move_{key}_brain.h5')
-        self.models['vote_best_move'][0].save(f'{self.location}/brain/vote_best_move_brain.h5')
+        for key in self.models:
+            self.models[key][0].save(f'{self.location}/brain/{key}_brain.h5')
+        self.model[0].save(f'{self.location}/brain/main_brain.h5')
+
 
 
     def _evaluate_model(self):
         from matplotlib import pyplot
         from numpy import mean, std
         fig, axs = pyplot.subplots(4, 4)
-        fig.suptitle('Should Move Networks')
-        it = iter(self.performances['should_move'])
+        fig.suptitle('Piece Network Accuracy')
+        it = iter(self.performances.keys())
         for i in range(4):
             for j in range(4):
                 performance = next(it)
-                model = self.performances['should_move'][performance]
+                if performance == 'main':
+                    performance = next(it)
+                model = self.performances[performance]
                 axs[i, j].set_title(f'{performance}')
-                axs[i, j].plot(model.history['binary_accuracy'],
+                axs[i, j].plot(model.history[LOSS],
                         color='blue', label='train')
-                axs[i, j].plot(model.history['val_binary_accuracy'],
-                        color='orange', label='test')
-        for ax in axs.flat:
-            ax.set(xlabel='Epoch', ylabel='Accuracy')
-        for ax in axs.flat:
-            ax.label_outer()
-        pyplot.legend()
-        pyplot.show()
-        fig, axs = pyplot.subplots(4, 4)
-        fig.suptitle('Get Move Networks')
-        it = iter(self.performances['get_move'])
-        for i in range(4):
-            for j in range(4):
-                performance = next(it)
-                model = self.performances['get_move'][performance]
-                axs[i, j].set_title(f'{performance}')
-                axs[i, j].plot(model.history['binary_accuracy'],
-                        color='blue', label='train')
-                axs[i, j].plot(model.history['val_binary_accuracy'],
+                axs[i, j].plot(model.history['val_' + LOSS],
                         color='orange', label='test')
         for ax in axs.flat:
             ax.set(xlabel='Epoch', ylabel='Accuracy')
@@ -300,11 +262,10 @@ class AdvancedCnn(BaseModel):
         axs.set_title('Main Network')
         pyplot.xlabel('Epoch')
         pyplot.ylabel('Accuracy')
-        axs.plot(self.performances['vote_best_move'].history['categorical_accuracy'],
+        axs.plot(self.performances['main'].history[LOSS_2],
                 color='blue', label='train')
-        axs.plot(self.performances['vote_best_move'].history['val_categorical_accuracy'],
+        axs.plot(self.performances['main'].history['val_' + LOSS_2],
                 color='orange', label='test')
         pyplot.legend()
         pyplot.show()
-
 
