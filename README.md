@@ -4,6 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
+- seperate network pet 10 turns.
 - only process games rank 1.8k and above
 - weight each datapoint based on how many other datapoints we have in this state (if many, weight is less)
 - ake board from 1x1->3x3
