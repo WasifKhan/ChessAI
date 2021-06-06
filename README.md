@@ -4,6 +4,7 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
+- make ai a sub(not super) class of models.
 - seperate network pet 10 turns.
 - blank out other pieces for each piece network...otherwise learning too slow!
 - right now, moves have no connecction to board..make the y values the actual boards after move has been made (one network per piece). then one piece-selector-network
