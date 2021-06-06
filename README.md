@@ -6,17 +6,16 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - seperate network pet 10 turns.
 - right now, moves have no connecction to board..make the y values the actual boards after move has been made (one network per piece). then one piece-selector-network
-- only process games rank 1.8k and above
 - weight each datapoint based on how many other datapoints we have in this state (if many, weight is less)
-- ake board from 1x1->3x3
-- clean logger
+- extra
+  - only process games rank 1.8k and above
+  - ake board from 1x1->3x3
+  - clean logger
 - finish cnn
   - prediction=max(nn=softmax activation of final layer)
   - tweak rewards to see best one-prioritize defense
   - try 18 architectures {space,avg,dense}layer x {1,2,3}layers x {sigmoid, relu}activations
   - custom loss functions
-- make data extracyor a subclass of ai
-- clean up ai logic
 - #### MILESTONE 1.5 base smart AI done
 - Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
