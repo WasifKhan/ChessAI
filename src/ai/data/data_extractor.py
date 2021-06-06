@@ -55,7 +55,7 @@ class DataExtractor(Parser):
         self.logger.info('Extracting Intelligence...')
         data = []
         with open(location, 'r') as fp:
-            for line in fp:
+            for i, line in enumerate(fp):
                 data.append(eval(line[0:-1]))
         self.logger.info(f'Done extacting intelligence.')
         return data

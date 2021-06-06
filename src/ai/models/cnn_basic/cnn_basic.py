@@ -127,15 +127,14 @@ class CnnBasic(BaseModel):
         from numpy import array
         from time import time
         start = time()
-        num_datapoints = 10000
+        num_datapoints = 3
         x = list()
         y = list()
-        self.logger.error('test error')
         my_data = self.get_data()
         self.logger.info(f'Begin downloading data.')
         for i, data in enumerate(self.datapoints(num_datapoints)):
             if i >= 100 and i % (num_datapoints//100) == 0:
-                self.logger.log(f'{i//(num_datapoints//100)}% downloading')
+                self.logger.debug(f'{i//(num_datapoints//100)}% downloading')
             boards, moves = data
             x_data = boards_to_datapoints(boards)
             y_data, bad_indicies = moves_to_datapoints(boards, my_data)
