@@ -4,14 +4,10 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- make ai a sub(not super) class of models.
-- seperate network pet 10 turns.
-- blank out other pieces for each piece network...otherwise learning too slow!
-- right now, moves have no connecction to board..make the y values the actual boards after move has been made (one network per piece). then one piece-selector-network
+- seperate network per 10 turns
 - weight each datapoint based on how many other datapoints we have in this state (if many, weight is less)
 - extra
-  - only process games rank 1.8k and above
-  - ake board from 1x1->3x3
+  - only process games rank 2k and above
   - clean logger
 - finish cnn
   - prediction=max(nn=softmax activation of final layer)
