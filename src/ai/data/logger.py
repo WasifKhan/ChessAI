@@ -20,6 +20,8 @@ class Logger:
         output = logging.FileHandler('output.log', mode='w')
         errors = logging.FileHandler('error.log', mode='w')
 
+        output.addFilter(lambda log: log.levelno <= 20)
+
         stream.setLevel(logging.INFO)
         output.setLevel(logging.DEBUG)
         errors.setLevel(logging.WARNING)

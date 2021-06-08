@@ -3,7 +3,6 @@ Data structure storing architecture of CnnBasic network
 '''
 
 from copy import copy
-from ai.data.model_info import ModelInfo
 
 
 

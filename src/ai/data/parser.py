@@ -2,16 +2,8 @@
 Abstract Base Class for Data Extractor
 '''
 
-from abc import ABCMeta
 from re import split
-from numpy import array
 from ai.models.base_model import BaseModel
-from backend.pieces.king import King
-from backend.pieces.queen import Queen
-from backend.pieces.rook import Rook
-from backend.pieces.knight import Knight
-from backend.pieces.bishop import Bishop
-from backend.pieces.pawn import Pawn
 
 
 
@@ -59,12 +51,13 @@ class Parser(BaseModel):
         candidates = []
         for cur_piece in pieces:
             if self.game.board.is_valid_move(cur_piece, destination) \
-                    and ((move[0] == 'K' and isinstance(cur_piece, King)) \
-                    or (move[0] == 'Q' and isinstance(cur_piece, Queen)) \
-                    or (move[0] == 'R' and isinstance(cur_piece, Rook)) \
-                    or (move[0] == 'N' and isinstance(cur_piece, Knight)) \
-                    or (move[0] == 'B' and isinstance(cur_piece, Bishop)) \
-                    or (move[0] not in {'K', 'Q', 'R', 'N', 'B'} and isinstance(cur_piece, Pawn))):
+                    and ((move[0] == 'K' and str(cur_piece) == 'K') \
+                    or (move[0] == 'Q' and str(cur_piece) == 'Q') \
+                    or (move[0] == 'R' and str(cur_piece) == 'R') \
+                    or (move[0] == 'N' and str(cur_piece) == 'N') \
+                    or (move[0] == 'B' and str(cur_piece) == 'B') \
+                    or (move[0] not in {'K', 'Q', 'R', 'N', 'B'} \
+                    and str(cur_piece) == 'P')):
                 candidates.append(cur_piece)
         if len(candidates) == 0:
             return None, None

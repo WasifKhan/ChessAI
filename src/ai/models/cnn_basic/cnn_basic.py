@@ -12,7 +12,6 @@ self._board_to_datapoint(board, is_white)
 
 from ai.data.model_info import ModelInfo
 from ai.models.cnn_basic.architecture import Architecture
-from numpy import array, copy
 
 
 
@@ -161,6 +160,7 @@ class CnnBasic(ModelInfo):
 
 
     def boards_to_datapoints(self, boards, is_white=True, moves=None):
+        from numpy import array
         piece_map = {'P':0, 'B':1, 'N':2, 'R':3, 'Q':4, 'K':5}
         if not moves:
             self.logger.debug('Begin prediction')
