@@ -4,16 +4,14 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- seperate network per 10 turns
-- weight each datapoint based on how many other datapoints we have in this state (if many, weight is less)
-- extra
-  - only process games rank 2k and above
-  - clean logger
+- compare separated vs non-separated network
+- weight each datapoint based (more weight for same x,y pair)
+- only process games rank 2k and above
+- clean logger
 - finish cnn
-  - prediction=max(nn=softmax activation of final layer)
-  - tweak rewards to see best one-prioritize defense
+  - tweak rewards (inputs) to see best one-prioritize defense
   - try 18 architectures {space,avg,dense}layer x {1,2,3}layers x {sigmoid, relu}activations
-  - custom loss functions
+  - custom loss functions?
 - #### MILESTONE 1.5 base smart AI done
 - Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
