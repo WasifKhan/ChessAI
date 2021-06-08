@@ -4,11 +4,10 @@ Repository containing Chess Engine and ML Model
 
 ## TODO
 ### **Wasif**
-- seperate network per 10 turns
-- weight each datapoint based on how many other datapoints we have in this state (if many, weight is less)
-- extra
-  - only process games rank 2k and above
-  - clean logger
+- compare separated vs non-separated network
+- weight each datapoint based (more weight for same x,y pair)
+- only process games rank 2k and above
+- clean logger
 - finish cnn
   - prediction=max(nn=softmax activation of final layer)
   - tweak rewards to see best one-prioritize defense
