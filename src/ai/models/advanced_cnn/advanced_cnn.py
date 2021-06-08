@@ -24,15 +24,13 @@ class CnnBasic(BaseModel):
     def _load_model(self):
         from os import listdir
         from tensorflow.keras.models import load_model
+        super().__init__(game, location)
         location = self.location + '/brain/'
-        self.models = dict()
+        self.models = list()
+        self.names = list()
         for brain in listdir(location):
             if 'brain' in brain:
-                model_ID = brain.split('_')[0]
-                if model_ID == 'main':
-                    self.model = load_model(location + brain)
-                else:
-                    self.models[model_ID] = load_model(location + brain)
+                self.models.append(load_model(location + brain))
 
     def _predict(self, board, is_white):
         from numpy import array
@@ -69,15 +67,13 @@ class CnnBasic(BaseModel):
 
 
     def _build_model(self):
-        if hasattr(self, 'model'):
+        if self.models:
             return
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
-        from tensorflow.keras.optimizers import SGD
+        from tensorflow.keras.optimizers import SGD, RMSprop
 
-        self.game.__init__()
-        self.models = dict()
         for piece in self.game.board.white_pieces:
             location = str(piece).upper() + str(piece.ID) \
                     if not piece.value == 9 else str(piece).upper() + str(1)

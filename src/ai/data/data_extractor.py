@@ -10,21 +10,25 @@ from ai.data.parser import Parser
 
 
 class DataExtractor(Parser):
-    def __init__(self, game, location):
-        super().__init__(game, location)
+    def __init__(self, game, location, logger):
+        super().__init__(game, location, logger)
         #self._download_raw_data()
 
 
     def datapoints(self, num_games):
-        from os import listdir
-        for data in listdir(DESTINATION):
-            if data[0] == 'd':
-                with open(DESTINATION + data) as fp:
-                    for moves in fp:
-                        if num_games == 0:
-                            return StopIteration
-                        num_games -= 1
-                        yield self._generate_datapoint(moves)
+        state = int(open(self.location + '/train_state.txt').readlines()[0])
+        skip_lines = state
+        with open(DESTINATION + 'data.txt') as fp:
+            for moves in fp:
+                if num_games == 0:
+                    break
+                if skip_lines != 0:
+                    skip_lines -= 1
+                    continue
+                num_games -= 1
+                state += 1
+                yield self._generate_datapoint(moves)
+        open(self.location + '/train_state.txt', 'w').write(str(state))
         return StopIteration
 
     def populate_data(self, num_games):

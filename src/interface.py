@@ -18,7 +18,7 @@ class Interface:
 
     def versus_AI(self, difficulty) -> None:
         self.ai = AI(self.game, difficulty)
-        self.versus_ai = True
+        self.versus_ai = difficulty+1
         self.set_player_names(self.game.p1_name, self.ai.name)
 
     def train_AI(self):
@@ -27,12 +27,13 @@ class Interface:
     def set_player_names(self, p1_name: str, p2_name: str) -> None:
         self.game.set_names(p1_name, p2_name)
 
-    def game_over(self) -> None:
+    def game_over(self, winner=None) -> None:
         print('*'*30)
         winner = not(self.game.white_turn)
         if not self.game.is_game_over():
-            loser = self.game.p1_name if self.game.white_turn else self.game.p2_name
-            print('*' * 7 + f'{loser} resigned' + '*' * 6)
+            if not winner:
+                winner = self.game.p2_name if self.game.white_turn else self.game.p1_name
+            print('*' * 7 + f'{winner} wins' + '*' * 6)
         print(('*'*30 + '\n') + ('*'*11 + 'GAME OVER' + '*'*10 + '\n') + ('*'*30))
         self.game.game_over(1, 0) if winner else self.game.game_over(0, 1)
         self.play_again()
@@ -56,9 +57,10 @@ class Interface:
     def simulate_games(self, num_games: int):
         white_wins, black_wins = 0,0
         for i in range(num_games):
-            self.game = Game('Wasif AI', 'Ali AI')
+            self.game = Game()
             white_ai = AI(self.game, 0)
-            black_ai = AI(self.game, 4)
+            black_ai = AI(self.game, 1)
+            self.game.set_names(white_ai.name, black_ai.name)
             AIs = [white_ai, black_ai]
             white_turn = True
             while not self.game.is_game_over():
@@ -68,19 +70,25 @@ class Interface:
                 white_turn = not(white_turn)
             if not(self.game.white_turn):
                 white_wins += 1
-                print('White wins')
+                print(f'{white_ai.name} wins')
             else:
                 black_wins += 1
-                print('Black wins')
-        self.game = Game('Player 1', 'Black AI')
+                print(f'{black_ai.name} wins')
+        print('*'*30 + '\n' + '*'*30)
+        winner = white_ai.name if white_wins > black_wins else black_ai.name
+        print('*' * 9 + f'{winner} wins' + '*' * 8)
+        print('*'*30 + '\n' + '*'*30)
         self.game.game_over(white_wins, black_wins)
-        print(f'score: {white_wins}-{black_wins}')
+        print('*'*4 + f'{white_ai.name}:{white_wins}-{black_wins}:{black_ai.name}' + '*'*5)
+        print('*'*30 + '\n' + '*'*30)
 
     def play_again(self, yes: bool=True):
         print('*'*30 + '\n')
         print('Reseting game...')
         print('*'*30 + '\n')
         self.game = Game(self.game.p1_name, self.game.p2_name)
+        if self.versus_ai:
+            self.ai = AI(self.game, self.versus_ai-1)
         print(self)
         return True
 

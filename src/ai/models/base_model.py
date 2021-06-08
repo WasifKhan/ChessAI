@@ -2,20 +2,19 @@
 Base Class for AI Engines
 '''
 
-from ai.data.data_extractor import DataExtractor
+from abc import ABCMeta
 
 
-
-class BaseModel(DataExtractor):
-    def __init__(self, game, location):
-        super().__init__(game, location)
-
+class BaseModel(metaclass=ABCMeta):
+    def __init__(self, game, location, logger):
+        self.game = game
+        self.location = location
+        self.logger = logger
 
     def train(self):
         self._build_model()
         self._train_model()
         self._evaluate_model()
-
 
     def _resign(self, board, is_white):
         if len(board.history) >= 5:
@@ -23,7 +22,6 @@ class BaseModel(DataExtractor):
             if (value <= -15 and is_white) or (value >= 15 and not is_white):
                 return True
         return False
-
 
     def predict(self, board, is_white):
         if self._resign(board, is_white):

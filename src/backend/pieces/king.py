@@ -41,7 +41,7 @@ class King(Piece):
         if self.location[0] - destination//10 == 2 and self.location[1] == destination%10:
             rook_location = destination//10-2, destination%10
             if isinstance(board[rook_location], Rook):
-                for square in range(1,3):
+                for square in range(0,3):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] - square)*10 + self.location[1]) in piece.moves(board):
                             return False
@@ -52,7 +52,7 @@ class King(Piece):
         elif destination//10 - self.location[0] == 2 and self.location[1] == destination%10:
             rook_location = destination//10+1, destination%10
             if isinstance(board[rook_location], Rook):
-                for square in range(1,3):
+                for square in range(0,3):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] + square)*10 + self.location[1]) in piece.moves(board):
                             return False

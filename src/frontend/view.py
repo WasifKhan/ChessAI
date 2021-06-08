@@ -89,7 +89,7 @@ class View:
         self.interface.train_AI()
 
     def simulate_games(self):
-        self.interface.simulate_games(100)
+        self.interface.simulate_games(10)
 
     def play_again(self):
         self.interface.play_again()
