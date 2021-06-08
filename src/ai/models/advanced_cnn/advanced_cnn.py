@@ -20,10 +20,7 @@ ACTIVATION = 'sigmoid'
 class CnnBasic(BaseModel):
     def __init__(self, game, location):
         from tensorflow.keras.models import load_model
-<<<<<<< HEAD
-=======
         from os import listdir
->>>>>>> 5cb4629188298f97cbc29bf56f7d10820af814bd
         super().__init__(game, location)
         location = self.location + '/brain/'
         self.models = list()
@@ -76,7 +73,6 @@ class CnnBasic(BaseModel):
         from tensorflow.keras.models import Model
         from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
-<<<<<<< HEAD
         from tensorflow.keras.optimizers import SGD, RMSprop
 
         for piece in self.game.board.white_pieces:
@@ -96,12 +92,6 @@ class CnnBasic(BaseModel):
             self.models[location] = [model, list(), list()]
         inputs_1 = Input(shape=(8, 8, 5))
         x = Conv2D(32, (4, 4), activation='relu')(inputs_1)
-=======
-        from tensorflow.keras.optimizers import SGD
-        self.names = list()
-        inputs = Input(shape=(8, 8, 5))
-        x = Conv2D(32, (4, 4), activation='relu')(inputs)
->>>>>>> 5cb4629188298f97cbc29bf56f7d10820af814bd
         x = MaxPooling2D()(x)
         x = Conv2D(64, (2, 2), activation='relu')(x)
         x = Flatten()(x)
