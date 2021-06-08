@@ -9,10 +9,9 @@ Repository containing Chess Engine and ML Model
 - only process games rank 2k and above
 - clean logger
 - finish cnn
-  - prediction=max(nn=softmax activation of final layer)
-  - tweak rewards to see best one-prioritize defense
+  - tweak rewards (inputs) to see best one-prioritize defense
   - try 18 architectures {space,avg,dense}layer x {1,2,3}layers x {sigmoid, relu}activations
-  - custom loss functions
+  - custom loss functions?
 - #### MILESTONE 1.5 base smart AI done
 - Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
