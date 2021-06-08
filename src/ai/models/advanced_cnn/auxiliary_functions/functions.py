@@ -4,25 +4,10 @@ Auxiliary Functions for Basic CNN
 
 from numpy import array
 from copy import copy
+from ai.models.cnn_basic.moves import MOVES as MOVES
 
-
-def move_to_datapoint(board, piece):
-    datapoint = [0]*len(piece.move_IDs)
-    for i, ID in enumerate(piece.move_IDs):
-        piece_move = piece.move_IDs[ID](piece.location)
-        piece_move = (piece_move//10, piece_move%10)
-        if piece_move[0] >= 0 and piece_move[0] <= 7 \
-                and piece_move[1] >= 0 and piece_move[1] <= 7 \
-                and board.is_valid_move(piece, piece_move):
-            temp_board = copy(board)
-            temp_board.move(temp_board[piece.location], piece_move)
-            datapoint[i] = piece.compute_info(board)
-    datapoint = array(datapoint)
-    return datapoint
-
-
-def boards_to_datapoints(boards):
-    is_white = True
+def boards_to_datapoints(boards, white=True):
+    is_white = white
     datapoints = []
     for board in boards:
         board_direction = range(8) if is_white else range(7, -1, -1)
@@ -32,7 +17,6 @@ def boards_to_datapoints(boards):
             for column in range(8):
                 piece = board[column,row]
                 piece.compute_info(board)
-                ID = piece.ID if piece.is_white is not None else 0
                 value = piece.value if piece.is_white == is_white \
                         else piece.value * -1
                 dp = array([value, piece.defends,
@@ -44,38 +28,40 @@ def boards_to_datapoints(boards):
         is_white = not(is_white)
         datapoint = array(datapoint)
         datapoints.append(datapoint)
-    datapoints = array(datapoints)
-    datapoints = datapoints.reshape((datapoints.shape[0], 8, 8, 5))
     return datapoints
 
-def moves_to_datapoints(boards, moves, info):
-    from copy import copy
-    piece_map = {'P': 0, 'B': 8, 'N': 10, 'R': 12, 'Q': 14, 'K':15}
+def moves_to_datapoints(boards, data):
     datapoints = [0] * len(boards)
-    white_turn = True
     bad_indicies = []
+    white_turn = True
     for i, board in enumerate(boards):
-        datapoints[i] = array([0]*16)
-        real_piece = boards[i][moves[i][0]]
-        ID = real_piece.ID if real_piece.value != 9 else 1
-        real_piece_ID = str(real_piece) + str(ID)
-        real_move = moves[i][1]
+        datapoint = array([-1]*142)
         my_pieces = board.white_pieces if white_turn else board.black_pieces
-        found = False
+        num_states = 0
+        valid_moves = 0
+        best_move = 0
         for piece in my_pieces:
-            ID = piece.ID if piece.value != 9 else 1
-            move_ID = info[i][piece_map[str(piece).upper()] + ID - 1]
-            if str(piece) + str(ID) == real_piece_ID:
-                our_move = piece.move_IDs[move_ID](piece.location)
-                if our_move == real_move:
-                    datapoints[i][piece_map[str(piece).upper()] + ID - 1] = 1
-                    found = True
-                break
-        if not found:
+            source = piece.location[0]*10 + piece.location[1]
+            for move in piece.move_IDs:
+                temp_board = copy(board)
+                destination = piece.move_IDs[move](piece.location)
+                destination = (destination//10, destination%10)
+                if destination[0] >= 0 and destination[0] <= 7 \
+                        and destination[1] >= 0 and destination[1] <= 7 \
+                        and temp_board.is_valid_move(temp_board[source], destination):
+                    temp_board.move(temp_board[source], destination)
+                    if (index := temp_board.pprint()) in data[i+1]:
+                        num_boards = data[i+1][index]
+                        best_move = max(num_boards, best_move)
+                        num_states += num_boards
+                        valid_moves += 1
+                        move_index = MOVES[temp_board.move_ID]
+                        datapoint[move_index] = num_boards
+        if num_states == 0:
             bad_indicies.append(i)
+        else:
+            datapoint = datapoint / best_move
+            datapoints[i] = datapoint
         white_turn = not(white_turn)
-    for index in bad_indicies[::-1]:
-        del datapoints[index]
-    datapoints = array(datapoints)
     return datapoints, bad_indicies
 
