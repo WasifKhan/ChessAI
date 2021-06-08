@@ -106,8 +106,8 @@ class CnnBasic(ModelInfo):
         self.model.add_model('S', model)
 
     def _train_model(self):
-        for i in range(5):
-            num_datapoints = 10000
+        for i in range(40):
+            num_datapoints = 5000
             self.model.clear_data()
             self.logger.info(f'Begin downloading data: {i*10}% done')
             for i, data in enumerate(self.datapoints(num_datapoints)):

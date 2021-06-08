@@ -83,10 +83,14 @@ class Board:
     def __str__(self):
         output = ''
         for row in range(len(self.board) -1, -1, -1):
+            r1, r2, r3 = ['']*3
             for column in range(len(self.board)):
-                output += f' {str(self.board[column][row])} '
-            output += '\n'
-        return output[0:-1]
+                out = '  ' + f'{str(self.board[column][row])}'*3 + '  '
+                r1 += out
+                r2 += out
+                r3 += out
+            output += f'{r1}\n{r2}\n{r3}\n\n\n'
+        return output[0:-2]
 
     def pprint(self):
         output = ''

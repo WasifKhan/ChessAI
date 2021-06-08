@@ -51,7 +51,8 @@ class Interface:
                 self.game_over()
                 return True
             return True
-        print('Invalid move.\nPlease enter a valid move.\n')
+        print(self.game)
+        print('Invalid move. Please enter a valid move.')
         return False
 
     def simulate_games(self, num_games: int):

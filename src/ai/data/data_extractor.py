@@ -75,7 +75,7 @@ class DataExtractor(Parser):
         num_games = 0
         start = None
         for ID in range(1,3):
-            for cur_ID in range(100):
+            for cur_ID in range(14, 100):
                 try:
                     lines = BZ2File(urlopen(FILES[ID]), 'r')
                     it = iter(lines)

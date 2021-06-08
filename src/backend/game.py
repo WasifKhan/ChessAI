@@ -16,11 +16,9 @@ class Game:
         self.white_turn = True
 
     def __str__(self):
-        ret_val = '\n' + self.p2_name
-        ret_val += '\n' + '-' * 23 + '\n'
+        ret_val = '\n' + ('-'*24 + self.p2_name + '-'*24 + '\n')[0:54] + '\n'
         ret_val += str(self.board)
-        ret_val += '\n' + '-' * 23 + '\n'
-        ret_val += self.p1_name + '\n'
+        ret_val += ('-'*24 + self.p1_name + '-'*24)[0:54]
         return ret_val
 
     def _add_games(self, player1, player2, p1_wins, p2_wins):
