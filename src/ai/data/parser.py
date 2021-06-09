@@ -50,14 +50,15 @@ class Parser(BaseModel):
         pieces = self.game.board.white_pieces if is_white else self.game.board.black_pieces
         candidates = []
         for cur_piece in pieces:
+            ID = str(cur_piece).upper()
             if self.game.board.is_valid_move(cur_piece, destination) \
-                    and ((move[0] == 'K' and str(cur_piece) == 'K') \
-                    or (move[0] == 'Q' and str(cur_piece) == 'Q') \
-                    or (move[0] == 'R' and str(cur_piece) == 'R') \
-                    or (move[0] == 'N' and str(cur_piece) == 'N') \
-                    or (move[0] == 'B' and str(cur_piece) == 'B') \
+                    and ((move[0] == 'K' and ID == 'K') \
+                    or (move[0] == 'Q' and ID == 'Q') \
+                    or (move[0] == 'R' and ID == 'R') \
+                    or (move[0] == 'N' and ID == 'N') \
+                    or (move[0] == 'B' and ID == 'B') \
                     or (move[0] not in {'K', 'Q', 'R', 'N', 'B'} \
-                    and str(cur_piece) == 'P')):
+                    and ID == 'P')):
                 candidates.append(cur_piece)
         if len(candidates) == 0:
             return None, None
