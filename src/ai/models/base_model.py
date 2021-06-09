@@ -12,6 +12,7 @@ class BaseModel(metaclass=ABCMeta):
         self.logger = logger
 
     def train(self):
+        # self.download_raw_data()
         self._build_model()
         self._train_model()
         self._evaluate_model()

@@ -101,7 +101,8 @@ class Pawn(Piece):
             result.add(piece.location[0] * 10 + piece.location[1])
         # Double vertical movement
         if (self.location[1] == 1 and self.is_white) or (self.location[1] == 6 and not(self.is_white)):
-            if (piece:= board[self.location[0], self.location[1] + y_direction * 2]).is_white is None:
+            if board[self.location[0], self.location[1] + y_direction].is_white is None \
+                    and (piece:= board[self.location[0], self.location[1] + y_direction * 2]).is_white is None:
                 result.add(piece.location[0] * 10 + piece.location[1])
         # Capture
         if (self.location[0] == 0):
@@ -151,6 +152,5 @@ class Pawn(Piece):
                     if isinstance(previous_move[0], Pawn) and previous_move[1][1] - previous_move[2][1] == -2 and\
                         previous_move[2][0] == self.location[0] + 1:
                         result.add((self.location[0]+1)*10 + self.location[1]+1)
-
         return result
 

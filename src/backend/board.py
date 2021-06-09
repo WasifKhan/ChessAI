@@ -147,6 +147,8 @@ class Board:
 
 
     def _check_after_move(self, piece, destination):
+        if type(destination) == int:
+            destination = (destination//10, destination%10)
         if (captured_piece := self[destination]).is_white == piece.is_white:
             return False
         self[destination] = piece

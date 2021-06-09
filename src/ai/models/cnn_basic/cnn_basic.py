@@ -34,7 +34,7 @@ class CnnBasic(ModelInfo):
         dp = self.boards_to_datapoints(board, is_white)
         model = self.model.get_model(phase, 'S')
         prediction = model.predict(dp)[0].round(3)
-        self.logger.info(f'Piece probabilities: [P, B, N, R, Q, K]: {prediction}')
+        self.logger.debug(f'Piece probabilities: [P, B, N, R, Q, K]: {prediction}')
         for index in range(len(prediction)):
             if prediction[index] == max(prediction):
                 break
@@ -43,10 +43,10 @@ class CnnBasic(ModelInfo):
         board_move = prediction.reshape((8,8))
         max_val = max(prediction.reshape((-1,)))
         piece_dp = dp[:,:,:,index:index+1].reshape((8,8))
-        max_diff = None
-        source = None
         self.logger.debug(f'prediction:\n{board_move}')
         self.logger.debug(f'true:\n{piece_dp}')
+        max_diff = None
+        source = None
         board_direction = range(8) if is_white else range(7, -1, -1)
         for row in board_direction:
             for column in range(8):

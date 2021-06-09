@@ -43,45 +43,49 @@ class Interface:
                 if (ai_move := self.ai.predict(self.game.board, is_white)) \
                 else ai_move
 
-    def add_move(self, source: int, destination: int) -> bool:
+    def add_move(self, source: int, destination: int, simulation:bool =False) -> bool:
         if self.game.move(source, destination):
             name = self.game.p2_name if self.game.white_turn else self.game.p1_name
-            print(f'{name} move: {source} -> {destination}')
+            if not simulation:
+                print(self.game)
+                print(f'{name} move: {source} -> {destination}')
             if self.game.is_game_over():
                 self.game_over()
                 return True
             return True
         print(self.game)
-        print('Invalid move. Please enter a valid move.')
+        print(f'Invalid move: {source} -> {destination}. Please enter a valid move.')
         return False
 
     def simulate_games(self, num_games: int):
+        from matplotlib import pyplot
         white_wins, black_wins = 0,0
+        scores = [0]
         for i in range(num_games):
             self.game = Game()
-            white_ai = AI(self.game, 0)
-            black_ai = AI(self.game, 1)
+            white_ai = AI(self.game.__init__(), 0)
+            black_ai = AI(self.game.__init__(), 1)
             self.game.set_names(white_ai.name, black_ai.name)
             AIs = [white_ai, black_ai]
             white_turn = True
             while not self.game.is_game_over():
                 move = AIs[int(not white_turn)].predict(self.game.board, white_turn)
-                if not move or not self.add_move(*move):
+                if not move or not self.add_move(*move, True):
                     break
                 white_turn = not(white_turn)
             if not(self.game.white_turn):
                 white_wins += 1
-                print(f'{white_ai.name} wins')
+                scores.append(scores[-1]+1)
             else:
                 black_wins += 1
-                print(f'{black_ai.name} wins')
-        print('*'*30 + '\n' + '*'*30)
-        winner = white_ai.name if white_wins > black_wins else black_ai.name
-        print('*' * 9 + f'{winner} wins' + '*' * 8)
-        print('*'*30 + '\n' + '*'*30)
-        self.game.game_over(white_wins, black_wins)
-        print('*'*4 + f'{white_ai.name}:{white_wins}-{black_wins}:{black_ai.name}' + '*'*5)
-        print('*'*30 + '\n' + '*'*30)
+                scores.append(scores[-1]-1)
+        pyplot.plot(range(0, len(scores)), scores, color='blue', marker='o')
+        pyplot.title(f'{white_ai.name} vs {black_ai.name} Results')
+        pyplot.xlabel('Game', fontsize=14)
+        pyplot.ylabel('Wins Difference')
+        pyplot.ylim(-12, 12)
+        pyplot.grid()
+        pyplot.show()
 
     def play_again(self, yes: bool=True):
         print('*'*30 + '\n')

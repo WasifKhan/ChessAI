@@ -3,20 +3,43 @@ File to extract chess games data from the web
 '''
 
 from ai.data.parser import Parser
-from ai.data.dataset.files import destination as DESTINATION, files as RAW_DATA
 
 
 
 class DataExtractor(Parser):
     def __init__(self, game, location, logger):
         super().__init__(game, location, logger)
-        # self.download_raw_data()
+        from time import localtime
+        self.num_games = 10000000
+        self.destination = 'ai/data/dataset/'
+        self.link_start =\
+        'https://database.lichess.org/standard/lichess_db_standard_rated_'
+        self.link_end = '.pgn.bz2'
+        self.cur_year = localtime()[0] + 1
+        self.cur_month = localtime()[1]
+
+
+    @property
+    def memory(self):
+        location = self.destination + 'intelligence.py'
+        data = []
+        with open(location, 'r') as fp:
+            for i, line in enumerate(fp):
+                data.append(eval(line[0:-1]))
+        return data
+
+    @memory.setter
+    def memory(self, data):
+        location = self.destination + 'intelligence.py'
+        with open(location, 'w') as fp:
+            for moves in data:
+                fp.write(str(moves) + '\n')
 
 
     def datapoints(self, num_games):
         state = int(open(self.location + '/train_state.txt').readlines()[0])
         skip_lines = state
-        with open(DESTINATION + 'data.txt') as fp:
+        with open(self.destination + 'data.txt') as fp:
             for moves in fp:
                 if num_games == 0:
                     break
@@ -34,64 +57,58 @@ class DataExtractor(Parser):
         from bz2 import BZ2File
         from urllib.request import urlopen
         self.logger.info(f'\nBegin processing dataset\n')
-        for ID in range(0,5):
-            data = self._get_data()
-            self.logger.info(f'Processing dataset...{ID*20}% done')
-            filename = f'{DESTINATION}data_{ID}.txt'
-            try:
-                lines = BZ2File(urlopen(RAW_DATA[ID]), 'r')
-                self._process_data(filename, iter(lines), data, 100)
-            except Exception as e:
-                if e.value != 'Finished':
-                    self.logger.error(f'Exception raised in download:\n{e}')
-                self._set_data(data)
-                continue
+        total = (self.cur_year - 2015 - 1)*12 + self.cur_month-1
+        for year in range(2013, self.cur_year):
+            for month in range(1, 13):
+                if year == self.cur_year - 1 and month == self.cur_month - 1:
+                    break
+                link_ID = str(year) + '-'
+                link_ID += str(month) if month >= 10 else '0' + str(month)
+                link = self.link_start + link_ID + self.link_end
+                self.logger.info(f'Processing dataset...{((year-2015)*12+month-1)*100//total}% done')
+                filename = f'{self.destination}data_{year}_{month}.txt'
+                lines = BZ2File(urlopen(link), 'r')
+                memory = self.memory
+                try:
+                    state = open(filename, 'w')
+                    self._process_data(state, iter(lines), memory)
+                except StopIteration:
+                    state.close()
+                    self.logger.info('File Complete')
+                self.memory = memory
         self.logger.info('Finish processing dataset')
 
 
-    def _get_data(self):
-        self.logger.info(f'Loading prior data')
-        location = f'./ai/data/dataset/intelligence.py'
-        data = []
-        with open(location, 'r') as fp:
-            for i, line in enumerate(fp):
-                data.append(eval(line[0:-1]))
-        return data
-
-
-    def _set_data(self, data):
-        self.logger.info(f'Saving processed data')
-        location = DESTINATION + 'intelligence.py'
-        with open(location, 'w') as fp:
-            for moves in data:
-                fp.write(str(moves) + '\n')
-
-
-    def _process_data(self, filename, dataset, data, num_games):
+    def _process_data(self, state, dataset, memory):
         from re import split
         games_processed = 0
-        with open(filename, 'w') as fp:
-            white_elo, black_elo = None, None
-            while (line := next(dataset)) and games_processed < num_games:
-                if games_processed % num_games//100 == 0:
-                    self.logger.debug(f'Current data {games_processed*100//num_games}% processed')
-                move = str(line)
-                if 'WhiteElo' in move:
-                    white_elo = int(split('"', move)[1])
-                elif 'BlackElo' in move:
-                    black_elo = int(split('"', move)[1])
-                elif move[2] == '1' and min(white_elo, black_elo) >= 2000:
-                    games_processed += 1
-                    datapoint = self._raw_data_to_datapoint(move)
-                    boards = self._generate_datapoint(datapoint)
-                    for i, board in enumerate(boards[0]):
-                        if board.pprint() not in data[i]:
-                            data[i][board.pprint()] = 1
-                        else:
-                            data[i][board.pprint()] += 1
-                    white_elo, black_elo = None, None
-                    fp.write(datapoint)
-        raise StopIteration('Finished')
+        num_games = self.num_games//100
+        white_elo, black_elo = 0, 0
+        while (line := next(dataset)) and games_processed < num_games:
+            move = str(line)
+            if 'WhiteElo' in move:
+                white_elo = split('"', move)[1]
+                if white_elo[0] != '2':
+                    white_elo = 0
+                    continue
+                white_elo = int(white_elo)
+            elif 'BlackElo' in move:
+                black_elo = split('"', move)[1]
+                if black_elo[0] != '2':
+                    black_elo = 0
+                    continue
+                black_elo = int(black_elo)
+            elif move[2] == '1' and min(white_elo, black_elo) >= 2000:
+                games_processed += 1
+                datapoint = self._raw_data_to_datapoint(move)
+                boards = self._generate_datapoint(datapoint)
+                for i, board in enumerate(boards[0]):
+                    try:
+                        memory[i][board.pprint()] += 1
+                    except KeyError:
+                        memory[i][board.pprint()] = 1
+                white_elo, black_elo = 0, 0
+                state.write(datapoint)
 
 
     def _generate_datapoint(self, moves):
