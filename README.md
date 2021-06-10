@@ -5,7 +5,6 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - compare separated vs non-separated network
-- weight each datapoint based (more weight for same x,y pair)
 - prediction = piece selector*move selector
 - finish cnn
   - tweak rewards (inputs) to see best one-prioritize defense
