@@ -17,7 +17,7 @@ class DataExtractor(Parser):
                 'start_year': 2013,
                 'cur_year': localtime()[0] + 1,
                 'cur_month': localtime()[1],
-                'total': (localtime()[0] - 2013) + localtime()[1] - 1
+                'total': (localtime()[0] - 2013)*12 + localtime()[1] - 1
                 }
 
 
@@ -77,7 +77,6 @@ class DataExtractor(Parser):
                 link = self.raw_data['link_start'] \
                         + link_ID \
                         + self.raw_data['link_end']
-                self.logger.info(f'link is:\n{link}')
                 self.logger.info(f'Processing data: {year}:{month}...{((year-2013)*12+(month-1))*100//self.raw_data["total"]}% done')
                 filename = f'{self.destination}data_{year}_{month}'
                 lines = BZ2File(urlopen(link), 'r')
@@ -85,10 +84,8 @@ class DataExtractor(Parser):
                 try:
                     self._process_data(filename, iter(lines), memory)
                 except StopIteration:
-                    state.close()
                     self.logger.info('File Complete')
                 except Exception as e:
-                    state.close()
                     self.logger.error(f'Exception occured!\n{e}')
                 self.memory = memory
         self.logger.info('Finish processing dataset')

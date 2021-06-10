@@ -1,5 +1,5 @@
 '''
-AI Implemented Using A Basic Convolutional Neural Network
+AI Implemented Using Basic Convolutional Neural Network
 
 self._predict(board, is_white)
 self._load_model()
