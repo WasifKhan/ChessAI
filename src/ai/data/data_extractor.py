@@ -99,9 +99,9 @@ class DataExtractor(Parser):
         file_ID = 0
         while (line := next(dataset)):
             games_processed = 0
-            state = open(f'{filename}_{file_ID}', 'w')
+            state = open(f'{filename}_{file_ID}.txt', 'w')
             white_elo, black_elo = 0, 0
-            while games_processed < 30 and (line := next(dataset)):
+            while games_processed < 100000 and (line := next(dataset)):
                 move = str(line)
                 if 'WhiteElo' in move:
                     white_elo = split('"', move)[1]
