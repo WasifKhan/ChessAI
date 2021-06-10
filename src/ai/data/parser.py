@@ -12,6 +12,38 @@ class Parser(BaseModel):
         super().__init__(game, location, logger)
 
 
+    def _raw_data_to_datapoint(self, line):
+        datapoint = '['
+        moves = eval(self._extract_moves(line))
+        self.game.__init__()
+        for move_pair in moves:
+            for i in range(len(move_pair)):
+                source, destination = self._convert_move(move_pair[i], not(bool(i)))
+                if source == None or not self.game.move(source, destination):
+                    datapoint = datapoint[0:-2] + ']\n'
+                    return datapoint
+                datapoint += f"({source}, {destination}), "
+        datapoint = datapoint[0:-2] + ']\n'
+        return datapoint
+
+
+    def _generate_datapoint(self, moves):
+        from copy import copy
+        self.game.__init__()
+        x_vector, y_vector = [], []
+        moves = eval(moves)
+        for source, destination in moves:
+            x = copy(self.game.board)
+            if not self.game.move(source, destination):
+                self.logger.warning(\
+                        f'Move was invalid.\n{x}\nMove: {source} -> {destination}')
+                break
+            y = (source, destination)
+            x_vector.append(x)
+            y_vector.append(y)
+        return (x_vector, y_vector)
+
+
     def _extract_moves(self, line):
         game = split('[\d]+\.\s', line)
         datapoint = '['
@@ -38,7 +70,7 @@ class Parser(BaseModel):
 
 
     def _convert_move(self, move, is_white):
-        if move == 'None':
+        if move == 'None' or move == 'Draw':
             return None, None
         if move[0] == 'O':
             piece = self.game.board.white_king if is_white else self.game.board.black_king
@@ -73,19 +105,4 @@ class Parser(BaseModel):
                         and candidate.location[1] == int(identifier) - 1):
                     piece = candidate
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
-
-
-    def _raw_data_to_datapoint(self, line):
-        datapoint = '['
-        moves = eval(self._extract_moves(line))
-        self.game.__init__()
-        for move_pair in moves:
-            for i in range(len(move_pair)):
-                source, destination = self._convert_move(move_pair[i], not(bool(i)))
-                if source == None or not self.game.move(source, destination):
-                    datapoint = datapoint[0:-2] + ']\n'
-                    return datapoint
-                datapoint += f"({source}, {destination}), "
-        datapoint = datapoint[0:-2] + ']\n'
-        return datapoint
 
