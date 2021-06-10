@@ -17,6 +17,7 @@ Repository containing Chess Engine and ML Model
 - Train/Test
 - IReinfLearn to learn reward
 #### MILESTONE 2: **Smart AI done**
+- Submit to Lichess
 
 ### **Ali**
 - unit tests for board and game
