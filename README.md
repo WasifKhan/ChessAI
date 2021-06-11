@@ -6,6 +6,7 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - compare separated vs non-separated network
 - prediction = piece selector*move selector
+- get gpu acceleration
 - tweak rewards (inputs) to see best one-prioritize defense
 - custom loss function (outputs) to capture more chess strategy
 - #### MILESTONE 1.5 base smart AI done
