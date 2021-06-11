@@ -81,6 +81,15 @@ class Architecture:
         return bool(self.models[list(self.models.keys())[0]]['S'])
 
 
+    def generate_best_model(self):
+        '''
+        Look at performances for each network and pick best one
+        '''
+        self.best_model = {'S':None, 'K': None, 'Q':None, 'R':None, 'N':None,
+                'B':None, 'P':None}
+        pass
+
+
     def clear_data(self):
         for network in self.data:
             self.data[network][0] = list()
@@ -105,8 +114,8 @@ class Architecture:
         self.models[ID][str(piece)] = model
 
 
-    def get_model(self, ID, network):
-        return self.models[ID][network]
+    def get_model(self, network):
+        return self.best_model[network]
 
 
     def get_models(self):

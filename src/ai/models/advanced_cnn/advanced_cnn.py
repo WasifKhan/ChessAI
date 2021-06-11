@@ -26,16 +26,19 @@ class AdvancedCnn(ModelInfo):
         piece_map = {0:'P', 1:'B', 2:'N', 3:'R', 4:'Q', 5:'K'}
         dp = self._boards_to_datapoints(board, is_white)
         model = self.model.get_model('S')
-        prediction = model.predict(dp)[0].round(3)
+        selector = model.predict(dp)[0].round(3)
         self.logger.debug(f'Piece probabilities: [P, B, N, R, Q, K]: {prediction}')
-        for index in range(len(prediction)):
-            if prediction[index] == max(prediction):
-                break
-        piece_model = self.model.get_model(piece_map[index])
-        prediction = piece_model.predict(dp)[0].round(3)
-        board_move = prediction.reshape((8,8))
-        max_val = max(prediction.reshape((-1,)))
-        piece_dp = dp[:,:,:,index:index+1].reshape((8,8))
+        best_pred, best_val, best_piece = [None]*3
+        for ID in piece_map:
+            model = self.get_model(piece_map[ID])
+            move_pred = model.predict(dp)[0].round(3)
+            max_pred = max(move_pred.reshape((-1,)))
+            cur_val = max_pred * selector[piece_map[ID]]
+            if best_val is None or best_val < cur_move:
+                best_pred, best_val, best_piece = move_pred, cur_val, ID
+
+        board_move = best_prediction.reshape((8,8))
+        piece_dp = dp[:,:,:,ID:ID+1].reshape((8,8))
         self.logger.debug(f'prediction:\n{board_move}')
         self.logger.debug(f'true:\n{piece_dp}')
         max_diff = None
@@ -132,6 +135,7 @@ class AdvancedCnn(ModelInfo):
                         label=f'{model} - Test Loss')
             pyplot.legend()
             pyplot.show()
+        self.model.generate_best_model()
 
 
     def _boards_to_datapoints(self, boards, is_white=True, moves=None):
