@@ -18,7 +18,7 @@ class AliAI(BaseModel):
                 return (36, 34)
             return (46, 44)
         return None
-             
+
     def _resign(self, board, is_white):
         if len(board.history) >= 5:
             value = sum([value[3] for value in board.history[-5:]])
@@ -27,6 +27,20 @@ class AliAI(BaseModel):
         return False
 
     def predict(self, board, is_white):
+        '''
+        self.memory: list(X)
+            X: dict(repr(board): int)
+        -----------------------------
+        Contains 1M games of data. Each index in list represents all boards for
+        a given turn.
+        Boards are represented as keys in a dictionary with the value being the
+        frequency of how much the board occurred
+        Ie. list[0] contains a dictionary of size 1 containing the starting
+        board.
+        list[1] contains a dictionary with keys reprenting the board state
+        after white made their first move. Values being the frequency of how
+        many games white made that move.
+        '''
         if self._resign(board, is_white):
             return False
         if x := self.edge_cases(board, is_white):

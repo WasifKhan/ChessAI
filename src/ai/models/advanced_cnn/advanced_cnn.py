@@ -16,18 +16,15 @@ from ai.models.cnn_basic.architecture import Architecture
 
 
 class CnnBasic(ModelInfo):
-    learning_rate = 0.001
-    loss = 'categorical_crossentropy'
-    activation = 'softmax'
     def __init__(self, game, location):
         super().__init__(game, location)
-        self.model = Architecture('RMSProp', location)
+        self.model = Architecture(location)
 
     def _predict(self, board, is_white):
         from numpy import set_printoptions
         set_printoptions(suppress=True)
         piece_map = {0:'P', 1:'B', 2:'N', 3:'R', 4:'Q', 5:'K'}
-        dp = self.boards_to_datapoints(board, is_white)
+        dp = self._boards_to_datapoints(board, is_white)
         model = self.model.get_model('S')
         prediction = model.predict(dp)[0].round(3)
         self.logger.debug(f'Piece probabilities: [P, B, N, R, Q, K]: {prediction}')
@@ -44,11 +41,12 @@ class CnnBasic(ModelInfo):
         max_diff = None
         source = None
         board_direction = range(8) if is_white else range(7, -1, -1)
-        for row in board_direction:
-            for column in range(8):
+        found = False
+        for row in board_direction and not Found:
+            for column in range(8) and not Found:
                 if board_move[row][column] == max_val:
                     destination = column*10 + 7-row
-                    self.logger.debug(f'row,column is: {(row, column)}')
+                    found = True
                     self.logger.debug(f'destination is: {destination}')
         for piece in board.white_pieces if is_white else board.black_pieces:
             if str(piece).upper() == piece_map[index] \
@@ -66,93 +64,95 @@ class CnnBasic(ModelInfo):
         if self.model.built():
             return
         from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
-            Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
-        from tensorflow.keras.optimizers import SGD, RMSprop
-        from tensorflow.keras.initializers import RandomUniform as RU
-        for piece in ['K', 'Q', 'R', 'N', 'B', 'P']:
+        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten
+        self.logger.info('Building models')
+        for ID in self.model.configurations:
+            configuration = self.model.configurations[ID]
+            layer_info, initializer, optimizer, loss_metric = configuration
+            num_layers, density, supp_info, activation, = layer_info
+            for piece in ['K', 'Q', 'R', 'N', 'B', 'P']:
+                inputs = Input(shape=(8, 8, 6))
+                x = inputs
+                for i in range(num_layers):
+                    x = Conv2D(density[i], supp_info[i],
+                            activation[i], initializer)(x)
+                x = Flatten()(x)
+                outputs = Dense(64, 'softmax', initializer)(x)
+                model = Model(inputs=inputs, outputs=outputs)
+                model.compile(optimizer=optimizer, loss_metric[0], [loss_metric[1]])
+                self.model.add_model(ID, piece, model)
+            layer_info, initializer, optimizer, loss_metric = info
+            num_layers, density, supp_info, activation, = layer_info
             inputs = Input(shape=(8, 8, 6))
-            x = Conv2D(32, (4, 4), activation='relu',
-                    kernel_initializer=RU(minval=0.00001, maxval=0.0001))(inputs)
-            x = Conv2D(64, (2, 2), activation='relu',
-                    kernel_initializer=RU(minval=0.00001, maxval=0.0001))(x)
+            x = inputs
+            for i in range(num_layers):
+                x = Conv2D(density[i], supp_info[i],
+                        activation[i], initializer)(x)
             x = Flatten()(x)
-            outputs = Dense(64, activation=CnnBasic.activation,
-                    kernel_initializer=RU(minval=0.00001, maxval=0.0001))(x)
-            opt = RMSprop()
+            outputs = Dense(6, 'softmax', initializer)(x)
             model = Model(inputs=inputs, outputs=outputs)
-            model.compile(optimizer=opt,
-                    loss=CnnBasic.loss, metrics=[CnnBasic.loss])
-            self.model.add_model(piece, model)
-        inputs = Input(shape=(8, 8, 6))
-        x = Conv2D(16, (4, 4), activation='relu',
-                kernel_initializer=RU(minval=0.00001, maxval=0.0001))(inputs)
-        x = Conv2D(32, (2, 2), activation='relu',
-                kernel_initializer=RU(minval=0.00001, maxval=0.0001))(x)
-        x = Flatten()(x)
-        outputs = Dense(6, activation=CnnBasic.activation,
-                kernel_initializer=RU(minval=0.00001, maxval=0.0001))(x)
-        opt = RMSprop()
-        model = Model(inputs=inputs, outputs=outputs)
-        model.compile(optimizer=opt,
-                loss=CnnBasic.loss, metrics=[CnnBasic.loss])
-        self.model.add_model('S', model)
+            model.compile(optimizer=optimizer, loss_metric[0], [loss_metric[1]])
+            self.model.add_model(configuration, 'S', model)
+
 
     def _train_model(self):
-        for i in range(40):
-            num_datapoints = 5000
-            self.model.clear_data()
-            self.logger.info(f'Begin downloading data: {i*10}% done')
-            for i, data in enumerate(self.datapoints(num_datapoints)):
-                if i >= 0 and i*100 % num_datapoints == 0:
-                    self.logger.debug(f'{i*100//num_datapoints}% done downloading')
-                boards, moves = data
-                self.boards_to_datapoints(boards, True, moves)
-            self.model.prepare_model()
-            self.logger.info(f'Learning {self.model.name} network')
-            for tp in self.model.get_models():
-                model, x, y, network = tp
-                performance = model.fit(x, y,
-                        epochs=10, batch_size=512, validation_split=0.2, verbose=0)
-                self.model.add_performance(performance, network)
-            self.model.save_model()
-        self.logger.info(f'Done learning')
+        self.logger.info('Training models')
+        for ID in self.models:
+            self.logger.info(f'Training model:\n{ID}')
+            for it in range(40):
+                num_datapoints = 5000
+                self.model.clear_data()
+                self.logger.info(f'Begin downloading data: {i*10}% done')
+                for i, data in enumerate(self.datapoints(num_datapoints),\
+                        not(bool(it))):
+                    if i >= 0 and i*100 % num_datapoints == 0:
+                        self.logger.debug(f'{i*100//num_datapoints}% done downloading')
+                    boards, moves = data
+                    self._boards_to_datapoints(ID, boards, True, moves)
+                self.model.prepare_model(ID)
+                self.logger.info(f'Learning {ID} model')
+                for tp in self.model.get_models(ID):
+                    model, x, y, network = tp
+                    performance = model.fit(x, y,
+                            epochs=10, batch_size=512, validation_split=0.2, verbose=0)
+                    self.model.add_performance(performance, ID, network)
+                    self.model.save_model(ID)
+            self.logger.info(f'Done learning')
 
 
     def _evaluate_model(self):
         from matplotlib import pyplot
-        fig, axs = pyplot.subplots(3, 2)
-        fig.suptitle('Piece Networks')
-        performances = iter(self.model.performances)
-        sub_1 = False
-        for i in range(3):
-            for j in range(2):
-                network = next(performances)
-                if network == 'S':
-                    sub_1 = True
-                    continue
-                performance = self.model.performances[network]
-                axs[i, j-sub_1].set_title(f'{phase} - {network}')
-                for perf in performance:
-                    axs[i, j-sub_1].plot(perf.history['loss'], color='blue', label='Train Loss')
-                    axs[i, j-sub_1].plot(perf.history['val_loss'], color='orange', label='Test Loss')
-        for ax in axs.flat:
-            ax.set(xlabel='Epoch', ylabel='Accuracy')
-        for ax in axs.flat:
-            ax.label_outer()
-        pyplot.legend()
-        pyplot.show()
-        fig_2, axs_2 = pyplot.subplots(3, 1)
-        fig_2.suptitle('Selector Network')
-        performance = self.model.performances['S']
-        for perf in performance:
-            axs_2.plot(perf.history['loss'], color='blue', label='Train Loss')
-            axs_2.plot(perf.history['val_loss'], color='orange', label='Test Loss')
-        pyplot.legend()
-        pyplot.show()
+        for performance in self.model.performances:
+            fig, axs = pyplot.subplots(3, 2)
+            fig.suptitle('Piece Networks')
+            performances = iter(self.model.performances)
+            sub_1 = False
+            for i in range(3):
+                for j in range(2):
+                    network = next(performances)
+                    if network == 'S':
+                        sub_1 = True
+                        continue
+                    performance = self.model.performances[ID][network]
+                    axs[i, j-sub_1].set_title(f'{phase} - {network}')
+                    for perf in performance:
+                        axs[i, j-sub_1].plot(perf.history['loss'], color='blue', label='Train Loss')
+                        axs[i, j-sub_1].plot(perf.history['val_loss'], color='orange', label='Test Loss')
+            for ax in axs.flat:
+                ax.set(xlabel='Epoch', ylabel='Accuracy')
+            for ax in axs.flat:
+                ax.label_outer()
+            fig_2, axs_2 = pyplot.subplots(3, 1)
+            fig_2.suptitle('Selector Network')
+            performance = self.model.performances[ID]['S']
+            for perf in performance:
+                axs_2.plot(perf.history['loss'], color='blue', label='Train Loss')
+                axs_2.plot(perf.history['val_loss'], color='orange', label='Test Loss')
+            pyplot.legend()
+            pyplot.show()
 
 
-    def boards_to_datapoints(self, boards, is_white=True, moves=None):
+    def _boards_to_datapoints(self, ID, boards, is_white=True, moves=None):
         from numpy import array
         piece_map = {'P':0, 'B':1, 'N':2, 'R':3, 'Q':4, 'K':5}
         if not moves:
@@ -199,7 +199,7 @@ class CnnBasic(ModelInfo):
             y_piece = array([[0]*8]*8).reshape(8,8)
             y_piece[move[1]%10][move[1]//10] = 1
             y_piece = y_piece.reshape((-1, ))
-            self.model.add_data('S', x_data, y_selector)
-            self.model.add_data(str(piece).upper(), x_data, y_piece)
+            self.model.add_data(ID, 'S', x_data, y_selector)
+            self.model.add_data(ID, str(piece).upper(), x_data, y_piece)
             is_white = not(is_white)
-        self.logger.debug(f'End generating {len(boards)} datapoints')
+

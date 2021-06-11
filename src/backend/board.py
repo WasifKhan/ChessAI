@@ -92,7 +92,7 @@ class Board:
             output += f'{r1}\n{r2}\n{r3}\n\n\n'
         return output[0:-2]
 
-    def pprint(self):
+    def __repr__(self):
         output = ''
         for row in range(8):
             for column in range(8):

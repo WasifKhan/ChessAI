@@ -39,10 +39,10 @@ class DataExtractor(Parser):
                 fp.write(str(moves) + '\n')
 
 
-    def datapoints(self, num_games):
+    def datapoints(self, num_games, reset=False):
         from os import listdir
         data = open(self.location + '/train_state.txt').readlines()
-        datafile, line = int(data[0][0:-1]), int(data[1])
+        datafile, line = (0, 0) if reset else (int(data[0][0:-1]), int(data[1]))
         skip_lines = line
         while num_games != 0:
             with open(self.destination + f'data_{datafile}.txt') as fp:
@@ -86,7 +86,9 @@ class DataExtractor(Parser):
                 except StopIteration:
                     self.logger.info('File Complete')
                 except Exception as e:
-                    self.logger.error(f'Exception occured!\n{e}')
+                    import traceback
+                    self.logger.error(\
+                            f'Exception occured!\n{traceback.format_exc(3)}')
                 self.memory = memory
         self.logger.info('Finish processing dataset')
 
@@ -94,7 +96,7 @@ class DataExtractor(Parser):
     def _process_data(self, filename, dataset, memory):
         from re import split
         file_ID = 0
-        while (line := next(dataset)):
+        while True:
             games_processed = 0
             state = open(f'{filename}_{file_ID}.txt', 'w')
             white_elo, black_elo = 0, 0
@@ -118,9 +120,10 @@ class DataExtractor(Parser):
                     boards = self._generate_datapoint(datapoint)
                     for i, board in enumerate(boards[0]):
                         try:
-                            memory[i][board.pprint()] += 1
+                            memory[i][repr(board)] += 1
                         except KeyError:
-                            memory[i][board.pprint()] = 1
+                            memory[i][repr(board)] = 1
                     white_elo, black_elo = 0, 0
                     state.write(datapoint)
             file_ID += 1
+        return StopIteration

@@ -50,7 +50,7 @@ def moves_to_datapoints(boards, data):
                         and destination[1] >= 0 and destination[1] <= 7 \
                         and temp_board.is_valid_move(temp_board[source], destination):
                     temp_board.move(temp_board[source], destination)
-                    if (index := temp_board.pprint()) in data[i+1]:
+                    if (index := repr(temp_board)) in data[i+1]:
                         num_boards = data[i+1][index]
                         best_move = max(num_boards, best_move)
                         num_states += num_boards
