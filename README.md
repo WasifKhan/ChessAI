@@ -5,11 +5,11 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - compare separated vs non-separated network
-- weight each datapoint based (more weight for same x,y pair)
-- finish cnn
-  - tweak rewards (inputs) to see best one-prioritize defense
-  - try 18 architectures {space,avg,dense}layer x {1,2,3}layers x {sigmoid, relu}activations
-  - custom loss functions?
+- prediction = piece selector*move selector
+- save performance results for grid search comparison
+- get gpu acceleration
+- tweak rewards (inputs) to see best one-prioritize defense
+- custom loss function (outputs) to capture more chess strategy
 - #### MILESTONE 1.5 base smart AI done
 - Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
@@ -17,6 +17,7 @@ Repository containing Chess Engine and ML Model
 - Train/Test
 - IReinfLearn to learn reward
 #### MILESTONE 2: **Smart AI done**
+- Submit to Lichess
 
 ### **Ali**
 - unit tests for board and game
