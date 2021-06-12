@@ -5,7 +5,7 @@ Repository containing Chess Engine and ML Model
 ## TODO
 ### **Wasif**
 - compare separated vs non-separated network
-- save performance results for grid search comparison
+- clean memory file
 - get gpu acceleration
 - tweak rewards (inputs) to see best one-prioritize defense
 - custom loss function (outputs) to capture more chess strategy
