@@ -51,7 +51,7 @@ class DataExtractor(Parser):
                         or (i < 25 and dp[board] >= 4):
                     cur_dict[board] = dp[board]
             data.append(cur_dict)
-        self.data = data
+        self.memory = data
 
     def datapoints(self, num_games):
         from os import listdir
@@ -81,8 +81,8 @@ class DataExtractor(Parser):
         from bz2 import BZ2File
         from urllib.request import urlopen
         self.logger.info(f'\nBegin processing dataset\n')
-        for year in range(2016, self.raw_data['cur_year']):
-            for month in range(1, 13):
+        for year in range(2017, self.raw_data['cur_year']):
+            for month in range(6, 13):
                 if year == self.raw_data['cur_year'] - 1 \
                         and month == self.raw_data['cur_month'] - 1:
                     break
@@ -128,11 +128,11 @@ class DataExtractor(Parser):
                         black_elo = 0
                         continue
                     black_elo = int(black_elo)
-                elif move[2] == '1' and min(white_elo, black_elo) >= 2000:
+                elif move[2] == '1' and min(white_elo, black_elo) >= 2500:
                     games_processed += 1
                     datapoint = self._raw_data_to_datapoint(move)
                     boards = self._generate_datapoint(datapoint)
-                    for i, board in enumerate(boards[0][0:100]):
+                    for i, board in enumerate(boards[0][0:25]):
                         try:
                             memory[i][repr(board)] += 1
                         except KeyError:

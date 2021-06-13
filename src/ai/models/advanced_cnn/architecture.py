@@ -34,7 +34,7 @@ class Architecture:
                 ('deepskyblue', 'dimgray'), ('lightblue', 'silver'),
                 ]
         layer_infos = [
-                {'1 Layer': (1, [128], [(4, 4))], ['relu'])},
+                {'1 Layer': (1, [128], [(4, 4)], ['relu'])},
                 #{'2 DLayers': (2, [64, 16], [(4, 4), (3, 3)], ['relu']*2)},
                 {'2 Layers': (2, [32, 128], [(4, 4), (3, 3)], ['relu']*2)},
                 {'3 Layers': (3, [8, 16, 32], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
