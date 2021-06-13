@@ -39,6 +39,20 @@ class DataExtractor(Parser):
                 fp.write(str(moves) + '\n')
 
 
+    def clean_memory(self):
+        old_data = self.memory
+        data = []
+        for i, dp in enumerate(old_data[0:25]):
+            cur_dict = dict()
+            for board in dp:
+                if (i < 8 and dp[board] >= 9)\
+                        or (i < 16 and dp[board] >= 8)\
+                        or (i < 21 and dp[board] >= 6)\
+                        or (i < 25 and dp[board] >= 4):
+                    cur_dict[board] = dp[board]
+            data.append(cur_dict)
+       self.data = data
+
     def datapoints(self, num_games):
         from os import listdir
         data = open(self.location + '/train_state.txt').readlines()

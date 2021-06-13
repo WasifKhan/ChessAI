@@ -98,9 +98,9 @@ class AdvancedCnn(ModelInfo):
 
     def _train_model(self):
         self.logger.info('Training models')
-        for it in range(4):
+        for it in range(5):
             self.logger.info(f'Downloading data: {it*25}% done')
-            num_datapoints = 5000
+            num_datapoints = 6000
             self.model.clear_data()
             for i, data in enumerate(self.datapoints(num_datapoints)):
                 if i*100 % num_datapoints == 0:
@@ -113,7 +113,7 @@ class AdvancedCnn(ModelInfo):
                 model, x, y, ID, network = tp
                 self.logger.debug(f'Learning {ID}')
                 performance = model.fit(x, y,
-                        epochs=10, batch_size=128, validation_split=0.2,
+                        epochs=10, batch_size=64, validation_split=0.2,
                         verbose=0)
                 self.model.add_performance(performance, ID, network)
                 # self.model.save_model(ID)

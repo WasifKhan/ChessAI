@@ -34,14 +34,16 @@ class Architecture:
                 ('deepskyblue', 'dimgray'), ('lightblue', 'silver'),
                 ]
         layer_infos = [
-                {'2 Layers': (2, [32, 64], [(4, 4), (3, 3)], ['relu']*2)},
-                {'3 Layers': (3, [8, 16, 32], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
-                {'4 Layers': (4, [8, 16, 32, 64], [(3, 3), (2, 2), (1, 1), (1,1)], ['relu']*4)},
+                {'2 SLayers': (2, [16, 34], [(4, 4), (3, 3)], ['relu']*2)},
+                {'2 DLayers': (2, [32, 128], [(4, 4), (3, 3)], ['relu']*2)},
+                {'3 SLayers': (3, [16, 16, 16], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
+                {'3 DLayers': (3, [64, 32, 16], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
+                {'4 Layers': (4, [32, 32, 32, 32], [(4, 4), (3, 3), (2, 2), (2, 2)], ['relu']*4)},
                 ]
         initializers = [
-                {'Small Uniform Weights': RU(minval=0.0000001, maxval=0.000001)},
+                {'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
                 {'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
-                {'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
+                #{'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
                 ]
         optimizers = [
                 {'RMSprop': RMSprop()},
