@@ -98,9 +98,9 @@ class AdvancedCnn(ModelInfo):
 
     def _train_model(self):
         self.logger.info('Training models')
-        for it in range(5):
+        for it in range(4):
             self.logger.info(f'Downloading data: {it*25}% done')
-            num_datapoints = 6000
+            num_datapoints = 5000
             self.model.clear_data()
             for i, data in enumerate(self.datapoints(num_datapoints)):
                 if i*100 % num_datapoints == 0:

@@ -15,7 +15,7 @@ class Architecture:
 
 
     def _load_configurations(self):
-        from keras.optimizers import Adam, RMSprop
+        from keras.optimizers import Adam, RMSprop, Adagrad, Adadelta, Adamax, Nadam, Ftrl
         from keras.initializers import RandomUniform as RU,\
                 RandomNormal as RN
         from itertools import product
@@ -34,20 +34,24 @@ class Architecture:
                 ('deepskyblue', 'dimgray'), ('lightblue', 'silver'),
                 ]
         layer_infos = [
-                {'2 SLayers': (2, [16, 34], [(4, 4), (3, 3)], ['relu']*2)},
-                {'2 DLayers': (2, [32, 128], [(4, 4), (3, 3)], ['relu']*2)},
-                {'3 SLayers': (3, [16, 16, 16], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
-                {'3 DLayers': (3, [64, 32, 16], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
-                {'4 Layers': (4, [32, 32, 32, 32], [(4, 4), (3, 3), (2, 2), (2, 2)], ['relu']*4)},
+                #{'1 Layer': (1, [128], [(4, 4))], ['relu'])},
+                #{'2 DLayers': (2, [64, 16], [(4, 4), (3, 3)], ['relu']*2)},
+                {'2 Layers': (2, [32, 128], [(4, 4), (3, 3)], ['relu']*2)},
+                {'3 Layers': (3, [8, 16, 32], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
                 ]
         initializers = [
-                {'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
-                {'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
-                #{'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
+                #{'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
+                #{'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
+                {'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
                 ]
         optimizers = [
-                {'RMSprop': RMSprop()},
-                {'Adam': Adam()},
+                {'RMSprop': RMSprop(learning_rate=0.000001)},
+                {'Adam': Adam(learning_rate=0.000001)},
+                {'Adagrad': Adagrad(learning_rate=0.000001)},
+                {'Adadelta': Adadelta(learning_rate=0.000001)},
+                {'Adamax': Adamax(learning_rate=0.000001)},
+                {'Nadam': Nadam(learning_rate=0.000001)},
+                {'Ftrl': Ftrl(learning_rate=0.000001)},
                 ]
         loss_metrics = [
                 {'Categorical-crossentropy': 'categorical_crossentropy'},
