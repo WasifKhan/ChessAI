@@ -6,6 +6,7 @@ Repository containing Chess Engine and ML Model
 ### **Wasif**
 - compare separated vs non-separated network
 - 2018 = 2.5k+ rating for processing
+- mess with optimizers
 - get gpu acceleration
 - tweak rewards (inputs) to see best one-prioritize defense
 - custom loss function (outputs) to capture more chess strategy 
