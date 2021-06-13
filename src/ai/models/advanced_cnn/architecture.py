@@ -11,7 +11,7 @@ class Architecture:
         self.performances = dict()
         self.models = dict()
         self._load_configurations()
-        # self._load_model()
+        self._load_model()
 
 
     def _load_configurations(self):
@@ -34,24 +34,20 @@ class Architecture:
                 ('deepskyblue', 'dimgray'), ('lightblue', 'silver'),
                 ]
         layer_infos = [
-                #{'1 Layer': (1, [128], [(4, 4))], ['relu'])},
+                {'1 Layer': (1, [128], [(4, 4))], ['relu'])},
                 #{'2 DLayers': (2, [64, 16], [(4, 4), (3, 3)], ['relu']*2)},
                 {'2 Layers': (2, [32, 128], [(4, 4), (3, 3)], ['relu']*2)},
                 {'3 Layers': (3, [8, 16, 32], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
                 ]
         initializers = [
-                #{'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
+                {'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
                 #{'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
-                {'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
+                #{'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
                 ]
         optimizers = [
-                {'RMSprop': RMSprop(learning_rate=0.000001)},
-                {'Adam': Adam(learning_rate=0.000001)},
-                {'Adagrad': Adagrad(learning_rate=0.000001)},
-                {'Adadelta': Adadelta(learning_rate=0.000001)},
-                {'Adamax': Adamax(learning_rate=0.000001)},
-                {'Nadam': Nadam(learning_rate=0.000001)},
-                {'Ftrl': Ftrl(learning_rate=0.000001)},
+                {'RMSprop': RMSprop(learning_rate=0.0001)},
+                {'Adam': Adam(learning_rate=0.0001)},
+                {'Nadam': Nadam(learning_rate=0.0001)},
                 ]
         loss_metrics = [
                 {'Categorical-crossentropy': 'categorical_crossentropy'},

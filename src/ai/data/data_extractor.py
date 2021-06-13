@@ -51,7 +51,7 @@ class DataExtractor(Parser):
                         or (i < 25 and dp[board] >= 4):
                     cur_dict[board] = dp[board]
             data.append(cur_dict)
-       self.data = data
+        self.data = data
 
     def datapoints(self, num_games):
         from os import listdir
