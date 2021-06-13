@@ -27,32 +27,31 @@ class AdvancedCnn(ModelInfo):
         dp = self._boards_to_datapoints(board, is_white)
         model = self.model.get_model('S')
         selector = model.predict(dp)[0].round(3)
-        self.logger.debug(f'Piece probabilities: [P, B, N, R, Q, K]: {prediction}')
+        self.logger.debug(f'Piece probabilities: [P, B, N, R, Q, K]: {selector}')
         best_pred, best_val, best_piece = [None]*3
+        true_max_pred = None
         for ID in piece_map:
-            model = self.get_model(piece_map[ID])
+            model = self.model.get_model(piece_map[ID])
             move_pred = model.predict(dp)[0].round(3)
             max_pred = max(move_pred.reshape((-1,)))
-            cur_val = max_pred * selector[piece_map[ID]]
-            if best_val is None or best_val < cur_move:
+            cur_val = max_pred * selector[ID]
+            if best_val is None or best_val < cur_val:
                 best_pred, best_val, best_piece = move_pred, cur_val, ID
+                true_max_pred = max_pred
 
-        board_move = best_prediction.reshape((8,8))
-        piece_dp = dp[:,:,:,ID:ID+1].reshape((8,8))
+        board_move = best_pred.reshape((8,8))
+        piece_dp = dp[:,:,:,best_piece:best_piece+1].reshape((8,8))
         self.logger.debug(f'prediction:\n{board_move}')
         self.logger.debug(f'true:\n{piece_dp}')
-        max_diff = None
         source = None
         board_direction = range(8) if is_white else range(7, -1, -1)
-        found = False
-        for row in board_direction and not Found:
-            for column in range(8) and not Found:
-                if board_move[row][column] == max_val:
+        for row in board_direction:
+            for column in range(8):
+                if board_move[row][column] == true_max_pred:
                     destination = column*10 + 7-row
-                    found = True
                     self.logger.debug(f'destination is: {destination}')
         for piece in board.white_pieces if is_white else board.black_pieces:
-            if str(piece).upper() == piece_map[index] \
+            if str(piece).upper() == piece_map[best_piece] \
                     and board.is_valid_move(piece, (destination//10, destination%10)):
                 source = piece.location[0]*10 + piece.location[1]
                 self.logger.debug(f'source is: {source}')
@@ -78,10 +77,11 @@ class AdvancedCnn(ModelInfo):
                 x = inputs
                 for i in range(num_layers):
                     x = Conv2D(density[i], supp_info[i],
-                            activation=activation[i], kernel_initializer=initializer)(x)
+                            activation=activation[i],
+                            kernel_initializer=initializer)(x)
                 x = Flatten()(x)
-                x = Dense(128, 'relu', initializer)(x)
-                outputs = Dense(64, 'softmax', initializer)(x)
+                x = Dense(256, 'relu', kernel_initializer=initializer)(x)
+                outputs = Dense(64, 'softmax')(x)
                 model = Model(inputs=inputs, outputs=outputs)
                 model.compile(optimizer, loss_metric, [loss_metric])
                 self.model.add_model(ID, piece, model)
@@ -89,10 +89,11 @@ class AdvancedCnn(ModelInfo):
             x = inputs
             for i in range(num_layers):
                 x = Conv2D(density[i], supp_info[i],
-                        activation=activation[i], kernel_initializer=initializer)(x)
+                        activation=activation[i],
+                        kernel_initializer=initializer)(x)
             x = Flatten()(x)
-            x = Dense(32, 'relu', initializer)(x)
-            outputs = Dense(6, 'softmax', initializer)(x)
+            x = Dense(64, 'relu', kernel_initializer=initializer)(x)
+            outputs = Dense(6, 'softmax')(x)
             model = Model(inputs=inputs, outputs=outputs)
             model.compile(optimizer, loss_metric, [loss_metric])
             self.model.add_model(ID, 'S', model)
@@ -100,8 +101,8 @@ class AdvancedCnn(ModelInfo):
 
     def _train_model(self):
         self.logger.info('Training models')
-        for it in range(20):
-            self.logger.info(f'Downloading data: {it*25}% done')
+        for it in range(3):
+            self.logger.info(f'Downloading data: {it*33}% done')
             num_datapoints = 10000
             self.model.clear_data()
             for i, data in enumerate(self.datapoints(num_datapoints)):
@@ -118,7 +119,7 @@ class AdvancedCnn(ModelInfo):
                         epochs=10, batch_size=64, validation_split=0.2,
                         verbose=0)
                 self.model.add_performance(performance, ID, network)
-                self.model.save_model(ID)
+                self.model.save_model(ID, network)
         self.logger.info(f'Done training models')
 
 

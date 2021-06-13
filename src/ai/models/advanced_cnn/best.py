@@ -1,7 +1,7 @@
-S: 0.87 - 2layer-smallnormal-adam
-P: 1.36 - 2layer smallnormal-adam
-B: 1.05 - 2layer largeuniform-adam
-N: 0.76 - 2layer small uniform-adam
-R: 2.8 - 2layer small normal-adam
-Q: 1.5 - 2layer large uniform -adam
-K: 1.5 - 2layer smallnormal -adam
+S: 0.83
+P: 1.2
+B: 0.85
+N: 0.6
+R: 2.2
+Q: 1.3
+K: 1.3

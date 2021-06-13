@@ -128,15 +128,17 @@ class DataExtractor(Parser):
                         black_elo = 0
                         continue
                     black_elo = int(black_elo)
-                elif move[2] == '1' and min(white_elo, black_elo) >= 2500:
+                elif move[2] == '1' and min(white_elo, black_elo) >= 2400:
                     games_processed += 1
                     datapoint = self._raw_data_to_datapoint(move)
                     boards = self._generate_datapoint(datapoint)
-                    for i, board in enumerate(boards[0][0:25]):
+                    for i, board in enumerate(boards[0]):
                         try:
                             memory[i][repr(board)] += 1
                         except KeyError:
                             memory[i][repr(board)] = 1
+                        except IndexError:
+                            break
                     white_elo, black_elo = 0, 0
                     state.write(datapoint)
             file_ID += 1

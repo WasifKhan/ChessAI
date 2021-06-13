@@ -15,9 +15,8 @@ class Architecture:
 
 
     def _load_configurations(self):
-        from keras.optimizers import Adam, RMSprop, Adagrad, Adadelta, Adamax, Nadam, Ftrl
-        from keras.initializers import RandomUniform as RU,\
-                RandomNormal as RN
+        from keras.optimizers import Adam, RMSprop, Nadam
+        from keras.initializers import RandomUniform as RU
         from itertools import product
         self.colors = [('midnightblue', 'darkorange'),('mediumblue', 'burlywood'),
                 ('blue', 'navajowhite'), ('slateblue', 'papayawhip'),
@@ -34,18 +33,15 @@ class Architecture:
                 ('deepskyblue', 'dimgray'), ('lightblue', 'silver'),
                 ]
         layer_infos = [
-                {'1 Layer': (1, [128], [(4, 4)], ['relu'])},
-                #{'2 DLayers': (2, [64, 16], [(4, 4), (3, 3)], ['relu']*2)},
-                {'2 Layers': (2, [32, 128], [(4, 4), (3, 3)], ['relu']*2)},
-                {'3 Layers': (3, [8, 16, 32], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
+                {'1 Layer': (1, [64], [(4, 4)], ['relu'])},
+                {'1 Layer': (1, [256], [(4, 4)], ['relu'])},
+                {'2 Layers': (2, [16, 32], [(4, 4), (3, 3)], ['relu']*2)},
                 ]
         initializers = [
                 {'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
-                #{'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
-                #{'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
                 ]
         optimizers = [
-                {'RMSprop': RMSprop(learning_rate=0.0001)},
+                #{'RMSprop': RMSprop(learning_rate=0.0001)},
                 {'Adam': Adam(learning_rate=0.0001)},
                 {'Nadam': Nadam(learning_rate=0.0001)},
                 ]
@@ -76,20 +72,25 @@ class Architecture:
     def _load_model(self):
         from os import listdir
         from keras.models import load_model
-        from keras.optimizers import Adam, RMSprop
-        from keras.initializers import RandomUniform, RandomNormal
         brain_location = self.location + '/brain/'
+        self._built = False
+        self.best_model = dict()
         for brain in listdir(brain_location):
-            if '.h5' in brain:
+            if 'best' in brain:
+                network = brain.split('best_')[1][0]
+                self.best_model[network] = load_model(brain_location + brain,
+                        compile=False)
+            elif '.h5' in brain:
                 name = brain.split('_')
                 ID = ' '.join(name[0:10])
                 network = name[10]
-                self.models[ID][network] = load_model(brain_location + brain)
+                self.models[ID][network] = load_model(brain_location + brain,
+                        compile=False)
+                self._built = True
 
 
     def built(self):
-        return bool(self.models[list(self.models.keys())[0]]['S'])
-
+        return self._built
 
     def generate_best_model(self):
         from numpy import array
@@ -104,6 +105,8 @@ class Architecture:
         for key in candidates:
             candidates[key] = sorted(candidates[key], key=lambda x: \
                     x[1][-1][-1][-1])
+        for key in candidates:
+            self.best_model[key] = self.models[candidates[key][0][0]][key]
         with open(self.location + '/performances/performance.txt', 'w') as fp:
             for key in candidates:
                 output = f'\nPerformances for {key} network\n'
@@ -115,6 +118,11 @@ class Architecture:
                     output += f'{str(test)}:Test, {str(train)}:Train, {name[0:-15].replace(" ", "")}\n'
                 output += '\n\n'
                 fp.write(output)
+        # Hacky way to load best model
+        for ID in self.best_model:
+            model = self.best_model[ID]
+            model.save(f'{self.location}/brain/best_{ID}.h5')
+
 
 
     def clear_data(self):
@@ -137,8 +145,8 @@ class Architecture:
                     array(self.data[network][1])
 
 
-    def add_model(self, ID, piece, model):
-        self.models[ID][str(piece)] = model
+    def add_model(self, ID, network, model):
+        self.models[ID][network] = model
 
 
     def get_model(self, network):
@@ -160,10 +168,9 @@ class Architecture:
         self.performances[ID][network].append(performance)
 
 
-    def save_model(self, ID):
-        for network in self.models[ID]:
-            model = self.models[ID][network]
-            str_ID = ID.replace(' ', '_')
-            str_ID = f'{str_ID}_{network}_network.h5'
-            model.save(f'{self.location}/brain/{str_ID}')
+    def save_model(self, ID, network):
+        model = self.models[ID][network]
+        str_ID = ID.replace(' ', '_')
+        str_ID = f'{str_ID}_{network}_network.h5'
+        model.save(f'{self.location}/brain/{str_ID}')
 
