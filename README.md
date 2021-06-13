@@ -7,7 +7,8 @@ Repository containing Chess Engine and ML Model
 - compare separated vs non-separated network
 - get gpu acceleration
 - tweak rewards (inputs) to see best one-prioritize defense
-- custom loss function (outputs) to capture more chess strategy
+- custom loss function (outputs) to capture more chess strategy 
+  - GradientTapes w/ custom training loop
 - #### MILESTONE 1.5 base smart AI done
 - Set up RNN/cnnRNN,CNN/Greedy/Greedy+exploit
 - Move w.r.t. various reward functions  
