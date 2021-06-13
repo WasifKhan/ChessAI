@@ -11,36 +11,44 @@ class Architecture:
         self.performances = dict()
         self.models = dict()
         self._load_configurations()
-        self._load_model()
+        # self._load_model()
 
 
     def _load_configurations(self):
-        from tensorflow.keras.optimizers import SGD, Adam, RMSprop
-        from tensorflow.keras.initializers import RandomUniform as RU,\
+        from keras.optimizers import Adam, RMSprop
+        from keras.initializers import RandomUniform as RU,\
                 RandomNormal as RN
         from itertools import product
+        self.colors = [('midnightblue', 'darkorange'),('mediumblue', 'burlywood'),
+                ('blue', 'navajowhite'), ('slateblue', 'papayawhip'),
+                ('mediumpurple', 'orange'), ('indigo', 'floralwhite'),
+                ('darkviolet', 'darkgoldenrod'), ('violet', 'gold'),
+                ('fuchsia', 'lemonchiffon'), ('orchid', 'darkkhaki'),
+                ('hotpink', 'lightyellow'), ('pink', 'olive'),
+                ('lightpink', 'olivedrab'), ('forestgreen', 'lightcoral'),
+                ('limegreen', 'brown'), ('green', 'maroon'),
+                ('seagreen', 'red'), ('mediumseagreen', 'salmon'),
+                ('aquamarine', 'coral'), ('turquoise', 'orangered'),
+                ('mediumturquoise', 'sienna'), ('lightcyan', 'chocolate'),
+                ('teal', 'peachpuff'), ('aqua', 'linen'), ('cyan', 'slategrey'),
+                ('deepskyblue', 'dimgray'), ('lightblue', 'silver'),
+                ]
         layer_infos = [
-#                {'1 Shallow Layer': (1, [16], [(4, 4)], ['relu'])},
-#                {'1 Dense Layer': (1, [32], [(4, 4)], ['relu'])},
-#                {'2 Shallow Layers': (2, [16, 32], [(4, 4), (3, 3)], ['relu']*2)},
-                {'2 Dense Layers': (2, [32, 64], [(4, 4), (3, 3)], ['relu']*2)},
-#                {'3 Shallow Layers': (3, [16, 32, 64], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
-                {'3 Dense Layers': (3, [32, 64, 128], [(3, 3), (2, 2), (1, 1)], ['relu']*3)},
+                {'2 Layers': (2, [32, 64], [(4, 4), (3, 3)], ['relu']*2)},
+                {'3 Layers': (3, [8, 16, 32], [(4, 4), (3, 3), (2, 2)], ['relu']*3)},
+                {'4 Layers': (4, [8, 16, 32, 64], [(3, 3), (2, 2), (1, 1), (1,1)], ['relu']*4)},
                 ]
         initializers = [
-#                {'Small Uniform Weights': RU(minval=0.0000001, maxval=0.000001)},
+                {'Small Uniform Weights': RU(minval=0.0000001, maxval=0.000001)},
                 {'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
-#                {'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
-                {'Large Normal Weights': RN(mean=0, stddev=0.00001)},
+                {'Small Normal Weights': RN(mean=0, stddev=0.0000001)},
                 ]
         optimizers = [
                 {'RMSprop': RMSprop()},
-#                {'SGD': SGD(learning_rate=0.001)},
-#                {'Adam': Adam()},
+                {'Adam': Adam()},
                 ]
         loss_metrics = [
                 {'Categorical-crossentropy': 'categorical_crossentropy'},
-#                {'Mean-squared-error': 'mean_squared_error'},
                 ]
         for info in product(layer_infos, initializers, optimizers, loss_metrics):
             layer_info, initializer, optimizer, loss_metric = info
@@ -65,15 +73,15 @@ class Architecture:
 
     def _load_model(self):
         from os import listdir
-        from tensorflow.keras.models import load_model
-        from tensorflow.keras.optimizers import SGD, Adam, RMSprop
-        from tensorflow.keras.initializers import RandomUniform, RandomNormal
+        from keras.models import load_model
+        from keras.optimizers import Adam, RMSprop
+        from keras.initializers import RandomUniform, RandomNormal
         brain_location = self.location + '/brain/'
         for brain in listdir(brain_location):
             if '.h5' in brain:
                 name = brain.split('_')
-                ID = ' '.join(name[0:11])
-                network = name[11]
+                ID = ' '.join(name[0:10])
+                network = name[10]
                 self.models[ID][network] = load_model(brain_location + brain)
 
 
@@ -82,12 +90,29 @@ class Architecture:
 
 
     def generate_best_model(self):
-        '''
-        Look at performances for each network and pick best one
-        '''
-        self.best_model = {'S':None, 'K': None, 'Q':None, 'R':None, 'N':None,
-                'B':None, 'P':None}
-        pass
+        from numpy import array
+        candidates = {'S':list(), 'P':list(), 'B':list(), 'N':list(),
+                'R':list(), 'Q':list(), 'K':list()}
+        for ID in self.data:
+            for model in self.performances:
+                performances = list(map(lambda x: \
+                    (x.history['loss'], x.history['val_loss']),
+                    self.performances[model][ID]))
+                candidates[ID].append((model, performances))
+        for key in candidates:
+            candidates[key] = sorted(candidates[key], key=lambda x: \
+                    x[1][-1][-1][-1])
+        with open(self.location + '/performances/performance.txt', 'w') as fp:
+            for key in candidates:
+                output = f'\nPerformances for {key} network\n'
+                for perf in candidates[key]:
+                    name = perf[0]
+                    performance = perf[1][-1]
+                    train = array(performance[0][1::2]).round(3)
+                    test = array(performance[1][1::2]).round(3)
+                    output += f'{str(test)}:Test, {str(train)}:Train, {name[0:-15].replace(" ", "")}\n'
+                output += '\n\n'
+                fp.write(output)
 
 
     def clear_data(self):

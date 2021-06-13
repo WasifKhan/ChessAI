@@ -70,11 +70,11 @@ class CnnBasic(ModelInfo):
     def _build_model(self):
         if self.model.built():
             return
-        from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
+        from keras.models import Model
+        from keras.layers import Input, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
-        from tensorflow.keras.optimizers import SGD, RMSprop
-        from tensorflow.keras.initializers import RandomUniform as RU
+        from keras.optimizers import SGD, RMSprop
+        from keras.initializers import RandomUniform as RU
         for piece in ['K', 'Q', 'R', 'N', 'B', 'P']:
             inputs = Input(shape=(8, 8, 6))
             x = Conv2D(32, (4, 4), activation='relu',

@@ -19,7 +19,7 @@ ACTIVATION = 'sigmoid'
 
 class CnnBasic(BaseModel):
     def __init__(self, game, location):
-        from tensorflow.keras.models import load_model
+        from keras.models import load_model
         from os import listdir
         super().__init__(game, location)
         location = self.location + '/brain/'
@@ -70,10 +70,10 @@ class CnnBasic(BaseModel):
     def _build_model(self):
         if self.models:
             return
-        from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, \
+        from keras.models import Model
+        from keras.layers import Input, Conv2D, Dense, Flatten, \
             Concatenate, Lambda, Reshape, MaxPooling2D, Dropout
-        from tensorflow.keras.optimizers import SGD, RMSprop
+        from keras.optimizers import SGD, RMSprop
 
         for piece in self.game.board.white_pieces:
             location = str(piece).upper() + str(piece.ID) \

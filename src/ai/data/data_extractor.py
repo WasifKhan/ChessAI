@@ -39,10 +39,10 @@ class DataExtractor(Parser):
                 fp.write(str(moves) + '\n')
 
 
-    def datapoints(self, num_games, reset=False):
+    def datapoints(self, num_games):
         from os import listdir
         data = open(self.location + '/train_state.txt').readlines()
-        datafile, line = (0, 0) if reset else (int(data[0][0:-1]), int(data[1]))
+        datafile, line = int(data[0][0:-1]), int(data[1])
         skip_lines = line
         while num_games != 0:
             with open(self.destination + f'data_{datafile}.txt') as fp:
@@ -67,7 +67,7 @@ class DataExtractor(Parser):
         from bz2 import BZ2File
         from urllib.request import urlopen
         self.logger.info(f'\nBegin processing dataset\n')
-        for year in range(2013, self.raw_data['cur_year']):
+        for year in range(2016, self.raw_data['cur_year']):
             for month in range(1, 13):
                 if year == self.raw_data['cur_year'] - 1 \
                         and month == self.raw_data['cur_month'] - 1:
@@ -83,7 +83,7 @@ class DataExtractor(Parser):
                 memory = self.memory
                 try:
                     self._process_data(filename, iter(lines), memory)
-                except StopIteration:
+                except (StopIteration, EOFError):
                     self.logger.info('File Complete')
                 except Exception as e:
                     import traceback
@@ -118,7 +118,7 @@ class DataExtractor(Parser):
                     games_processed += 1
                     datapoint = self._raw_data_to_datapoint(move)
                     boards = self._generate_datapoint(datapoint)
-                    for i, board in enumerate(boards[0]):
+                    for i, board in enumerate(boards[0][0:100]):
                         try:
                             memory[i][repr(board)] += 1
                         except KeyError:
@@ -126,4 +126,4 @@ class DataExtractor(Parser):
                     white_elo, black_elo = 0, 0
                     state.write(datapoint)
             file_ID += 1
-        return StopIteration
+        raise EOFError

@@ -79,7 +79,7 @@ class Architecture:
 
     def load_model(self):
         from os import listdir
-        from tensorflow.keras.models import load_model
+        from keras.models import load_model
         brain_location = self.location + '/brain/'
         for brain in listdir(brain_location):
             if self.name in brain:

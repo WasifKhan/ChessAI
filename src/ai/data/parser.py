@@ -13,17 +13,17 @@ class Parser(BaseModel):
 
 
     def _raw_data_to_datapoint(self, line):
-        datapoint = '['
+        datapoint = ''
         moves = eval(self._extract_moves(line))
         self.game.__init__()
         for move_pair in moves:
             for i in range(len(move_pair)):
                 source, destination = self._convert_move(move_pair[i], not(bool(i)))
                 if source == None or not self.game.move(source, destination):
-                    datapoint = datapoint[0:-2] + ']\n'
+                    datapoint = '[' + datapoint[0:-2] + ']\n'
                     return datapoint
                 datapoint += f"({source}, {destination}), "
-        datapoint = datapoint[0:-2] + ']\n'
+        datapoint = '[' + datapoint[0:-2] + ']\n'
         return datapoint
 
 

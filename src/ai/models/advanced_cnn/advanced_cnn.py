@@ -66,8 +66,8 @@ class AdvancedCnn(ModelInfo):
     def _build_model(self):
         if self.model.built():
             return
-        from tensorflow.keras.models import Model
-        from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten
+        from keras.models import Model
+        from keras.layers import Input, Conv2D, Dense, Flatten
         self.logger.info('Building models')
         for ID in self.model.configurations:
             configuration = self.model.configurations[ID]
@@ -98,44 +98,45 @@ class AdvancedCnn(ModelInfo):
 
     def _train_model(self):
         self.logger.info('Training models')
-        for it in range(2):
-            num_datapoints = 300
+        for it in range(4):
+            self.logger.info(f'Downloading data: {it*25}% done')
+            num_datapoints = 5000
             self.model.clear_data()
-            self.logger.info(f'Begin downloading data: {it*50}% done')
-            for i, data in enumerate(self.datapoints(num_datapoints),\
-                    not(bool(it))):
+            for i, data in enumerate(self.datapoints(num_datapoints)):
                 if i*100 % num_datapoints == 0:
                     self.logger.debug(f'{i*100//num_datapoints}% done downloading')
                 boards, moves = data
                 self._boards_to_datapoints(boards, True, moves)
             self.model.prepare_data()
+            self.logger.info(f'Learning models')
             for tp in self.model.get_models():
                 model, x, y, ID, network = tp
-                self.logger.info(f'Learning {ID}')
+                self.logger.debug(f'Learning {ID}')
                 performance = model.fit(x, y,
-                        epochs=10, batch_size=32, validation_split=0.2, verbose=0)
+                        epochs=10, batch_size=128, validation_split=0.2,
+                        verbose=0)
                 self.model.add_performance(performance, ID, network)
-                self.model.save_model(ID)
+                # self.model.save_model(ID)
         self.logger.info(f'Done training models')
 
 
     def _evaluate_model(self):
-        '''
-        need more colors...lol
-        '''
         from matplotlib import pyplot
+        self.model.generate_best_model()
         for ID in self.model.data:
+            colors = iter(self.model.colors*10)
             fig, axs = pyplot.subplots()
             fig.suptitle(f'{ID} Network')
             for model in self.model.performances:
-                performance = self.model.performances[model][ID][-1]
-                axs.plot(performance.history['loss'], color='blue',
+                train_color, test_color = next(colors)
+                performance = self.model.performances[model][ID][-3:-1]
+                color_pair = next(colors)
+                axs.plot(performance[-1].history['loss'], color=train_color,
                         label=f'{model} - Train Loss')
-                axs.plot(performance.history['val_loss'], color='orange',
+                axs.plot(performance[-1].history['val_loss'], color=test_color,
                         label=f'{model} - Test Loss')
             pyplot.legend()
             pyplot.show()
-        self.model.generate_best_model()
 
 
     def _boards_to_datapoints(self, boards, is_white=True, moves=None):
