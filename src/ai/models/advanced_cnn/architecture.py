@@ -10,58 +10,56 @@ class Architecture:
         self.configurations = dict()
         self.performances = dict()
         self.models = dict()
-        self._load_configurations()
-        self._load_model()
+        self._load_models()
 
 
     def _load_configurations(self):
         from keras.optimizers import Adam, RMSprop, Nadam
-        from keras.initializers import RandomUniform as RU
+        from keras.initializers import RandomUniform as RU, RandomNormal as RN
         from itertools import product
-        self.colors = [('midnightblue', 'darkorange'),('mediumblue', 'burlywood'),
-                ('blue', 'navajowhite'), ('slateblue', 'papayawhip'),
-                ('mediumpurple', 'orange'), ('indigo', 'floralwhite'),
-                ('darkviolet', 'darkgoldenrod'), ('violet', 'gold'),
-                ('fuchsia', 'lemonchiffon'), ('orchid', 'darkkhaki'),
-                ('hotpink', 'lightyellow'), ('pink', 'olive'),
-                ('lightpink', 'olivedrab'), ('forestgreen', 'lightcoral'),
-                ('limegreen', 'brown'), ('green', 'maroon'),
-                ('seagreen', 'red'), ('mediumseagreen', 'salmon'),
-                ('aquamarine', 'coral'), ('turquoise', 'orangered'),
-                ('mediumturquoise', 'sienna'), ('lightcyan', 'chocolate'),
-                ('teal', 'peachpuff'), ('aqua', 'linen'), ('cyan', 'slategrey'),
-                ('deepskyblue', 'dimgray'), ('lightblue', 'silver'),
+        conv_layer_infos = [
+                ##{'1 16NLayer': (1, [16], [(4, 4)], ['relu'])},
+                {'1 32 N5sLayer': (1, [32], [(5, 5)], ['relu'])},
+                #{'1 32N4sLayer': (1, [32], [(4, 4)], ['relu'])},
+                #{'1 32N3sLayer': (1, [32], [(3, 3)], ['relu'])},
+                #{'1 64NLayer': (1, [64], [(4, 4)], ['relu'])},
                 ]
-        layer_infos = [
-                {'1 Layer': (1, [64], [(4, 4)], ['relu'])},
-                {'1 Layer': (1, [256], [(4, 4)], ['relu'])},
-                {'2 Layers': (2, [16, 32], [(4, 4), (3, 3)], ['relu']*2)},
+        dense_layer_infos = [
+                {'1 16NLayer': (1, [16], ['sigmoid'])},
+                {'1 32NLayer': (1, [32], ['sigmoid'])},
+                {'1 64NLayer': (1, [64], ['sigmoid'])},
+                {'2 LayersSig/Rel': (2, [32, 64], ['relu', 'sigmoid'])},
+                {'2 LayersSig/Sig': (2, [32, 64], ['sigmoid', 'sigmoid'])},
+                {'3 Layers': (3, [256, 128, 64], ['relu', 'relu', 'sigmoid'])},
                 ]
+
         initializers = [
-                {'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
+                #{'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
+                {'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
+                #{'Small Normal Weights': RN(std=0.0000001)},
                 ]
         optimizers = [
-                #{'RMSprop': RMSprop(learning_rate=0.0001)},
-                {'Adam': Adam(learning_rate=0.0001)},
-                {'Nadam': Nadam(learning_rate=0.0001)},
+                {'RMSprop': RMSprop(learning_rate=0.000001)},
+                #{'Adam': Adam()},
+                {'Nadam': Nadam()},
                 ]
         loss_metrics = [
                 {'Categorical-crossentropy': 'categorical_crossentropy'},
                 ]
-        for info in product(layer_infos, initializers, optimizers, loss_metrics):
-            layer_info, initializer, optimizer, loss_metric = info
-            l_name = list(layer_info.keys())[0]
+        for info in product(dense_layer_infos, conv_layer_infos, initializers, optimizers, loss_metrics):
+            dense_layer_info, conv_layer_info, initializer, optimizer, loss_metric = info
+            d_name = list(dense_layer_info.keys())[0]
+            c_name = list(conv_layer_info.keys())[0]
             i_name = list(initializer.keys())[0]
             o_name = list(optimizer.keys())[0]
             m_name = list(loss_metric.keys())[0]
-            ID = f'{l_name} - {i_name} - {o_name} - {m_name}'
+            ID = f'{d_name} - {c_name} - {o_name} - {m_name}'
             self.models[ID] = {'S': None, 'K': None, 'Q': None, 'R': None,
                     'N': None, 'B': None, 'P': None}
             self.performances[ID] = {
                     'S':list(), 'K':list(), 'Q':list(), 'R':list(),
                     'N':list(), 'B':list(), 'P':list()}
-            self.configurations[ID] = (layer_info[l_name], initializer[i_name],
-                    optimizer[o_name], loss_metric[m_name])
+            self.configurations[ID] = (dense_layer_info[d_name], conv_layer_info[c_name], initializer[i_name], optimizer[o_name], loss_metric[m_name])
         self.data = {'S' : [list(), list()], 'P' : [list(), list()],
                 'B' : [list(), list()], 'N' : [list(), list()],
                 'R' : [list(), list()], 'Q' : [list(), list()],
@@ -69,30 +67,43 @@ class Architecture:
                 }
 
 
-    def _load_model(self):
+    def _load_models(self):
         from os import listdir
         from keras.models import load_model
         brain_location = self.location + '/brain/'
-        self._built = False
         self.best_model = dict()
         for brain in listdir(brain_location):
             if 'best' in brain:
-                network = brain.split('best_')[1][0]
-                self.best_model[network] = load_model(brain_location + brain,
-                        compile=False)
+                ID = brain.split('best_')[1][0]
+                self.best_model[ID] = load_model(brain_location + brain)
+        '''
             elif '.h5' in brain:
                 name = brain.split('_')
                 ID = ' '.join(name[0:10])
                 network = name[10]
-                self.models[ID][network] = load_model(brain_location + brain,
-                        compile=False)
-                self._built = True
+                self.models[ID][network] = load_model(brain_location + brain)
+        '''
 
 
-    def built(self):
-        return self._built
+    def train(self, batch_size, epochs):
+        from numpy import array
+        for network in self.data:
+            self.data[network][0] = \
+                    array(self.data[network][0])
+            self.data[network][1] = \
+                    array(self.data[network][1])
+        for ID in self.models:
+            for network in self.models[ID]:
+                model = self.models[ID][network]
+                x, y = self.data[network]
+                performance = model.fit(x, y,
+                        epochs=epochs, batch_size=batch_size, validation_split=0.2,
+                        verbose=0)
+                self.performances[ID][network].append(performance)
 
-    def generate_best_model(self):
+
+
+    def _generate_best_model(self):
         from numpy import array
         candidates = {'S':list(), 'P':list(), 'B':list(), 'N':list(),
                 'R':list(), 'Q':list(), 'K':list()}
@@ -118,11 +129,47 @@ class Architecture:
                     output += f'{str(test)}:Test, {str(train)}:Train, {name[0:-15].replace(" ", "")}\n'
                 output += '\n\n'
                 fp.write(output)
-        # Hacky way to load best model
         for ID in self.best_model:
             model = self.best_model[ID]
-            model.save(f'{self.location}/brain/best_{ID}.h5')
+            model.save(f'{self.location}/brain/best_{ID}.h5',
+                    include_optimizer=False)
 
+
+    def build_model(self, input_shape, output_shapes):
+        from keras.models import Model
+        from keras.layers import Input, Conv2D, Dense, Flatten
+        self._load_configurations()
+        inputs = Input(shape=input_shape)
+        for ID in self.configurations:
+            configuration = self.configurations[ID]
+            d_layer_info, c_layer_info, initializer, optimizer, loss_metric = configuration
+            d_num_layers, d_density, d_activation, = d_layer_info
+            c_num_layers, c_density, c_sliders, c_activation, = c_layer_info
+            for network in ['K', 'Q', 'R', 'N', 'B', 'P']:
+                x = inputs
+                for i in range(c_num_layers):
+                    x = Conv2D(c_density[i], c_sliders[i],
+                            activation=c_activation[i],
+                            kernel_initializer=initializer)(x)
+                x = Flatten()(x)
+                for i in range(d_num_layers):
+                    x = Dense(d_density[i], d_activation[i], kernel_initializer=initializer)(x)
+                outputs = Dense(output_shapes[0][0], output_shapes[0][1])(x)
+                model = Model(inputs=inputs, outputs=outputs)
+                model.compile(optimizer, loss_metric, [loss_metric])
+                self.models[ID][network] = model
+            x = inputs
+            for i in range(c_num_layers):
+                x = Conv2D(c_density[i], c_sliders[i],
+                        activation=c_activation[i],
+                        kernel_initializer=initializer)(x)
+            x = Flatten()(x)
+            for i in range(d_num_layers):
+                x = Dense(d_density[i]//2, d_activation[i], kernel_initializer=initializer)(x)
+            outputs = Dense(output_shapes[1][0], output_shapes[1][1])(x)
+            model = Model(inputs=inputs, outputs=outputs)
+            model.compile(optimizer, loss_metric, [loss_metric])
+            self.models[ID]['S'] = model
 
 
     def clear_data(self):
@@ -136,41 +183,16 @@ class Architecture:
         self.data[network][1].append(y_data)
 
 
-    def prepare_data(self):
-        from numpy import array
-        for network in self.data:
-            self.data[network][0] = \
-                    array(self.data[network][0])
-            self.data[network][1] = \
-                    array(self.data[network][1])
-
-
-    def add_model(self, ID, network, model):
-        self.models[ID][network] = model
-
-
     def get_model(self, network):
         return self.best_model[network]
 
 
-    def get_models(self):
+    def save_model(self):
         for ID in self.models:
             for network in self.models[ID]:
-                yield (self.models[ID][network],
-                        self.data[network][0],
-                        self.data[network][1],
-                        ID,
-                        network)
-        return StopIteration
-
-
-    def add_performance(self, performance, ID, network):
-        self.performances[ID][network].append(performance)
-
-
-    def save_model(self, ID, network):
-        model = self.models[ID][network]
-        str_ID = ID.replace(' ', '_')
-        str_ID = f'{str_ID}_{network}_network.h5'
-        model.save(f'{self.location}/brain/{str_ID}')
-
+                model = self.models[ID][network]
+                str_ID = ID.replace(' ', '_')
+                str_ID = f'{str_ID}_{network}_network.h5'
+                model.save(f'{self.location}/brain/{str_ID}',
+                        include_optimizer=False)
+        self._generate_best_model()

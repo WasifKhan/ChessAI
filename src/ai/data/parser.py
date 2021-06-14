@@ -46,7 +46,7 @@ class Parser(BaseModel):
 
     def _extract_moves(self, line):
         game = split('[\d]+\.\s', line)
-        datapoint = '['
+        datapoint = ''
         for it in range (1, len(game)):
             move = game[it].split('{')
             if len(move) > 1:
@@ -66,7 +66,7 @@ class Parser(BaseModel):
             black_move = 'None'
         if not white_move == 'None':
             datapoint += f"('{white_move}', '{black_move}'), "
-        return datapoint[0:-2] + ']\n'
+        return '[' + datapoint[0:-2] + ']\n'
 
 
     def _convert_move(self, move, is_white):

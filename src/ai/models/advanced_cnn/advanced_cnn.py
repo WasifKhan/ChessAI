@@ -2,11 +2,9 @@
 AI Implemented Using Basic Convolutional Neural Network
 
 self._predict(board, is_white)
-self._load_model()
 self._build_model()
 self._train_model()
 self._evaluate_model()
-self._move_to_datapoint(move)
 self._board_to_datapoint(board, is_white)
 '''
 
@@ -22,6 +20,7 @@ class AdvancedCnn(ModelInfo):
 
     def _predict(self, board, is_white):
         from numpy import set_printoptions
+        self.logger.debug(f'board is:\n{str(board)}')
         set_printoptions(suppress=True)
         piece_map = {0:'P', 1:'B', 2:'N', 3:'R', 4:'Q', 5:'K'}
         dp = self._boards_to_datapoints(board, is_white)
@@ -62,76 +61,29 @@ class AdvancedCnn(ModelInfo):
         return (source, destination)
 
 
-    def _build_model(self):
-        if self.model.built():
-            return
-        from keras.models import Model
-        from keras.layers import Input, Conv2D, Dense, Flatten
-        self.logger.info('Building models')
-        for ID in self.model.configurations:
-            configuration = self.model.configurations[ID]
-            layer_info, initializer, optimizer, loss_metric = configuration
-            num_layers, density, supp_info, activation, = layer_info
-            for piece in ['K', 'Q', 'R', 'N', 'B', 'P']:
-                inputs = Input(shape=(8, 8, 6))
-                x = inputs
-                for i in range(num_layers):
-                    x = Conv2D(density[i], supp_info[i],
-                            activation=activation[i],
-                            kernel_initializer=initializer)(x)
-                x = Flatten()(x)
-                x = Dense(256, 'relu', kernel_initializer=initializer)(x)
-                outputs = Dense(64, 'softmax')(x)
-                model = Model(inputs=inputs, outputs=outputs)
-                model.compile(optimizer, loss_metric, [loss_metric])
-                self.model.add_model(ID, piece, model)
-            inputs = Input(shape=(8, 8, 6))
-            x = inputs
-            for i in range(num_layers):
-                x = Conv2D(density[i], supp_info[i],
-                        activation=activation[i],
-                        kernel_initializer=initializer)(x)
-            x = Flatten()(x)
-            x = Dense(64, 'relu', kernel_initializer=initializer)(x)
-            outputs = Dense(6, 'softmax')(x)
-            model = Model(inputs=inputs, outputs=outputs)
-            model.compile(optimizer, loss_metric, [loss_metric])
-            self.model.add_model(ID, 'S', model)
-
-
     def _train_model(self):
-        self.logger.info('Training models')
-        for it in range(3):
-            self.logger.info(f'Downloading data: {it*33}% done')
-            num_datapoints = 10000
+        self.logger.info('Building models')
+        self.model.build_model((8, 8, 6), [(64, 'softmax'), (6, 'softmax')])
+        iterations = 20
+        for it in range(iterations):
+            self.logger.info(f'Training models... {it*(100//iterations)}% done')
+            num_datapoints = 8000
             self.model.clear_data()
-            for i, data in enumerate(self.datapoints(num_datapoints)):
-                if i*100 % num_datapoints == 0:
-                    self.logger.debug(f'{i*100//num_datapoints}% done downloading')
-                boards, moves = data
-                self._boards_to_datapoints(boards, True, moves)
-            self.model.prepare_data()
-            self.logger.info(f'Learning models')
-            for tp in self.model.get_models():
-                model, x, y, ID, network = tp
-                self.logger.debug(f'Learning {ID}')
-                performance = model.fit(x, y,
-                        epochs=10, batch_size=64, validation_split=0.2,
-                        verbose=0)
-                self.model.add_performance(performance, ID, network)
-                self.model.save_model(ID, network)
-        self.logger.info(f'Done training models')
+            for data in self.datapoints(num_datapoints):
+                self._boards_to_datapoints(*data, True)
+            self.model.train(batch_size=128, epochs=10)
+        self.model.save_model()
 
 
     def _evaluate_model(self):
         from matplotlib import pyplot
-        self.model.generate_best_model()
+        from matplotlib.colors import CSS4_COLORS
         for ID in self.model.data:
-            colors = iter(self.model.colors*10)
+            colors = iter(CSS4_COLORS)
             fig, axs = pyplot.subplots()
             fig.suptitle(f'{ID} Network')
             for model in self.model.performances:
-                train_color, test_color = next(colors)
+                train_color, test_color = next(colors), next(colors)
                 performance = self.model.performances[model][ID][-3:-1]
                 color_pair = next(colors)
                 axs.plot(performance[-1].history['loss'], color=train_color,
@@ -142,7 +94,7 @@ class AdvancedCnn(ModelInfo):
             pyplot.show()
 
 
-    def _boards_to_datapoints(self, boards, is_white=True, moves=None):
+    def _boards_to_datapoints(self, boards, moves=None, is_white=True):
         from numpy import array
         piece_map = {'P':0, 'B':1, 'N':2, 'R':3, 'Q':4, 'K':5}
         if not moves:

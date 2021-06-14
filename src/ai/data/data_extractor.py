@@ -81,8 +81,8 @@ class DataExtractor(Parser):
         from bz2 import BZ2File
         from urllib.request import urlopen
         self.logger.info(f'\nBegin processing dataset\n')
-        for year in range(2017, self.raw_data['cur_year']):
-            for month in range(6, 13):
+        for year in range(2018, self.raw_data['cur_year']):
+            for month in range(2, 12):
                 if year == self.raw_data['cur_year'] - 1 \
                         and month == self.raw_data['cur_month'] - 1:
                     break

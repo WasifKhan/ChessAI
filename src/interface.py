@@ -36,7 +36,6 @@ class Interface:
             print('*' * 7 + f'{winner} wins' + '*' * 6)
         print(('*'*30 + '\n') + ('*'*11 + 'GAME OVER' + '*'*10 + '\n') + ('*'*30))
         self.game.game_over(1, 0) if winner else self.game.game_over(0, 1)
-        self.play_again()
 
     def ai_move(self, is_white: bool) -> bool:
         return self.add_move(ai_move[0], ai_move[1]) \
@@ -64,7 +63,7 @@ class Interface:
         for i in range(num_games):
             self.game = Game()
             white_ai = AI(self.game.__init__(), 0)
-            black_ai = AI(self.game.__init__(), 1)
+            black_ai = AI(self.game.__init__(), 2)
             self.game.set_names(white_ai.name, black_ai.name)
             AIs = [white_ai, black_ai]
             white_turn = True

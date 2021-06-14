@@ -13,7 +13,7 @@ class BaseModel(metaclass=ABCMeta):
 
     def train(self):
         # self.download_raw_data()
-        self._build_model()
+        # self.clean_memory()
         self._train_model()
         self._evaluate_model()
 
