@@ -45,7 +45,7 @@ class King(Piece):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] - square)*10 + self.location[1]) in piece.moves(board):
                             return False
-                        if board[(self.location[0] - square)*10 + self.location[1]].is_white is not None:
+                        if square >= 1 and board[(self.location[0] - square)*10 + self.location[1]].is_white is not None:
                             return False
                 return True
         # Right Castle
@@ -56,7 +56,7 @@ class King(Piece):
                     for piece in (pieces := board.black_pieces if self.is_white else board.white_pieces):
                         if not isinstance(piece, King) and ((self.location[0] + square)*10 + self.location[1]) in piece.moves(board):
                             return False
-                        if board[(self.location[0] + square)*10 + self.location[1]].is_white is not None:
+                        if square >= 1 and board[(self.location[0] + square)*10 + self.location[1]].is_white is not None:
                             return False
                 return True
 

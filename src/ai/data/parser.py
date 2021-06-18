@@ -17,7 +17,12 @@ class Parser(BaseModel):
         moves = eval(self._extract_moves(line))
         self.game.__init__()
         for move_pair in moves:
-            for i in range(len(move_pair)):
+            if move_pair[0] == 'Win' \
+                    or move_pair[0] == 'Draw' \
+                    or move_pair[0] == 'Lose':
+                datapoint = '[' + datapoint[0:-2] + ']\n'
+                return datapoint
+            for i in range(2):
                 source, destination = self._convert_move(move_pair[i], not(bool(i)))
                 if source == None or not self.game.move(source, destination):
                     datapoint = '[' + datapoint[0:-2] + ']\n'
@@ -34,10 +39,7 @@ class Parser(BaseModel):
         moves = eval(moves)
         for source, destination in moves:
             x = copy(self.game.board)
-            if not self.game.move(source, destination):
-                self.logger.warning(\
-                        f'Move was invalid.\n{x}\nMove: {source} -> {destination}')
-                break
+            self.game.move(source, destination)
             y = (source, destination)
             x_vector.append(x)
             y_vector.append(y)
@@ -58,20 +60,18 @@ class Parser(BaseModel):
             datapoint += f"('{white_move}', '{black_move}'), " \
                     if it != len(game) - 1 else ""
         if white_move == black_move or '*' in black_move or '1-0' in black_move:
-            black_move = 'None'
+            white_move = 'Win'
+            black_move = 'Lose'
         elif '1/2' in black_move:
-            black_move = 'Draw'
+            white_move = black_move = 'Draw'
         elif '0-1' in black_move:
-            white_move = 'None'
-            black_move = 'None'
-        if not white_move == 'None':
-            datapoint += f"('{white_move}', '{black_move}'), "
-        return '[' + datapoint[0:-2] + ']\n'
+            white_move = 'Lose'
+            black_move = 'Win'
+        datapoint += f"('{white_move}', '{black_move}')"
+        return '[' + datapoint + ']\n'
 
 
     def _convert_move(self, move, is_white):
-        if move == 'None' or move == 'Draw':
-            return None, None
         if move[0] == 'O':
             piece = self.game.board.white_king if is_white else self.game.board.black_king
             destination = (piece.location[0]+2, piece.location[1]) \
@@ -92,7 +92,10 @@ class Parser(BaseModel):
                     or (move[0] not in {'K', 'Q', 'R', 'N', 'B'} \
                     and ID == 'P')):
                 candidates.append(cur_piece)
+        piece = None
         if len(candidates) == 0:
+            self.logger.warning(\
+                f'Move was invalid.\n{self.game.board}\nMove: {is_white} - {move}\n')
             return None, None
         elif len(candidates) == 1:
             piece = candidates[0]
@@ -104,5 +107,9 @@ class Parser(BaseModel):
                         or (ord(identifier) < 97 \
                         and candidate.location[1] == int(identifier) - 1):
                     piece = candidate
+        if not piece:
+            self.logger.warning(\
+                f'Move was invalid.\n{self.game.board}\nMove: {is_white} - {move}\n')
+            return None, None
         return piece.location[0]*10 + piece.location[1], destination[0]*10 + destination[1]
 

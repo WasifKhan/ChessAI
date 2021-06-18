@@ -12,10 +12,11 @@ class BaseModel(metaclass=ABCMeta):
         self.logger = logger
 
     def train(self):
-        # self.download_raw_data()
-        # self.clean_memory()
-        self._train_model()
-        self._evaluate_model()
+        self.download_raw_data()
+        #self.clean_memory()
+        #self.clean_data()
+        #self._train_model()
+        #self._evaluate_model()
 
     def _resign(self, board, is_white):
         if len(board.history) >= 5:

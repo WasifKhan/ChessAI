@@ -1,7 +1,7 @@
-from ai.models.base_model import BaseModel
+from ai.data.model_info import ModelInfo
 
 
-class AliAI(BaseModel):
+class AliAI(ModelInfo):
     def __init__(self, game, location):
         super().__init__(game, location)
 
@@ -57,6 +57,9 @@ class AliAI(BaseModel):
                 enemy_move_values = []
                 for their_piece in their_pieces:
                     for their_move in their_piece.moves(temp_board):
+                        if not temp_board.is_valid_move(their_piece,
+                                (their_move//10, their_move%10)):
+                            continue
                         second_temp_board = copy(temp_board)
                         second_temp_board.move(second_temp_board[their_piece.location], ((their_move//10),(their_move%10)))
                         my_pieces = second_temp_board.white_pieces if is_white else second_temp_board.black_pieces
@@ -76,9 +79,10 @@ class AliAI(BaseModel):
                 else:
                     if (best_moves[0][0] > cur_value and is_white) or (best_moves[0][0] < cur_value and not is_white):
                         best_moves = [(cur_value, enemy_move_values[0][1], source, move)]
-        
+        # Omit next line to continue search
+        return best_moves[0][2], best_moves[0][3]
         real_best_move = []
-        
+
         for state in best_moves:
             third_temp_board = state[1]
             my_pieces = third_temp_board.white_pieces if is_white else third_temp_board.black_pieces

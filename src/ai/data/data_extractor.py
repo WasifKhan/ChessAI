@@ -14,10 +14,10 @@ class DataExtractor(Parser):
         self.raw_data = {
                 'link_start': 'https://database.lichess.org/standard/lichess_db_standard_rated_',
                 'link_end': '.pgn.bz2',
-                'start_year': 2013,
+                'start_year': 2018,
                 'cur_year': localtime()[0] + 1,
                 'cur_month': localtime()[1],
-                'total': (localtime()[0] - 2013)*12 + localtime()[1] - 1
+                'total': (localtime()[0] - 2018)*12 + localtime()[1] - 1
                 }
 
 
@@ -40,6 +40,7 @@ class DataExtractor(Parser):
 
 
     def clean_memory(self):
+        self.logger.info('Cleaning memory...')
         old_data = self.memory
         data = []
         for i, dp in enumerate(old_data[0:25]):
@@ -52,6 +53,18 @@ class DataExtractor(Parser):
                     cur_dict[board] = dp[board]
             data.append(cur_dict)
         self.memory = data
+
+    def clean_data(self):
+        self.logger.info('Cleaning data...')
+        data = []
+        with open(self.destination + 'data_0.txt') as fp:
+            for line in fp:
+                if len(line) >= 150:
+                    data.append(line)
+        with open(self.destination + 'data_0.txt', 'w') as fp:
+            for line in data:
+                fp.write(line)
+
 
     def datapoints(self, num_games):
         from os import listdir
@@ -66,9 +79,23 @@ class DataExtractor(Parser):
                     if skip_lines != 0:
                         skip_lines -= 1
                         continue
-                    num_games -= 1
-                    line += 1
-                    yield self._generate_datapoint(moves)
+                    try:
+                        games = self._generate_datapoint(moves)
+                        num_games -= 1
+                        line += 1
+                        yield games
+                    except ValueError:
+                        import traceback
+                        self.logger.error(\
+                                f'Fix this bug!!\n{traceback.format_exc()}')
+                        self.logger.error(f'moves is:\n{moves}')
+                        self.logger.error(f'line is: {line}')
+                        continue
+                    except Exception:
+                        import traceback
+                        self.logger.error(\
+                                f'Exception occured!\n{traceback.format_exc()}')
+                        continue
             if num_games != 0:
                 datafile += 1
                 line = 0
@@ -81,8 +108,8 @@ class DataExtractor(Parser):
         from bz2 import BZ2File
         from urllib.request import urlopen
         self.logger.info(f'\nBegin processing dataset\n')
-        for year in range(2018, self.raw_data['cur_year']):
-            for month in range(2, 12):
+        for year in range(self.raw_data['start_year'], self.raw_data['cur_year']):
+            for month in range(12, 13):
                 if year == self.raw_data['cur_year'] - 1 \
                         and month == self.raw_data['cur_month'] - 1:
                     break
@@ -91,7 +118,8 @@ class DataExtractor(Parser):
                 link = self.raw_data['link_start'] \
                         + link_ID \
                         + self.raw_data['link_end']
-                self.logger.info(f'Processing data: {year}:{month}...{((year-2013)*12+(month-1))*100//self.raw_data["total"]}% done')
+                self.logger.info(f'Processing data:\
+                        {year}:{month}...{((year-self.raw_data["start_year"])*12+(month-1))*100//self.raw_data["total"]}% done')
                 filename = f'{self.destination}data_{year}_{month}'
                 lines = BZ2File(urlopen(link), 'r')
                 memory = self.memory
@@ -103,6 +131,7 @@ class DataExtractor(Parser):
                     import traceback
                     self.logger.error(\
                             f'Exception occured!\n{traceback.format_exc(3)}')
+                    raise e
                 self.memory = memory
         self.logger.info('Finish processing dataset')
 
@@ -128,7 +157,7 @@ class DataExtractor(Parser):
                         black_elo = 0
                         continue
                     black_elo = int(black_elo)
-                elif move[2] == '1' and min(white_elo, black_elo) >= 2400:
+                elif move[2] == '1' and min(white_elo, black_elo) >= 2500:
                     games_processed += 1
                     datapoint = self._raw_data_to_datapoint(move)
                     boards = self._generate_datapoint(datapoint)

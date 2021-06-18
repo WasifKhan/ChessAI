@@ -39,6 +39,18 @@ class Pawn(Piece):
                     values.append(piece_2.value)
         return values
 
+    def valid_en_passant(self, board, destination):
+        y_movement = 2 if self.is_white else -2
+        location = 4 if self.is_white else 3
+        if board.history:
+            previous_move = board.history[-1]
+            if (isinstance(previous_move[0], Pawn) \
+                    and previous_move[1][1] - previous_move[2][1] == y_movement \
+                    and previous_move[2][0] == destination[0] \
+                    and self.location[1] == location):
+                return True
+        return False
+
 
     def is_valid_move(self, board, destination):
         if self.is_white:
@@ -49,11 +61,8 @@ class Pawn(Piece):
                 if board[destination].is_white == False:
                     return True
                 # Check for en passant movement
-                    previous_move = board.history[-1]
-                    if (isinstance(previous_move[0], Pawn) and
-                    previous_move[1][1] - previous_move[2][1] == 2 and
-                    previous_move[2][0] == destination[0] and self.location[1] == 4):
-                        return True
+                if self.valid_en_passant(board, destination):
+                    return True
             # Check for vertical movement - 1 square
             if (self.location[1] + 1 == destination[1] and
                 self.location[0] == destination[0]):
@@ -73,12 +82,8 @@ class Pawn(Piece):
                     or self.location[0] - 1 == destination[0]):
                 if board[destination].is_white:
                     return True
-                # Check for en passant movement    
-                    previous_move = board.history[-1]
-                    if (isinstance(previous_move[0], Pawn) and
-                    previous_move[1][1] - previous_move[2][1] == -2 and
-                    previous_move[2][0] == destination[0] and self.location[1] == 3):
-                        return True
+                if self.valid_en_passant(board, destination):
+                    return True
             # Check for vertical movement - 1 square
             if (self.location[1] - 1 == destination[1] and
                 self.location[0] == destination[0]):

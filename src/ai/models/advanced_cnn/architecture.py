@@ -18,33 +18,29 @@ class Architecture:
         from keras.initializers import RandomUniform as RU, RandomNormal as RN
         from itertools import product
         conv_layer_infos = [
-                ##{'1 16NLayer': (1, [16], [(4, 4)], ['relu'])},
-                {'1 32 N5sLayer': (1, [32], [(5, 5)], ['relu'])},
-                #{'1 32N4sLayer': (1, [32], [(4, 4)], ['relu'])},
-                #{'1 32N3sLayer': (1, [32], [(3, 3)], ['relu'])},
-                #{'1 64NLayer': (1, [64], [(4, 4)], ['relu'])},
+                {'5Slider Layer': (1, [16], [(4, 4)], ['relu'])},
+                {'4Slider Layer': (1, [32], [(4, 4)], ['relu'])},
+                {'3Slider Layer': (1, [16], [(3, 3)], ['relu'])},
+                {'2Slider Layer': (1, [32], [(3, 3)], ['relu'])},
                 ]
         dense_layer_infos = [
-                {'1 16NLayer': (1, [16], ['sigmoid'])},
-                {'1 32NLayer': (1, [32], ['sigmoid'])},
-                {'1 64NLayer': (1, [64], ['sigmoid'])},
-                {'2 LayersSig/Rel': (2, [32, 64], ['relu', 'sigmoid'])},
-                {'2 LayersSig/Sig': (2, [32, 64], ['sigmoid', 'sigmoid'])},
-                {'3 Layers': (3, [256, 128, 64], ['relu', 'relu', 'sigmoid'])},
+                {'128-12N Layer': (1, [[12], [128]], ['sigmoid'])},
+                {'256-24N Layer': (1, [[24], [256]], ['sigmoid'])},
+                {'512-48N Layer': (1, [[48], [512]], ['sigmoid'])},
                 ]
 
         initializers = [
-                #{'Small Uniform Weights': RU(minval=0.00000001, maxval=0.0000001)},
-                {'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
-                #{'Small Normal Weights': RN(std=0.0000001)},
+                {'Small Uniform Weights': RU(minval=0.0000001, maxval=0.000001)},
+                #{'Large Uniform Weights': RU(minval=0.00001, maxval=0.0001)},
+                #{'Small Normal Weights': RN(stddev=0.000001)},
                 ]
         optimizers = [
-                {'RMSprop': RMSprop(learning_rate=0.000001)},
-                #{'Adam': Adam()},
+                #{'RMSprop': RMSprop(learning_rate=0.0015)},
+                #{'Adam': Adam(learning_rate=0.0015)},
                 {'Nadam': Nadam()},
                 ]
         loss_metrics = [
-                {'Categorical-crossentropy': 'categorical_crossentropy'},
+                {'Categorical-crossentropy': ('categorical_crossentropy', 'categorical_accuracy')},
                 ]
         for info in product(dense_layer_infos, conv_layer_infos, initializers, optimizers, loss_metrics):
             dense_layer_info, conv_layer_info, initializer, optimizer, loss_metric = info
@@ -67,6 +63,54 @@ class Architecture:
                 }
 
 
+    def build_model(self, input_shape, output_shapes):
+        from keras.models import Model
+        from keras.layers import Input, Conv2D, Dense, Flatten
+        self._load_configurations()
+        inputs = Input(shape=input_shape)
+        for ID in self.configurations:
+            configuration = self.configurations[ID]
+            d_layer_info, c_layer_info, initializer, optimizer, loss_metric = configuration
+            d_num_layers, d_density, d_activation, = d_layer_info
+            c_num_layers, c_density, c_sliders, c_activation, = c_layer_info
+            for network in ['K', 'Q', 'R', 'N', 'B', 'P']:
+                x = inputs
+                for i in range(c_num_layers):
+                    x = Conv2D(
+                            c_density[i],
+                            c_sliders[i],
+                            activation=c_activation[i],
+                            kernel_initializer=initializer)(x)
+                x = Flatten()(x)
+                for i in range(d_num_layers):
+                    x = Dense(
+                            d_density[1][i],
+                            d_activation[i],
+                            kernel_initializer=initializer)(x)
+                outputs = Dense(output_shapes[0][0], output_shapes[0][1])(x)
+                model = Model(inputs=inputs, outputs=outputs)
+                model.compile(optimizer, loss_metric[0], [loss_metric[1]])
+                self.models[ID][network] = model
+            x = inputs
+            for i in range(c_num_layers):
+                x = Conv2D(
+                        c_density[i],
+                        c_sliders[i],
+                        activation=c_activation[i],
+                        kernel_initializer=initializer)(x)
+            x = Flatten()(x)
+            for i in range(d_num_layers):
+                x = Dense(
+                        d_density[0][i],
+                        d_activation[i],
+                        kernel_initializer=initializer)(x)
+            outputs = Dense(output_shapes[1][0], output_shapes[1][1])(x)
+            model = Model(inputs=inputs, outputs=outputs)
+            model.compile(optimizer, loss_metric[0], [loss_metric[1]])
+            self.models[ID]['S'] = model
+
+
+
     def _load_models(self):
         from os import listdir
         from keras.models import load_model
@@ -75,14 +119,8 @@ class Architecture:
         for brain in listdir(brain_location):
             if 'best' in brain:
                 ID = brain.split('best_')[1][0]
-                self.best_model[ID] = load_model(brain_location + brain)
-        '''
-            elif '.h5' in brain:
-                name = brain.split('_')
-                ID = ' '.join(name[0:10])
-                network = name[10]
-                self.models[ID][network] = load_model(brain_location + brain)
-        '''
+                self.best_model[ID] = load_model(brain_location + brain,
+                        compile=False)
 
 
     def train(self, batch_size, epochs):
@@ -110,15 +148,16 @@ class Architecture:
         for ID in self.data:
             for model in self.performances:
                 performances = list(map(lambda x: \
-                    (x.history['loss'], x.history['val_loss']),
+                    (x.history['categorical_accuracy'], x.history['val_categorical_accuracy']),
                     self.performances[model][ID]))
                 candidates[ID].append((model, performances))
         for key in candidates:
             candidates[key] = sorted(candidates[key], key=lambda x: \
-                    x[1][-1][-1][-1])
+                    -x[1][-1][-1][-1])
         for key in candidates:
-            self.best_model[key] = self.models[candidates[key][0][0]][key]
-        with open(self.location + '/performances/performance.txt', 'w') as fp:
+            name = candidates[key][0][0]
+            self.best_model[key] = (name, self.models[name][key])
+        with open(self.location + '/performances/performances.txt', 'a') as fp:
             for key in candidates:
                 output = f'\nPerformances for {key} network\n'
                 for perf in candidates[key]:
@@ -130,46 +169,9 @@ class Architecture:
                 output += '\n\n'
                 fp.write(output)
         for ID in self.best_model:
-            model = self.best_model[ID]
-            model.save(f'{self.location}/brain/best_{ID}.h5',
+            piece, model = self.best_model[ID]
+            model.save(f'{self.location}/brain/{piece}_best_{ID}.h5',
                     include_optimizer=False)
-
-
-    def build_model(self, input_shape, output_shapes):
-        from keras.models import Model
-        from keras.layers import Input, Conv2D, Dense, Flatten
-        self._load_configurations()
-        inputs = Input(shape=input_shape)
-        for ID in self.configurations:
-            configuration = self.configurations[ID]
-            d_layer_info, c_layer_info, initializer, optimizer, loss_metric = configuration
-            d_num_layers, d_density, d_activation, = d_layer_info
-            c_num_layers, c_density, c_sliders, c_activation, = c_layer_info
-            for network in ['K', 'Q', 'R', 'N', 'B', 'P']:
-                x = inputs
-                for i in range(c_num_layers):
-                    x = Conv2D(c_density[i], c_sliders[i],
-                            activation=c_activation[i],
-                            kernel_initializer=initializer)(x)
-                x = Flatten()(x)
-                for i in range(d_num_layers):
-                    x = Dense(d_density[i], d_activation[i], kernel_initializer=initializer)(x)
-                outputs = Dense(output_shapes[0][0], output_shapes[0][1])(x)
-                model = Model(inputs=inputs, outputs=outputs)
-                model.compile(optimizer, loss_metric, [loss_metric])
-                self.models[ID][network] = model
-            x = inputs
-            for i in range(c_num_layers):
-                x = Conv2D(c_density[i], c_sliders[i],
-                        activation=c_activation[i],
-                        kernel_initializer=initializer)(x)
-            x = Flatten()(x)
-            for i in range(d_num_layers):
-                x = Dense(d_density[i]//2, d_activation[i], kernel_initializer=initializer)(x)
-            outputs = Dense(output_shapes[1][0], output_shapes[1][1])(x)
-            model = Model(inputs=inputs, outputs=outputs)
-            model.compile(optimizer, loss_metric, [loss_metric])
-            self.models[ID]['S'] = model
 
 
     def clear_data(self):

@@ -22,23 +22,26 @@ class CnnBasic(ModelInfo):
     def __init__(self, game, location):
         super().__init__(game, location)
         self.model = Architecture('RMSProp', location)
+        self.piece_map = {
+                0:'P', 1:'B', 2:'N', 3:'R', 4:'Q', 5:'K',
+                'P':0, 'B':1, 'N':2, 'R':3, 'Q':4, 'K':5
+                }
         self.turn = 1
 
     def _predict(self, board, is_white):
         from numpy import set_printoptions
+        set_printoptions(suppress=True)
         phase = 'early_game' if self.turn <= 10 \
                 else 'mid_game' if self.turn <= 25 \
                 else 'late_game'
-        set_printoptions(suppress=True)
-        piece_map = {0:'P', 1:'B', 2:'N', 3:'R', 4:'Q', 5:'K'}
-        dp = self.boards_to_datapoints(board, is_white)
+        dp = self.boards_to_datapoints(board, None, is_white)
         model = self.model.get_model(phase, 'S')
         prediction = model.predict(dp)[0].round(3)
         self.logger.debug(f'Piece probabilities: [P, B, N, R, Q, K]: {prediction}')
         for index in range(len(prediction)):
             if prediction[index] == max(prediction):
                 break
-        piece_model = self.model.get_model(phase, piece_map[index])
+        piece_model = self.model.get_model(phase, self.piece_map[index])
         prediction = piece_model.predict(dp)[0].round(3)
         board_move = prediction.reshape((8,8))
         max_val = max(prediction.reshape((-1,)))
@@ -55,7 +58,7 @@ class CnnBasic(ModelInfo):
                     self.logger.debug(f'row,column is: {(row, column)}')
                     self.logger.debug(f'destination is: {destination}')
         for piece in board.white_pieces if is_white else board.black_pieces:
-            if str(piece).upper() == piece_map[index] \
+            if str(piece).upper() == self.piece_map[index] \
                     and board.is_valid_move(piece, (destination//10, destination%10)):
                 source = piece.location[0]*10 + piece.location[1]
                 self.logger.debug(f'source is: {source}')
@@ -105,15 +108,16 @@ class CnnBasic(ModelInfo):
         self.model.add_model('S', model)
 
     def _train_model(self):
-        for i in range(40):
-            num_datapoints = 5000
+        self.logger.info('Building models')
+        self.model.build_model((8, 8, 6), [(64, 'softmax'), (6, 'softmax')])
+        iterations = 24
+        num_datapoints = 5000
+        for it in range(iterations):
+            self.logger.info(f'Training models... {it*(100//iterations)}% done')
             self.model.clear_data()
-            self.logger.info(f'Begin downloading data: {i*10}% done')
-            for i, data in enumerate(self.datapoints(num_datapoints)):
-                if i >= 0 and i*100 % num_datapoints == 0:
-                    self.logger.debug(f'{i*100//num_datapoints}% done downloading')
+            for data in self.datapoints(num_datapoints):
                 boards, moves = data
-                self.boards_to_datapoints(boards, True, moves)
+                self.boards_to_datapoints(boards, moves, True)
             self.model.prepare_model()
             self.logger.info(f'Learning {self.model.name} network')
             for tp in self.model.get_models():
@@ -159,9 +163,8 @@ class CnnBasic(ModelInfo):
         pyplot.show()
 
 
-    def boards_to_datapoints(self, boards, is_white=True, moves=None):
+    def boards_to_datapoints(self, boards, moves=None, is_white=True):
         from numpy import array
-        piece_map = {'P':0, 'B':1, 'N':2, 'R':3, 'Q':4, 'K':5}
         if not moves:
             self.logger.debug('Begin prediction')
             board_direction = range(8) if is_white else range(7, -1, -1)
@@ -172,7 +175,7 @@ class CnnBasic(ModelInfo):
                     dp = [0]*6
                     if (piece := boards[column,row]).value != 0:
                         value = 1 if piece.is_white == is_white else -1
-                        dp[piece_map[str(piece).upper()]] = value
+                        dp[self.piece_map[str(piece).upper()]] = value
                     cur_row.append(array(dp))
                 x_data.append(array(cur_row))
             x_data = array(x_data)
@@ -184,7 +187,7 @@ class CnnBasic(ModelInfo):
         for i in range(len(boards)):
             board = boards[i]
             piece = boards[i][moves[i][0]]
-            index = piece_map[str(piece).upper()]
+            index = self.piece_map[str(piece).upper()]
             source = moves[i][0] if i % 2 == 0 else (moves[i][0]//10)*10 + (7-moves[i][0]%10)
             destination = moves[i][1] if i % 2 == 0 else (moves[i][1]//10)*10 + (7-moves[i][1]%10)
             move = (source, destination)
@@ -197,7 +200,7 @@ class CnnBasic(ModelInfo):
                     dp = [0]*6
                     if str(cur_piece) != '.':
                         value = 1 if not(cur_piece.is_white) == i % 2 else -1
-                        dp[piece_map[str(cur_piece).upper()]] = value
+                        dp[self.piece_map[str(cur_piece).upper()]] = value
                     cur_row.append(dp)
                 x_data.append(array(cur_row))
             x_data = array(x_data)

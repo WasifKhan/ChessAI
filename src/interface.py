@@ -62,7 +62,7 @@ class Interface:
         scores = [0]
         for i in range(num_games):
             self.game = Game()
-            white_ai = AI(self.game.__init__(), 0)
+            white_ai = AI(self.game.__init__(), 4)
             black_ai = AI(self.game.__init__(), 2)
             self.game.set_names(white_ai.name, black_ai.name)
             AIs = [white_ai, black_ai]

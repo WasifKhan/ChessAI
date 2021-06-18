@@ -126,15 +126,14 @@ class Board:
 
 
     def is_valid_move(self, piece, destination):
-        if self._check_after_move(piece, destination):
+        if not piece.is_valid_move(self, destination):
             return False
-        return piece.is_valid_move(self, destination)
+        return not self._check_after_move(piece, destination)
 
 
     def move(self, piece, destination):
         self.history.append((piece, piece.location, destination, self.value()))
         self._castle(piece, destination)
-        self._enpassant(piece, destination)
         self._move_piece(piece, destination)
         self._promote(piece, destination)
         self._checkmate(piece, destination)
@@ -149,22 +148,26 @@ class Board:
     def _check_after_move(self, piece, destination):
         if type(destination) == int:
             destination = (destination//10, destination%10)
-        if (captured_piece := self[destination]).is_white == piece.is_white:
-            return False
+        en_passant = None
+        if isinstance(piece, Pawn) and piece.valid_en_passant(self, destination):
+            en_passant = destination[0], destination[1] - 1 if piece.is_white else destination[1] + 1
+        captured_piece = self[en_passant] if en_passant else self[destination]
         self[destination] = piece
         self[piece.location] = Square(piece.location,
                 piece.location[0]*10+piece.location[1])
+        if en_passant:
+            self[en_passant] = Square(en_passant, en_passant[0]*10+en_passant[1])
         piece_location = piece.location
         piece.location = destination
-        if self._check(piece.is_white, captured_piece):
-            piece.location = piece_location
-            self[piece.location] = piece
-            self[destination] = captured_piece
-            return True
+        ret_val = self._check(piece.is_white, captured_piece)
         piece.location = piece_location
         self[piece.location] = piece
-        self[destination] = captured_piece
-        return False
+        if en_passant:
+            self[en_passant] = captured_piece
+            self[destination] = Square(destination, destination[0]*10+destination[1])
+        else:
+            self[destination] = captured_piece
+        return ret_val
 
 
     def _check(self, is_white, excluded=None):
@@ -193,18 +196,6 @@ class Board:
                 self[rook_location] = Square(rook_location, rook_location[0]*10 + rook_location[1])
 
 
-    def _enpassant(self, piece, destination):
-        if isinstance(piece, Pawn):
-            if destination[0] in {piece.location[0]-1, piece.location[0]+1} \
-                    and self[destination].is_white == None:
-                capture_location = destination[0], destination[1] - 1 if piece.is_white else destination[1] + 1
-                capture_piece = self[capture_location]
-                self.white_pieces.remove(capture_piece) \
-                    if capture_piece.is_white \
-                    else self.black_pieces.remove(capture_piece)
-                self[capture_location] = Square(capture_location, capture_location[0]*10 + capture_location[1])
-
-
     def _promote(self, piece, destination):
         '''
         Minor bug - queen id should be incremented, not set to 2.
@@ -230,11 +221,16 @@ class Board:
 
 
     def _move_piece(self, piece, destination):
+        en_passant = None
+        if isinstance(piece, Pawn) \
+                and self[destination].is_white == None \
+                and destination[0] != piece.location[0]:
+            en_passant = destination[0], destination[1] - 1 if piece.is_white else destination[1] + 1
         previous_location = piece.location
         piece.move(destination)
         ID = 1 if isinstance(piece, Queen) else piece.ID
         self.move_ID = str(piece).upper() + str(ID) + str(piece.move_ID)
-        captured_piece = self[destination]
+        captured_piece = self[en_passant] if en_passant else self[destination]
         if (isinstance(captured_piece, Piece)):
             if captured_piece.is_white:
                 self.white_pieces.remove(captured_piece)
@@ -242,6 +238,8 @@ class Board:
                 self.black_pieces.remove(captured_piece)
         self[destination] = piece
         self[previous_location] = Square(previous_location, previous_location[0]*10 + previous_location[1])
+        if en_passant:
+            self[en_passant] = Square(en_passant, en_passant[0]*10+en_passant[1])
 
 
     def _add_piece(self, piece):
