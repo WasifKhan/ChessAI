@@ -10,18 +10,6 @@ from interface import Interface
 CURRENT_AI = 2
 
 
-class Window(tk.Frame):
-    def __init__(self, master=None):
-        tk.Frame.__init__(self, master)
-        self.master = master
-        self.pack(fill=tk.BOTH, expand=1)
-        load = Image.open('./frontend/images/chess_board.png')
-        render = ImageTk.PhotoImage(load)
-        img = tk.Label(self, image=render)
-        img.image = render
-        img.place(x=0, y=0)
-
-
 class View:
     def __init__(self):
         self.interface = Interface()
@@ -40,10 +28,18 @@ class View:
         self.current_click = None
 
         root = tk.Tk()
+
+        canvas = tk.Canvas(root, width=700, height=700)
+        canvas.pack()
+
+        load = ImageTk.PhotoImage(file=\
+                './frontend/images/chess_board.png')
+        bg=canvas.create_image(0, 0, image=load, anchor=tk.NW)
+        
         self.root = root
-        app = Window(root)
         root.wm_title('Chess')
         root.geometry('840x770')
+        
         white_king_photo = ImageTk.PhotoImage(file = \
                 './frontend/images/pieces_image/king_white.png')
         black_king_photo = ImageTk.PhotoImage(file = \
@@ -53,7 +49,7 @@ class View:
         black_queen_photo = ImageTk.PhotoImage(file = \
                 './frontend/images/pieces_image/queen_black.png')
 
-
+        '''
         for row in range(8):
             root.columnconfigure(row, weight=1, minsize=50)
             root.rowconfigure(row, weight=1, minsize=50)
@@ -66,7 +62,7 @@ class View:
                 piece['command'] = lambda r=piece: self.piece(r)
                 piece.pack(padx=0, pady=0)
                 self.squares[piece] = column * 10 + row
-
+        '''
         btm_frame = tk.Frame(master=root, relief=tk.RAISED, borderwidth=6)
         btm_frame.pack(side=tk.BOTTOM)
         resign_button = tk.Button(master=btm_frame, text='Resign', fg='red')
