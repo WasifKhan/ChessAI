@@ -15,7 +15,7 @@ class Window(tk.Frame):
         tk.Frame.__init__(self, master)
         self.master = master
         self.pack(fill=tk.BOTH, expand=1)
-        load = Image.open('./frontend/images/bg_chessboard.png')
+        load = Image.open('./frontend/images/chess_board.png')
         render = ImageTk.PhotoImage(load)
         img = tk.Label(self, image=render)
         img.image = render
@@ -43,20 +43,30 @@ class View:
         self.root = root
         app = Window(root)
         root.wm_title('Chess')
-        root.geometry('640x470')
+        root.geometry('840x770')
+        white_king_photo = ImageTk.PhotoImage(file = \
+                './frontend/images/pieces_image/king_white.png')
+        black_king_photo = ImageTk.PhotoImage(file = \
+                './frontend/images/pieces_image/king_black.png')
+        white_queen_photo = ImageTk.PhotoImage(file = \
+                './frontend/images/pieces_image/queen_white.png')
+        black_queen_photo = ImageTk.PhotoImage(file = \
+                './frontend/images/pieces_image/queen_black.png')
+
 
         for row in range(8):
-            root.columnconfigure(row, weight=1, minsize=75)
+            root.columnconfigure(row, weight=1, minsize=50)
             root.rowconfigure(row, weight=1, minsize=50)
             for column in range(8):
                 frame = tk.Frame(master=app,
                             relief=tk.RAISED,
-                            borderwidth=4)
-                frame.grid(row=7-row, column=column, padx=5, pady=5)
-                piece = tk.Button(master=frame, text=f'({column}, {row})')
+                            borderwidth=3)
+                frame.grid(row=7-row, column=column, padx=9, pady=9)
+                piece = tk.Button(master=frame, image=white_king_photo, width=50, height=50)
                 piece['command'] = lambda r=piece: self.piece(r)
-                piece.pack(padx=5, pady=5)
+                piece.pack(padx=0, pady=0)
                 self.squares[piece] = column * 10 + row
+
         btm_frame = tk.Frame(master=root, relief=tk.RAISED, borderwidth=6)
         btm_frame.pack(side=tk.BOTTOM)
         resign_button = tk.Button(master=btm_frame, text='Resign', fg='red')

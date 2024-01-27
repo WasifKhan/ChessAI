@@ -13,7 +13,7 @@ class DataExtractor(Parser):
         self.destination = 'ai/data/dataset/'
         self.raw_data = {
                 'link_start': 'https://database.lichess.org/standard/lichess_db_standard_rated_',
-                'link_end': '.pgn.bz2',
+                'link_end': '.pgn.zst', #.pgn.bz2?
                 'start_year': 2018,
                 'cur_year': localtime()[0] + 1,
                 'cur_month': localtime()[1],
